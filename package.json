@@ -1,0 +1,14 @@
+{
+  "name": "cinar-tattoo",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "node --disable-warning=ExperimentalWarning --watch-path=functions --watch-path=dev dev/server.mjs",
+    "dev:lan": "node --disable-warning=ExperimentalWarning dev/server.mjs --lan",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.mjs\"",
+    "e2e": "node --disable-warning=ExperimentalWarning dev/e2e.mjs"
+  }
+}
