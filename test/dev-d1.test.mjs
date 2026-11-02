@@ -232,6 +232,31 @@ test('createD1 makes missing folders and persists to the file; close() releases 
   assert.equal(await reopened.prepare('SELECT v FROM t').first('v'), 'kalıcı');
   reopened.close();
 
-  // No retries on purpose: an open handle would show up here as EBUSY.
-  await rm(join(dir, 'nested'), { recursive: true });
+  // A leaked handle never goes away, so it still fails here (EBUSY); the few short retries
+  // only cover a virus scanner that briefly holds the freshly written file.
+  await rm(join(dir, 'nested'), { recursive: true, maxRetries: 3, retryDelay: 100 });
+});
+
+test('the returned object can be wrapped: its methods are own functions that work detached from it', async (t) => {
+  const db = memoryDb(t);
+  for (const name of ['prepare', 'batch', 'exec', 'close']) {
+    assert.ok(Object.hasOwn(db, name) && typeof db[name] === 'function', name);
+  }
+
+  // What a test that wraps env.DB does: copy the object and override prepare().
+  const { prepare, batch, exec } = db;
+  const wrapped = {
+    ...db,
+    prepare(sql) {
+      if (sql.startsWith('INSERT')) throw new Error('blocked by the wrapper');
+      return prepare(sql);
+    },
+  };
+  await exec('CREATE TABLE t (id INTEGER PRIMARY KEY)');
+  assert.throws(() => wrapped.prepare('INSERT INTO t DEFAULT VALUES'), /blocked by the wrapper/);
+
+  const [read] = await wrapped.batch([wrapped.prepare('SELECT 1 AS one')]);
+  assert.deepEqual(read.results, [{ one: 1 }]);
+  const [write] = await batch([prepare('INSERT INTO t DEFAULT VALUES')]);
+  assert.equal(write.meta.changes, 1);
 });

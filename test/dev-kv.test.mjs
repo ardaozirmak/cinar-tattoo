@@ -195,6 +195,21 @@ test('list() refuses limit and cursor instead of silently ignoring them', async 
   await assert.rejects(kv.list({ cursor: 'abc' }), /limit|cursor/);
 });
 
+test('the returned object can be wrapped: its methods are own functions that work detached from it', async (t) => {
+  const { kv } = await tempKv(t);
+  for (const name of ['get', 'getWithMetadata', 'put', 'delete', 'list']) {
+    assert.ok(Object.hasOwn(kv, name) && typeof kv[name] === 'function', name);
+  }
+
+  const { get, getWithMetadata, put, delete: remove, list } = kv;
+  await put('k', 'v', { metadata: { m: 1 } });
+  assert.equal(await get('k'), 'v');
+  assert.deepEqual(await getWithMetadata('k'), { value: 'v', metadata: { m: 1 } });
+  assert.deepEqual((await list()).keys, [{ name: 'k', metadata: { m: 1 } }]);
+  await remove('k');
+  assert.equal(await get('k'), null);
+});
+
 test('createKV creates its folder, and the data outlives the instance', async (t) => {
   const { dir } = await tempKv(t);
   const nested = join(dir, 'not', 'yet', 'there');
