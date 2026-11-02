@@ -1,0 +1,13 @@
+# Rules for the emulator tests. Every block whose pattern matches applies, in file order;
+# a header that several blocks (or one block twice) set is joined with ", ".
+/*
+  X-Fixture: all
+  X-Joined: one
+/a.txt
+  X-Exact: yes
+  X-Joined: two
+/dir/*
+  X-Splat: dir
+  X-Url: http://example.test:8080/x
+  Link: </one>; rel=preload
+  Link: </two>; rel=preload
