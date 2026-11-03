@@ -11,6 +11,14 @@ Galerideki 28 fotoğrafı stüdyo sahibi seçti (2026-11-03). Fotoğraflar masa�
 | `kalıcı` | Kalıcı dövme | 9 |
 | `geçici` | Geçici dövme | 10 |
 | `piercing` | Piercing | 9 |
+| `kulak` | Kulak delme | 3 |
+
+`kulak` ve `piercing` klasörlerine sonradan 9 fotoğraf daha eklendi, ama bunlar galeriye konmadı. Hepsi takı markası katalog fotoğrafına benziyor (stüdyo ışığı, model, düz arka plan) ve büyük olasılıkla Google'dan alındı. Başkasına ait bir fotoğrafı stüdyonun işiymiş gibi göstermek hem telif sorunu doğurur hem de müşteriyi yanıltır. Fotoğraflar stüdyonun kendi çekimiyse `dev/seed-images.py` içindeki listeye eklenebilir.
+
+Kenarda bekletilen fotoğraflar:
+
+- **kulak:** 160611, 160621, 161527, 161727, 161732, 161741
+- **piercing:** 161625, 161630, 161705
 
 "Tümü" sekmesinde kategoriler karışık sırayla gösterilir.
 
@@ -31,7 +39,7 @@ Betik her fotoğrafın kenarındaki ince arayüz çizgisini kırpar. Göğüs ya
 | Kalıcı dövme | Kadın portresi ve yapraklar (`kalici-07`) |
 | Geçici dövme | Renkli güller (`gecici-02`) |
 | Titanyum & çelik piercing | Sallantılı göbek piercing (`piercing-08`) |
-| Ağrısız kulak delme | Logo (küpe fotoğrafları gelince değişecek) |
+| Ağrısız kulak delme | Kulak dizisi, çiçek ve yıldız (`kulak-04`) |
 
 Kart görselleri `public/media/hizmet-*.jpg` dosyalarıdır; 560×700 boyutunda kırpılmıştır.
 

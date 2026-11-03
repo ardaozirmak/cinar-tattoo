@@ -89,17 +89,17 @@ test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
 // The owner's picks (2026-11-03), one folder per category, mixed: [seed_path, caption].
 const PICKS = [
   ['gecici-06', 'Chicano kol'], ['kalici-07', 'Kadın portresi ve yapraklar'], ['piercing-08', 'Sallantılı göbek piercing'],
-  ['gecici-02', 'Renkli güller'], ['kalici-03', 'Tüy ve kuşlar'], ['piercing-04', 'Kaş piercing'],
+  ['kulak-04', 'Kulak dizisi, çiçek ve yıldız'], ['gecici-02', 'Renkli güller'], ['kalici-03', 'Tüy ve kuşlar'],
 ];
 
-test('SEED_PHOTOS: the owner’s 28 picks, 10 geçici, 9 kalıcı and 9 piercing, mixed', () => {
-  assert.equal(SEED_PHOTOS.length, 28);
+test('SEED_PHOTOS: the owner’s 31 picks, 10 geçici, 9 kalıcı, 9 piercing and 3 kulak, mixed', () => {
+  assert.equal(SEED_PHOTOS.length, 31);
   assert.deepEqual(SEED_PHOTOS.slice(0, 6).map(({ seed_path, caption }) => [seed_path, caption]), PICKS);
   const per = (category) => SEED_PHOTOS.filter((photo) => photo.category === category).length;
-  assert.deepEqual([per('gecici'), per('dovme'), per('piercing')], [10, 9, 9]);
+  assert.deepEqual([per('gecici'), per('dovme'), per('piercing'), per('kulak')], [10, 9, 9, 3]);
   for (const photo of SEED_PHOTOS) {
     const folder = photo.seed_path.split('-')[0];
-    assert.equal(photo.category, { gecici: 'gecici', kalici: 'dovme', piercing: 'piercing' }[folder], photo.id);
+    assert.equal(photo.category, { gecici: 'gecici', kalici: 'dovme', piercing: 'piercing', kulak: 'kulak' }[folder], photo.id);
   }
   assert.deepEqual(SEED_PHOTOS[0], { id: 'seed-gecici-06', caption: 'Chicano kol', category: 'gecici', seed_path: 'gecici-06', width: 474, height: 790 });
 });

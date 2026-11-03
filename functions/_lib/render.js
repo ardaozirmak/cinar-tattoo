@@ -32,9 +32,9 @@ const ARTIST_NAME = 'Onur Aydoğan';
 const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
 // One picture per kind of service, matched on the service's name (the owner can rename and reorder
 // them): the studio's own work from the gallery's seed photos, cropped to 4:5 (docs/GORSELLER.md).
-// Kulak delme has no photo yet (the earrings are coming), so it shows the logo. "kulak" goes first.
+// "kulak" goes first, so that an ear piercing gets the ear.
 const SERVICE_PHOTOS = [
-  { key: 'kulak', words: ['kulak'], src: '/seed/logo-thumb.jpg', width: 640, height: 640, alt: '', logo: true },
+  { key: 'kulak', words: ['kulak'], src: '/media/hizmet-kulak.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da delinen kulak: çiçek ve yıldız küpeler' },
   { key: 'piercing', words: ['piercing'], src: '/media/hizmet-piercing.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan göbek piercing, sallantılı taşlı uç' },
   { key: 'gecici', words: ['geçici', 'çıkartma'], src: '/media/hizmet-gecici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan renkli güller, ön kol' },
   { key: 'kalici', words: ['dövme'], src: '/media/hizmet-kalici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan kadın portresi ve yapraklar dövmesi' },

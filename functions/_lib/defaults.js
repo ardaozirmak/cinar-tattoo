@@ -50,7 +50,7 @@ export const DEFAULT_SERVICES = [
 ];
 
 // The gallery a new site opens with, in position order: the photos the owner picked on 2026-11-03,
-// one folder per category (kalıcı, geçici, piercing), mixed so that "Tümü" alternates them. They
+// one folder per category (kalıcı, geçici, piercing, kulak), mixed so that "Tümü" alternates them. They
 // are the studio's own work, from its Instagram. The sizes are those of
 // public/seed/<seed_path>-full.jpg, which dev/seed-images.py makes.
 const photo = (path, caption, category, width, height) => ({ id: `seed-${path}`, caption, category, seed_path: path, width, height });
@@ -59,11 +59,13 @@ export const SEED_PHOTOS = [
   photo('gecici-06', 'Chicano kol', 'gecici', 474, 790),
   photo('kalici-07', 'Kadın portresi ve yapraklar', 'dovme', 469, 546),
   photo('piercing-08', 'Sallantılı göbek piercing', 'piercing', 466, 776),
+  photo('kulak-04', 'Kulak dizisi, çiçek ve yıldız', 'kulak', 470, 780),
   photo('gecici-02', 'Renkli güller', 'gecici', 466, 791),
   photo('kalici-03', 'Tüy ve kuşlar', 'dovme', 471, 770),
   photo('piercing-04', 'Kaş piercing', 'piercing', 345, 499),
   photo('gecici-08', 'Aslan', 'gecici', 476, 690),
   photo('kalici-08', 'Yıldırım', 'dovme', 471, 695),
+  photo('kulak-01', 'Kulak memesi ve kıkırdak, taşlı', 'kulak', 275, 484),
   photo('piercing-01', 'Göbek piercing, kalp uçlu', 'piercing', 466, 574),
   photo('gecici-10', 'Uluyan kurt', 'gecici', 467, 781),
   photo('kalici-09', 'Örümcek', 'dovme', 342, 369),
@@ -74,6 +76,7 @@ export const SEED_PHOTOS = [
   photo('gecici-05', 'Kartlar ve şişe', 'gecici', 481, 776),
   photo('kalici-01', 'Bebek ayak izi', 'dovme', 464, 771),
   photo('piercing-07', 'Göbek piercing, sade', 'piercing', 471, 790),
+  photo('kulak-05', 'Industrial ve halkalar', 'kulak', 466, 786),
   photo('gecici-07', 'Maskeli portre', 'gecici', 464, 792),
   photo('kalici-06', 'Kalp ritmi ve kuş', 'dovme', 339, 491),
   photo('piercing-09', 'Göğüs arası piercing', 'piercing', 466, 776),
