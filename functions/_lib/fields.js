@@ -68,7 +68,8 @@ export const SETTINGS_FIELDS = [
   field('maps_url', 'Google Haritalar bağlantısı', 'url', 500),
   field('announcement_text', 'Duyuru metni', 'text', 140),
   field('announcement_on', 'Duyuru', 'flag', 1, { required: true }),
-  field('highlights', 'Öne çıkanlar', 'list', 40, { maxItems: 8 }),
+  // 80: an item is “title — detail” (the Sanatçımız list splits it at the dash).
+  field('highlights', 'Öne çıkanlar', 'list', 80, { maxItems: 8 }),
   field('hero_points', 'Giriş maddeleri', 'list', 60, { maxItems: 4 }),
   field('payment_text', 'Ödeme bilgisi', 'text', 60),
   field('instagram_followers', 'Instagram takipçi sayısı', 'text', 20),

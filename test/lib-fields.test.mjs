@@ -70,7 +70,7 @@ const EXPECTED_FIELDS = [
   ['maps_url', 'Google Haritalar bağlantısı', 'url', 500, false],
   ['announcement_text', 'Duyuru metni', 'text', 140, false],
   ['announcement_on', 'Duyuru', 'flag', 1, true],
-  ['highlights', 'Öne çıkanlar', 'list', 40, false],
+  ['highlights', 'Öne çıkanlar', 'list', 80, false],
   ['hero_points', 'Giriş maddeleri', 'list', 60, false],
   ['payment_text', 'Ödeme bilgisi', 'text', 60, false],
   ['instagram_followers', 'Instagram takipçi sayısı', 'text', 20, false],
@@ -95,7 +95,7 @@ test('every field carries its default, and only the list kinds carry an item lim
   }
   assert.deepEqual(
     SETTINGS_FIELDS.filter((field) => field.kind === 'list').map((field) => [field.key, field.maxItems, field.max]),
-    [['highlights', 8, 40], ['hero_points', 4, 60]],
+    [['highlights', 8, 80], ['hero_points', 4, 60]],
   );
 });
 
@@ -361,16 +361,16 @@ test('list settings: array in, JSON string out, empties dropped, item and count 
   assert.equal(accepted(patchOf({ hero_points: Array(4).fill('a') })).ok, true);
   assert.equal(rejected(patchOf({ hero_points: Array(5).fill('a') })), 'Giriş maddeleri en fazla 4 madde olabilir.');
 
-  // The length of an item: at most 40 and 60.
-  assert.equal(accepted(patchOf({ highlights: [chars(40)] })).ok, true);
-  assert.equal(rejected(patchOf({ highlights: ['kısa', chars(41)] })), 'Öne çıkanlar maddeleri en fazla 40 karakter olabilir.');
+  // The length of an item: at most 80 (a “title — detail” highlight) and 60.
+  assert.equal(accepted(patchOf({ highlights: [chars(80)] })).ok, true);
+  assert.equal(rejected(patchOf({ highlights: ['kısa', chars(81)] })), 'Öne çıkanlar maddeleri en fazla 80 karakter olabilir.');
   assert.equal(accepted(patchOf({ hero_points: [chars(60)] })).ok, true);
   assert.equal(rejected(patchOf({ hero_points: [chars(61)] })), 'Giriş maddeleri maddeleri en fazla 60 karakter olabilir.');
-  assert.equal(accepted(patchOf({ highlights: [` ${chars(40)} `] })).ok, true); // measured after trimming
+  assert.equal(accepted(patchOf({ highlights: [` ${chars(80)} `] })).ok, true); // measured after trimming
 });
 
 test('list settings: the count is checked before the length of the items', () => {
-  assert.equal(rejected(patchOf({ highlights: [chars(41), ...Array(8).fill('a')] })), 'Öne çıkanlar en fazla 8 madde olabilir.');
+  assert.equal(rejected(patchOf({ highlights: [chars(81), ...Array(8).fill('a')] })), 'Öne çıkanlar en fazla 8 madde olabilir.');
 });
 
 test('list settings: only an array of strings will do', () => {
@@ -622,7 +622,7 @@ test('a rejected value comes back with a message and nothing else', () => {
 // listSetting
 // ---------------------------------------------------------------------------------------------
 
-const DEFAULT_HIGHLIGHTS = ['20 yılı aşkın tecrübe', '2005’ten beri Esenler’de', 'Kişiye özel çizim', 'Kalıcı ve geçici dövme', 'Profesyonel piercing'];
+const DEFAULT_HIGHLIGHTS = ['+20 yıllık tecrübe — 2005’ten beri Esenler’de, aynı mahallede.', 'Güler yüz — Her soruna sabırla cevap; acele yok.', 'Hijyen — Tek kullanımlık iğne, paketi göz önünde açılır.', 'Müşteri memnuniyeti — Google yorumlarının hepsi 5 yıldız.'];
 const DEFAULT_HERO_POINTS = ['Kişiye özel dövme tasarımı', 'Profesyonel piercing uygulamaları', 'Kaliteli dövme malzemeleri'];
 
 test('listSetting reads a stored list', () => {

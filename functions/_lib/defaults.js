@@ -10,12 +10,13 @@ export const BRAND_NAME = 'Çınar Tattoo';
 
 export const DEFAULT_SETTINGS = {
   seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
-  seo_description: 'Esenler’de 2005’ten beri dövme ve piercing: Onur Aydoğan’ın stüdyosu. Kişiye özel çizim, steril ortam, Google yorumlarının hepsi 5 yıldız. WhatsApp’tan randevu al.',
+  // No review claim here: the reviews can change, a fixed claim in Google's snippet cannot.
+  seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum piercing ve kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, hijyen ve güler yüz. WhatsApp’tan randevu al.',
   // Each line of the hero title is one line of the H1; the last of two or three is set in italics.
   hero_title: 'Bir ömür taşıyacağın\ndövme.',
   hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
   about_title: 'Onur Aydoğan',
-  about_text: 'Onur Aydoğan 20 yılı aşkın süredir dövme yapıyor. Esenler’deki stüdyosunda dövme, piercing ve malzeme için seni bekliyor.',
+  about_text: '+20 yıllık tecrübe, güler yüz, hijyen ve müşteri memnuniyeti sunar.',
   hours: '10.00–23.00',
   hours_note: 'Duruma göre esneyebilir.',
   address: 'Nine Hatun Mah. İnönü Cd. No:11, Akman Ticaret Merkezi, 34220 Esenler / İstanbul',
@@ -25,7 +26,13 @@ export const DEFAULT_SETTINGS = {
   maps_url: '',
   announcement_text: '',
   announcement_on: '0',
-  highlights: JSON.stringify(['20 yılı aşkın tecrübe', '2005’ten beri Esenler’de', 'Kişiye özel çizim', 'Kalıcı ve geçici dövme', 'Profesyonel piercing']),
+  // The Sanatçımız list: each item is split at its first ' — ' into a bold title and a detail.
+  highlights: JSON.stringify([
+    '+20 yıllık tecrübe — 2005’ten beri Esenler’de, aynı mahallede.',
+    'Güler yüz — Her soruna sabırla cevap; acele yok.',
+    'Hijyen — Tek kullanımlık iğne, paketi göz önünde açılır.',
+    'Müşteri memnuniyeti — Google yorumlarının hepsi 5 yıldız.',
+  ]),
   hero_points: JSON.stringify(['Kişiye özel dövme tasarımı', 'Profesyonel piercing uygulamaları', 'Kaliteli dövme malzemeleri']),
   payment_text: '',
   instagram_followers: '18 bin+',
@@ -36,10 +43,10 @@ export const DEFAULT_SETTINGS = {
 };
 
 export const DEFAULT_SERVICES = [
-  { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan büyük parçalara, sana göre çizilen dövmeler.' },
-  { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenler için.' },
-  { id: 3, name: 'Piercing', description: 'Kulak, burun, göbek ve daha fazlası.' },
-  { id: 4, name: 'Dövme malzemeleri', description: 'Boya, iğne ve bakım ürünleri.' },
+  { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan tam kola, sana göre çizilen dövmeler.' },
+  { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenlere.' },
+  { id: 3, name: 'Titanyum piercing', description: 'Kulak, burun, göbek; titanyum takıyla.' },
+  { id: 4, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
 ];
 
 // The gallery a new site opens with, in position order: the Dergi prototype's 32 works (photos of

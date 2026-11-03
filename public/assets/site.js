@@ -528,6 +528,10 @@ function entrance() {
     const vid = $('.vid', clip);
     if (vid) once(clip, () => wipe(vid, (index % 2) * 140, 1400), 0.15);
   });
+  // the artist's photo, watched through its figure: the frame itself is clipped shut
+  const artist = $('.artist-ph');
+  const frame = artist && $('.artist-frame', artist);
+  if (frame) once(artist, () => wipe(frame, 0, 1500), 0.2);
   // blocks rise; their list items follow
   $$('[data-rise]').forEach((el) => {
     once(
