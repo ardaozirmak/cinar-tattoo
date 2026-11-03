@@ -75,6 +75,8 @@ const EXPECTED_FIELDS = [
   ['payment_text', 'Ödeme bilgisi', 'text', 60, false],
   ['instagram_followers', 'Instagram takipçi sayısı', 'text', 20, false],
   ['google_reviews_url', 'Google yorumları bağlantısı', 'url', 500, false],
+  ['google_rating', 'Google puanı', 'text', 4, false],
+  ['google_review_count', 'Google yorum sayısı', 'text', 8, false],
   ['tiktok_url', 'TikTok adresi', 'url', 200, false],
   ['email', 'E-posta', 'email', 100, false],
 ];
@@ -113,7 +115,7 @@ test('SETTINGS_GROUPS are in admin order, and the Google reviews link sits on th
     { id: 'contact', title: 'İletişim ekleri', tab: 'texts', keys: ['payment_text', 'instagram_followers', 'tiktok_url', 'email'] },
     { id: 'announcement', title: 'Duyuru', tab: 'texts', keys: ['announcement_text', 'announcement_on'] },
     { id: 'seo', title: 'Google’da görünüm', tab: 'texts', keys: ['seo_title', 'seo_description'] },
-    { id: 'reviews_link', title: 'Google yorumları bağlantısı', tab: 'reviews', keys: ['google_reviews_url'] },
+    { id: 'reviews_link', title: 'Google yorumları', tab: 'reviews', keys: ['google_reviews_url', 'google_rating', 'google_review_count'] },
   ]);
 });
 
@@ -151,7 +153,7 @@ test('the exported limits are the numbers the rules use', () => {
     {
       MAX_SERVICES: 12, SERVICE_NAME_MAX: 40, SERVICE_DESCRIPTION_MAX: 120,
       MAX_PRICE_GROUPS: 6, PRICE_GROUP_TITLE_MAX: 30, MAX_PRICE_ITEMS: 12, PRICE_ITEM_NAME_MAX: 40, PRICE_ITEM_DETAIL_MAX: 60, PRICE_ITEM_PRICE_MAX: 24,
-      MAX_REVIEWS: 30, REVIEW_NAME_MAX: 40, REVIEW_TEXT_MAX: 400, REVIEW_DATE_MAX: 20,
+      MAX_REVIEWS: 200, REVIEW_NAME_MAX: 40, REVIEW_TEXT_MAX: 2000, REVIEW_DATE_MAX: 20,
       CAPTION_MAX: 120,
     },
   );
@@ -520,7 +522,7 @@ const review = (overrides = {}) => ({ name: 'Defne G.', rating: 5, text: 'Çok g
 test('validatePrices and validateReviews bounds and exact messages (reviews)', () => {
   assert.deepEqual(validateReviews([]), { ok: true, reviews: [] });
   assert.equal(accepted(validateReviews(Array.from({ length: 30 }, () => review()))).reviews.length, 30);
-  assert.equal(rejected(validateReviews(Array.from({ length: 31 }, () => review()))), 'En fazla 30 yorum eklenebilir.');
+  assert.equal(rejected(validateReviews(Array.from({ length: 201 }, () => review()))), 'En fazla 200 yorum eklenebilir.');
 
   assert.equal(rejected(validateReviews([review({ name: '' })])), 'Yorumcu adı boş bırakılamaz.');
   assert.equal(rejected(validateReviews([review({ name: '  ' })])), 'Yorumcu adı boş bırakılamaz.');
@@ -537,7 +539,7 @@ test('validatePrices and validateReviews bounds and exact messages (reviews)', (
   assert.equal(rejected(validateReviews([review({ text: '' })])), 'Yorum metni boş bırakılamaz.');
   assert.equal(rejected(validateReviews([review({ text: ' \n ' })])), 'Yorum metni boş bırakılamaz.');
   assert.equal(accepted(validateReviews([review({ text: chars(400) })])).ok, true);
-  assert.equal(rejected(validateReviews([review({ text: chars(401) })])), 'Yorum metni en fazla 400 karakter olabilir.');
+  assert.equal(rejected(validateReviews([review({ text: chars(2001) })])), 'Yorum metni en fazla 2000 karakter olabilir.');
 
   for (const source of REVIEW_SOURCES) assert.equal(accepted(validateReviews([review({ source })])).reviews[0].source, source);
   for (const source of ['facebook', 'Google', 'GOOGLE', '', ' google', 'toString', '__proto__']) {
@@ -566,8 +568,8 @@ test('validateReviews keeps the order and a review’s own line breaks, and clea
 
 test('validateReviews measures a review the way the browser does, so emoji count twice', () => {
   const emoji = '🙏';
-  assert.equal(accepted(validateReviews([review({ text: emoji.repeat(200) })])).ok, true); // 400 units
-  assert.equal(rejected(validateReviews([review({ text: emoji.repeat(201) })])), 'Yorum metni en fazla 400 karakter olabilir.'); // 402
+  assert.equal(accepted(validateReviews([review({ text: emoji.repeat(1000) })])).ok, true); // 2000 units
+  assert.equal(rejected(validateReviews([review({ text: emoji.repeat(1001) })])), 'Yorum metni en fazla 2000 karakter olabilir.'); // 2002
 });
 
 test('validateReviews names the first problem in the order name, rating, text, source, date', () => {
@@ -622,7 +624,7 @@ test('a rejected value comes back with a message and nothing else', () => {
 // listSetting
 // ---------------------------------------------------------------------------------------------
 
-const DEFAULT_HIGHLIGHTS = ['+20 yıllık tecrübe — 2005’ten beri Esenler’de, aynı mahallede.', 'Güler yüz — Her soruna sabırla cevap; acele yok.', 'Hijyen — Tek kullanımlık iğne, paketi göz önünde açılır.', 'Müşteri memnuniyeti — Google yorumlarının hepsi 5 yıldız.'];
+const DEFAULT_HIGHLIGHTS = ['+20 yıllık tecrübe — 2005’ten beri Esenler’de, aynı mahallede.', 'Güler yüz — Her soruna sabırla cevap; acele yok.', 'Hijyen — Tek kullanımlık iğne, paketi göz önünde açılır.', 'Müşteri memnuniyeti — Google’da 178 yorum, puan 4,8.'];
 const DEFAULT_HERO_POINTS = ['Kişiye özel dövme tasarımı', 'Profesyonel piercing uygulamaları', 'Kaliteli dövme malzemeleri'];
 
 test('listSetting reads a stored list', () => {

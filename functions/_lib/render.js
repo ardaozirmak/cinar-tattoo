@@ -368,7 +368,10 @@ function hero(ctx) {
 function facts(ctx) {
   const items = ['<div class="fact"><b class="num">+20</b><span>yıllık tecrübe</span></div>'];
   if (!blank(ctx.settings.instagram_followers)) items.push(`<div class="fact"><b>${text(String(ctx.settings.instagram_followers).trim())}</b><span>Instagram takipçisi</span></div>`);
-  if (ctx.reviews.length > 0) {
+  const google = googleSummary(ctx);
+  if (ctx.reviews.length > 0 && google?.typed) {
+    items.push(`<div class="fact"><b class="num">${text(google.score)} ★</b><span>${text(google.count)} Google yorumu</span></div>`);
+  } else if (ctx.reviews.length > 0) {
     const fives = ctx.reviews.filter((review) => review.rating === 5).length;
     const all = ctx.reviews.length;
     const label = fives === all ? 'Google yorumu, hepsi 5 yıldız' : 'yorum 5 yıldız';
@@ -617,6 +620,18 @@ function servicePhoto(name, used) {
 // Google's "G", in its own colours, so the reviews read as Google reviews at a glance.
 const GOOGLE_G = `<svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
 
+// Google's score and review count: as typed in the panel (google_rating and google_review_count),
+// else worked out from the Google reviews on the site. null when there is neither.
+function googleSummary(ctx) {
+  const score = String(ctx.settings.google_rating ?? '').trim();
+  const count = String(ctx.settings.google_review_count ?? '').trim();
+  if (score !== '' && count !== '') return { score, count, typed: true };
+  const fromGoogle = ctx.reviews.filter((review) => review.source === 'google');
+  if (fromGoogle.length === 0) return null;
+  const average = fromGoogle.reduce((sum, review) => sum + Math.max(1, Math.min(5, Number(review.rating) || 5)), 0) / fromGoogle.length;
+  return { score: average.toFixed(1).replace('.', ','), count: String(fromGoogle.length), typed: false };
+}
+
 function reviews(ctx, no) {
   const items = ctx.reviews
     .map((review) => {
@@ -629,13 +644,11 @@ function reviews(ctx, no) {
     .join('\n          ');
   const reviewsUrl = blank(ctx.settings.google_reviews_url) ? '' : escapeHtml(String(ctx.settings.google_reviews_url).trim());
   const google = reviewsUrl === '' ? '' : `<a class="link" href="${reviewsUrl}" ${external}>Google’da gör ↗</a>`;
-  // The summary over the quote: Google's G, the average and how many Google reviews there are.
-  const fromGoogle = ctx.reviews.filter((review) => review.source === 'google');
+  // The summary over the quote: Google's G, the score and how many Google reviews there are.
+  const summary = googleSummary(ctx);
   let badge = '';
-  if (fromGoogle.length > 0) {
-    const average = fromGoogle.reduce((sum, review) => sum + Math.max(1, Math.min(5, Number(review.rating) || 5)), 0) / fromGoogle.length;
-    const score = average.toFixed(1).replace('.', ',');
-    const inner = `${GOOGLE_G}<span class="g-name">Google</span><b class="g-score num">${score}</b><span class="stars" aria-hidden="true">★★★★★</span><span class="g-count">${fromGoogle.length} Google yorumu</span>`;
+  if (summary !== null) {
+    const inner = `${GOOGLE_G}<span class="g-name">Google</span><b class="g-score num">${escapeHtml(summary.score)}</b><span class="stars" aria-hidden="true">★★★★★</span><span class="g-count">${escapeHtml(summary.count)} Google yorumu</span>`;
     badge =
       reviewsUrl === ''
         ? `<p class="g-badge">${inner}</p>`

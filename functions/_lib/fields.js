@@ -28,9 +28,10 @@ export const MAX_PRICE_ITEMS = 12; // per group
 export const PRICE_ITEM_NAME_MAX = 40;
 export const PRICE_ITEM_DETAIL_MAX = 60;
 export const PRICE_ITEM_PRICE_MAX = 24;
-export const MAX_REVIEWS = 30;
+// Room for every 4- and 5-star Google review with a text (178 reviews on Google in 2026-11).
+export const MAX_REVIEWS = 200;
 export const REVIEW_NAME_MAX = 40;
-export const REVIEW_TEXT_MAX = 400;
+export const REVIEW_TEXT_MAX = 2000;
 export const REVIEW_DATE_MAX = 20;
 export const CAPTION_MAX = 120;
 
@@ -74,6 +75,9 @@ export const SETTINGS_FIELDS = [
   field('payment_text', 'Ödeme bilgisi', 'text', 60),
   field('instagram_followers', 'Instagram takipçi sayısı', 'text', 20),
   field('google_reviews_url', 'Google yorumları bağlantısı', 'url', 500),
+  // What Google shows for the shop (e.g. 4,8 and 178). Blank: the site counts the reviews it has.
+  field('google_rating', 'Google puanı', 'text', 4),
+  field('google_review_count', 'Google yorum sayısı', 'text', 8),
   field('tiktok_url', 'TikTok adresi', 'url', 200),
   field('email', 'E-posta', 'email', 100),
 ];
@@ -89,7 +93,7 @@ export const SETTINGS_GROUPS = [
   { id: 'contact', title: 'İletişim ekleri', tab: 'texts', keys: ['payment_text', 'instagram_followers', 'tiktok_url', 'email'] },
   { id: 'announcement', title: 'Duyuru', tab: 'texts', keys: ['announcement_text', 'announcement_on'] },
   { id: 'seo', title: 'Google’da görünüm', tab: 'texts', keys: ['seo_title', 'seo_description'] },
-  { id: 'reviews_link', title: 'Google yorumları bağlantısı', tab: 'reviews', keys: ['google_reviews_url'] },
+  { id: 'reviews_link', title: 'Google yorumları', tab: 'reviews', keys: ['google_reviews_url', 'google_rating', 'google_review_count'] },
 ];
 
 // A Map, so that a key such as "constructor" or "__proto__" is simply unknown.

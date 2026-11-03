@@ -12,6 +12,9 @@ import { validatePrices, validateReviews, validateServices, validateSettingsPatc
 import { HttpError, json, readJson } from '../http.js';
 import { adminSettings } from './auth-handlers.js';
 
+// Up to 200 reviews of up to 2000 characters do not fit in readJson's default 64 KiB.
+const REVIEWS_BODY_MAX = 1048576;
+
 /** PUT /api/admin/settings {key: value, ...} → { settings }: every setting. A list setting is an array of strings. */
 export async function saveSettings({ request, db }) {
   const { values } = valid(validateSettingsPatch(await readJson(request)));
@@ -35,7 +38,7 @@ export async function savePrices({ request, db }) {
 
 /** PUT /api/admin/reviews {reviews: [{name, rating, text, source, date_text}]} → { reviews }: with their ids. */
 export async function saveReviews({ request, db, now }) {
-  const { reviews } = valid(validateReviews((await readJson(request))?.reviews));
+  const { reviews } = valid(validateReviews((await readJson(request, REVIEWS_BODY_MAX))?.reviews));
   await replaceReviews(db, reviews, now);
   return json({ reviews: (await getContent(db)).reviews });
 }

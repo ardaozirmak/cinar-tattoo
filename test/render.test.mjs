@@ -100,12 +100,14 @@ test('defaults: 31 work cards, the first is seed-gecici-06, 24 shown and 7 behin
   assert.ok(!html.includes('Temsili') && !html.includes('temsili'));
 });
 
-test('defaults: 13 reviews, the facts 26 years and 13 / 13, and never ÇINAR or the old lacivert', () => {
+test('defaults: 13 reviews, the facts 26 years and Google’s 4,8 from 178, and never ÇINAR or the old lacivert', () => {
   const html = page();
   assert.equal(count(html, '<li class="q">'), 13);
   assert.ok(html.includes('<div class="fact"><b class="num">+20</b><span>yıllık tecrübe</span></div>'));
   assert.ok(!html.includes('aynı mahallede</span></div>'));
-  assert.ok(html.includes('<b class="num">13 / 13</b><span>Google yorumu, hepsi 5 yıldız</span>'));
+  assert.ok(html.includes('<b class="num">4,8 ★</b><span>178 Google yorumu</span>'));
+  assert.ok(html.includes('<b class="g-score num">4,8</b>'));
+  assert.ok(!html.includes('hepsi 5 yıldız'));
   assert.ok(html.includes('<b>18 bin+</b><span>Instagram takipçisi</span>'));
   assert.ok(html.includes('<b>Steril</b><span>iğne göz önünde açılır</span>'));
   assert.ok(!html.includes('ÇINAR'));
@@ -345,7 +347,7 @@ test('reviews: every one is in the HTML with its stars, source and date; a 4-sta
     { id: 1, name: 'A', rating: 5, text: 'Harika.', source: 'google', date_text: '' },
     { id: 2, name: 'B', rating: 4, text: 'İyi.', source: 'instagram', date_text: 'Ekim 2026' },
   ];
-  const html = page({}, { reviews });
+  const html = page({ google_rating: '', google_review_count: '' }, { reviews });
   assert.equal(count(html, '<li class="q">'), 2);
   assert.ok(html.includes('<span class="stars" role="img" aria-label="5 üzerinden 4 yıldız">★★★★</span>'));
   assert.ok(html.includes('Instagram'));
@@ -359,7 +361,9 @@ test('reviews: every one is in the HTML with its stars, source and date; a 4-sta
   assert.ok(html.includes('<a class="g-badge" href='));
   assert.equal(count(html, 'class="g-logo"'), 2);
   assert.ok(page({ google_reviews_url: '' }, { reviews }).includes('<p class="g-badge">'));
-  assert.ok(!page({}, { reviews: [reviews[1]] }).includes('g-badge'));
+  assert.ok(!page({ google_rating: '', google_review_count: '' }, { reviews: [reviews[1]] }).includes('g-badge'));
+  // The score and the count typed in the panel win over the reviews on the site.
+  assert.ok(page({ google_rating: '4,8', google_review_count: '178' }, { reviews }).includes('<b class="g-score num">4,8</b>'));
 });
 
 test('prices: none by default; a group with an empty price asks on WhatsApp, a set price is shown', () => {
@@ -403,7 +407,7 @@ test('sanatçı: the first section (01), the photo, the about title and text, an
   assert.ok(list.includes('<li><i class="num">01</i><b>+20 yıllık tecrübe</b><span>2005’ten beri Esenler’de, aynı mahallede.</span></li>'));
   assert.ok(list.includes('<li><i class="num">02</i><b>Güler yüz</b><span>Her soruna sabırla cevap; acele yok.</span></li>'));
   assert.ok(list.includes('<li><i class="num">03</i><b>Hijyen</b><span>Tek kullanımlık iğne, paketi göz önünde açılır.</span></li>'));
-  assert.ok(list.includes('<li><i class="num">04</i><b>Müşteri memnuniyeti</b><span>Google yorumlarının hepsi 5 yıldız.</span></li>'));
+  assert.ok(list.includes('<li><i class="num">04</i><b>Müşteri memnuniyeti</b><span>Google’da 178 yorum, puan 4,8.</span></li>'));
   const ask = anchors(section).find((tag) => tag.includes('wa.me'));
   assert.equal(attr(ask, 'data-track'), 'whatsapp');
   assert.ok(section.includes('Onur Bey’e yaz <span class="ar">→</span></a>'));
@@ -440,10 +444,10 @@ test('hizmetler: one item per service under the artist, the empty description le
   const block = between(section, '<div class="services" data-rise>', '</ul>');
   assert.ok(block.includes('<p class="lbl">Hizmetler</p>'));
   assert.equal(count(block, '<li>'), 4);
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kalici.jpg" alt="Çınar Tattoo’da yapılan kadın portresi ve yapraklar dövmesi" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-gecici.jpg" alt="Çınar Tattoo’da yapılan renkli güller, ön kol" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Yapıştırma (çıkartma) dövme; kalıcıya karar vermeden önce dene.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Çınar Tattoo’da yapılan göbek piercing, sallantılı taşlı uç" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek; titanyum ya da çelik takıyla.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kulak.jpg" alt="Çınar Tattoo’da delinen kulak: çiçek ve yıldız küpeler" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Ağrısız, acısız kulak delme; steril ortamda.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kalici.jpg" alt="Çınar Tattoo’da yapılan kadın portresi ve yapraklar dövmesi" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">01</i><h3>Kalıcı dövme</h3><p>Fikrini anlat, desenini sana özel çizelim. Bileğe küçük bir yazıdan tam kola kadar.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-gecici.jpg" alt="Çınar Tattoo’da yapılan renkli güller, ön kol" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Deseni önce yapıştırma dövmeyle birkaç gün taşı. İçine sinerse kalıcısını yapalım.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Çınar Tattoo’da yapılan göbek piercing, sallantılı taşlı uç" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek. Hassas cilde titanyum, bütçene göre çelik takı.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kulak.jpg" alt="Çınar Tattoo’da delinen kulak: çiçek ve yıldız küpeler" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Birkaç saniye sürer, neredeyse hiç hissetmezsin. İğne paketinden senin önünde çıkar.</p></li>'));
   const one = page({}, { services: [{ id: 9, name: "Onur'un <i>", description: '' }] });
   assert.ok(one.includes('<li><i class="num">01</i><h3>Onur’un &lt;i&gt;</h3></li>'));
   const none = page({}, { services: [] });

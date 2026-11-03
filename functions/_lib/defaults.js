@@ -31,22 +31,24 @@ export const DEFAULT_SETTINGS = {
     '+20 yıllık tecrübe — 2005’ten beri Esenler’de, aynı mahallede.',
     'Güler yüz — Her soruna sabırla cevap; acele yok.',
     'Hijyen — Tek kullanımlık iğne, paketi göz önünde açılır.',
-    'Müşteri memnuniyeti — Google yorumlarının hepsi 5 yıldız.',
+    'Müşteri memnuniyeti — Google’da 178 yorum, puan 4,8.',
   ]),
   hero_points: JSON.stringify(['Kişiye özel dövme tasarımı', 'Profesyonel piercing uygulamaları', 'Kaliteli dövme malzemeleri']),
   payment_text: '',
   instagram_followers: '18 bin+',
   // A Google Maps search for the name the shop has on Google, until the owner pastes the real link.
   google_reviews_url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Çınar Tattoo esenler dövme piercing studiosu')}`,
+  google_rating: '4,8',
+  google_review_count: '178',
   tiktok_url: '',
   email: '',
 };
 
 export const DEFAULT_SERVICES = [
-  { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan tam kola, sana göre çizilen dövmeler.' },
-  { id: 2, name: 'Geçici dövme', description: 'Yapıştırma (çıkartma) dövme; kalıcıya karar vermeden önce dene.' },
-  { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek; titanyum ya da çelik takıyla.' },
-  { id: 4, name: 'Ağrısız kulak delme', description: 'Ağrısız, acısız kulak delme; steril ortamda.' },
+  { id: 1, name: 'Kalıcı dövme', description: 'Fikrini anlat, desenini sana özel çizelim. Bileğe küçük bir yazıdan tam kola kadar.' },
+  { id: 2, name: 'Geçici dövme', description: 'Deseni önce yapıştırma dövmeyle birkaç gün taşı. İçine sinerse kalıcısını yapalım.' },
+  { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek. Hassas cilde titanyum, bütçene göre çelik takı.' },
+  { id: 4, name: 'Ağrısız kulak delme', description: 'Birkaç saniye sürer, neredeyse hiç hissetmezsin. İğne paketinden senin önünde çıkar.' },
 ];
 
 // The gallery a new site opens with, in position order: the photos the owner picked on 2026-11-03,

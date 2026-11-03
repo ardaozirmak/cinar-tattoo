@@ -34,6 +34,8 @@ const HINTS = {
   payment_text: 'Örn: Nakit ve kredi kartı. Boş bırakırsan ödeme kartı görünmez.',
   instagram_followers: 'Örn: 18 bin+. Boş bırakırsan sitede görünmez.',
   google_reviews_url: "Boş bırakırsan sitedeki \"Google'da gör\" düğmesi görünmez.",
+  google_rating: "Google'daki puan, örn: 4,8. Boş bırakırsan sitedeki yorumlardan hesaplanır.",
+  google_review_count: "Google'daki toplam yorum sayısı, örn: 178.",
   announcement_text: 'Sitenin en üstünde tek satır olarak görünür.',
 };
 

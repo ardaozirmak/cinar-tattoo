@@ -299,9 +299,9 @@ test('state holds everything the panel shows and edits, every photo and the hero
     priceItemNameMax: 40,
     priceItemDetailMax: 60,
     priceItemPriceMax: 24,
-    maxReviews: 30,
+    maxReviews: 200,
     reviewNameMax: 40,
-    reviewTextMax: 400,
+    reviewTextMax: 2000,
     reviewDateMax: 20,
   });
 });

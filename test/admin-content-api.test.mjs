@@ -258,9 +258,9 @@ test('PUT reviews: a rating of 6, an unknown source, 31 reviews and the like ans
     [[review({ source: 'yelp' })], 'Kaynak geçersiz.'],
     [[review({ name: '' })], 'Yorumcu adı boş bırakılamaz.'],
     [[review({ text: ' ' })], 'Yorum metni boş bırakılamaz.'],
-    [[review({ text: 'x'.repeat(401) })], 'Yorum metni en fazla 400 karakter olabilir.'],
+    [[review({ text: 'x'.repeat(2001) })], 'Yorum metni en fazla 2000 karakter olabilir.'],
     [[review({ date_text: 'x'.repeat(21) })], 'Tarih en fazla 20 karakter olabilir.'],
-    [Array.from({ length: 31 }, () => REVIEWS[0]), 'En fazla 30 yorum eklenebilir.'],
+    [Array.from({ length: 201 }, () => REVIEWS[0]), 'En fazla 200 yorum eklenebilir.'],
   ];
   for (const [reviews, message] of cases) await assertError(await put(env, cookie, 'reviews', { reviews }), 400, message);
   assert.equal((await getContent(env.DB)).reviews.length, 13);
