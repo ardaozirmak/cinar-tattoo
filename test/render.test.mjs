@@ -51,7 +51,7 @@ const jsonLd = (html) => JSON.parse(between(html, '<script type="application/ld+
 const anchors = (html) => html.match(/<a\s[^>]*>/g) ?? [];
 const attr = (tag, name) => tag.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1];
 const sectionIds = (html) => [...html.matchAll(/<section class="sec" id="([a-z]+)"/g)].map((match) => match[1]);
-const secNos = (html) => [...html.matchAll(/<p class="sec-no num" aria-hidden="true">(\d+)<\/p>/g)].map((match) => match[1]);
+const secNos = (html) => [...html.matchAll(/<p class="sec-no num[^"]*" aria-hidden="true">(\d+)<\/p>/g)].map((match) => match[1]);
 
 const WA_GENERIC = 'https://wa.me/905372631546?text=Merhaba%20Onur%20Bey%2C%20siteden%20yaz%C4%B1yorum.%20Randevu%20almak%20istiyorum.';
 
@@ -72,7 +72,7 @@ test('defaults: the WhatsApp number on <html>, the two-line H1, the logo, the li
   assert.ok(h1.includes('<em>dövme.</em>'));
   assert.ok(html.includes('src="/seed/logo-full.jpg"'));
   assert.ok(html.includes('srcset="/seed/logo-thumb.jpg 640w, /seed/logo-full.jpg 1254w"'));
-  assert.ok(html.includes('sizes="(max-width: 900px) 100vw, 100svh"'));
+  assert.ok(html.includes('sizes="(max-width: 900px) 100vw, min(100vw, 120svh)"'));
   assert.ok(html.includes('alt="Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa"'));
   assert.ok(html.includes('href="tel:+905372631546"'));
   assert.ok(html.includes(`href="${WA_GENERIC}"`));
@@ -114,7 +114,7 @@ test('defaults: 13 reviews, the facts 26 years and 13 / 13, and never ÇINAR or 
 test('defaults: the head carries the local SEO, the share tags, the icons and the two font preloads', () => {
   const html = page();
   assert.ok(html.includes('<title>Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri</title>'));
-  assert.ok(html.includes('<meta name="description" content="Esenler’de 2005’ten beri dövme ve piercing: Onur Aydoğan’ın stüdyosu.'));
+  assert.ok(html.includes('<meta name="description" content="Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum piercing ve kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, hijyen ve güler yüz. WhatsApp’tan randevu al.">'));
   assert.ok(html.includes('<link rel="canonical" href="https://cinar.test/">'));
   for (const tag of [
     '<meta property="og:type" content="website">',
@@ -314,10 +314,13 @@ test('every booking link says what it is: wa.me whatsapp, tel: call, directions,
 
 test('sections: the defaults render all but the price list, numbered 01 … in order, and the menus follow', () => {
   const html = page();
-  assert.deepEqual(sectionIds(html), ['calismalar', 'reels', 'surec', 'usta', 'yorumlar', 'bakim', 'randevu', 'sss']);
+  assert.deepEqual(sectionIds(html), ['sanatci', 'calismalar', 'reels', 'surec', 'yorumlar', 'bakim', 'randevu', 'sss']);
   assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07', '08']);
   const menu = between(html, '<nav class="menu"', '</nav>');
-  assert.deepEqual([...menu.matchAll(/href="#([a-z]+)"><i>(\d+)<\/i>/g)].map((m) => `${m[1]} ${m[2]}`), ['calismalar 01', 'reels 02', 'surec 03', 'yorumlar 05', 'randevu 07', 'sss 08']);
+  assert.deepEqual([...menu.matchAll(/href="#([a-z]+)"><i>(\d+)<\/i>/g)].map((m) => `${m[1]} ${m[2]}`), ['sanatci 01', 'calismalar 02', 'reels 03', 'surec 04', 'yorumlar 05', 'randevu 07', 'sss 08']);
+  assert.ok(menu.includes('<a href="#sanatci"><i>01</i>Sanatçı</a>'));
+  assert.ok(between(html, '<div class="sheet"', '<div class="sheet-foot">').includes('<a href="#sanatci"><i>01</i>Sanatçı</a>'));
+  assert.ok(!html.includes('id="usta"') && !html.includes('usta-'), 'the old Usta section is gone');
   const sheet = between(html, '<div class="sheet"', '<div class="sheet-foot">');
   assert.deepEqual([...sheet.matchAll(/href="#([a-z]+)"/g)].map((m) => m[1]), sectionIds(html));
 });
@@ -329,7 +332,7 @@ test('without reviews: no review section, no link to it, no review fact; the num
   assert.ok(!html.includes('/ 13'));
   assert.ok(!html.includes('Google yorumu'));
   assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07']);
-  const none = page({ about_title: '', about_text: '' }, { reviews: [] });
+  const none = page({ about_title: '', about_text: '', highlights: '[]' }, { reviews: [] });
   assert.deepEqual(sectionIds(none), ['calismalar', 'reels', 'surec', 'bakim', 'randevu', 'sss']);
   assert.deepEqual(secNos(none), ['01', '02', '03', '04', '05', '06']);
 });
@@ -367,19 +370,88 @@ test('prices: none by default; a group with an empty price asks on WhatsApp, a s
   assert.ok(section.includes('1.500₺&#39;den'));
   assert.ok(section.includes('<small>tek satır</small>'));
   assert.ok(section.includes('Fiyatlar boyuta ve detaya göre değişebilir; net fiyat için yaz.'));
-  assert.deepEqual(sectionIds(html), ['calismalar', 'reels', 'surec', 'usta', 'yorumlar', 'fiyatlar', 'bakim', 'randevu', 'sss']);
+  assert.deepEqual(sectionIds(html), ['sanatci', 'calismalar', 'reels', 'surec', 'yorumlar', 'fiyatlar', 'bakim', 'randevu', 'sss']);
   assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07', '08', '09']);
 });
 
-test('usta: left out without an about text and title; the default shows the text and the highlights', () => {
-  assert.ok(!page({ about_title: '', about_text: '' }).includes('id="usta"'));
+test('sanatçı: the first section (01), the photo, the about title and text, and the highlights split into title and detail', () => {
   const html = page();
-  const section = between(html, 'id="usta"', '</section>');
-  assert.ok(section.includes('aria-label="Onur Aydoğan"'));
-  assert.ok(section.includes('<p>Onur Aydoğan 20 yılı aşkın süredir dövme yapıyor.'));
-  assert.ok(section.includes('<ol class="usta-list"'));
-  assert.ok(section.includes('<li><i class="num">01</i>20 yılı aşkın tecrübe</li>'));
-  assert.ok(!page({ highlights: '[]' }).includes('usta-list'));
+  const section = between(html, '<section class="sec" id="sanatci"', '</section>');
+  assert.ok(section.includes('aria-labelledby="h-sanatci"'));
+  assert.ok(section.includes('<p class="sec-no num artist-no" aria-hidden="true">01</p>'));
+  assert.ok(section.includes('<p class="lbl">Sanatçımız</p>'));
+  assert.ok(section.includes('<h2 id="h-sanatci">Onur Aydoğan</h2>'));
+  assert.ok(section.includes('<div class="artist-lede"><p>+20 yıllık tecrübe, güler yüz, hijyen ve müşteri memnuniyeti sunar.</p></div>'));
+  assert.ok(
+    section.includes(
+      '<figure class="artist-ph">\n        <div class="artist-frame wipe"><img src="/media/sanatci.jpg" alt="Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda" width="540" height="1170" loading="lazy" decoding="async"></div>',
+    ),
+  );
+  assert.ok(section.includes('<figcaption class="lbl"><span>Onur Aydoğan</span><span>Çınar Tattoo · Esenler</span></figcaption>'));
+  const list = between(section, '<ol class="artist-list">', '</ol>');
+  assert.equal(count(list, '<li>'), 4);
+  assert.ok(list.includes('<li><i class="num">01</i><b>+20 yıllık tecrübe</b><span>2005’ten beri Esenler’de, aynı mahallede.</span></li>'));
+  assert.ok(list.includes('<li><i class="num">02</i><b>Güler yüz</b><span>Her soruna sabırla cevap; acele yok.</span></li>'));
+  assert.ok(list.includes('<li><i class="num">03</i><b>Hijyen</b><span>Tek kullanımlık iğne, paketi göz önünde açılır.</span></li>'));
+  assert.ok(list.includes('<li><i class="num">04</i><b>Müşteri memnuniyeti</b><span>Google yorumlarının hepsi 5 yıldız.</span></li>'));
+  const ask = anchors(section).find((tag) => tag.includes('wa.me'));
+  assert.equal(attr(ask, 'data-track'), 'whatsapp');
+  assert.ok(section.includes('Onur Bey’e yaz <span class="ar">→</span></a>'));
+  assert.ok(html.indexOf('id="sanatci"') < html.indexOf('id="calismalar"'), 'before the works');
+  assert.ok(existsSync(join(PUBLIC, 'media/sanatci.jpg')));
+});
+
+test('sanatçı: a highlight without a dash is a title only; edited texts are escaped; no WhatsApp, no button', () => {
+  const html = page({ highlights: JSON.stringify(["Onur'un <b>işi", 'Hijyen — Tek — iki']), about_title: 'Usta <x>', about_text: 'Bir.\n\nİki.' });
+  const section = between(html, '<section class="sec" id="sanatci"', '</section>');
+  assert.ok(section.includes('<li><i class="num">01</i><b>Onur’un &lt;b&gt;işi</b></li>'));
+  assert.ok(section.includes('<li><i class="num">02</i><b>Hijyen</b><span>Tek — iki</span></li>'), 'split at the first dash only');
+  assert.ok(section.includes('<h2 id="h-sanatci">Usta &lt;x&gt;</h2>'));
+  assert.ok(section.includes('<div class="artist-lede"><p>Bir.</p><p>İki.</p></div>'));
+  assert.ok(!between(page({ whatsapp: '' }), 'id="sanatci"', '</section>').includes('Onur Bey’e yaz'));
+});
+
+test('sanatçı: shown while any of the title, the text and the highlights is set; gone with all three empty', () => {
+  const gone = page({ about_title: '', about_text: '', highlights: '[]' });
+  assert.ok(!gone.includes('id="sanatci"'));
+  assert.ok(!gone.includes('href="#sanatci"'));
+  assert.ok(!gone.includes('class="services"'));
+  const onlyList = between(page({ about_title: '', about_text: '' }), 'id="sanatci"', '</section>');
+  assert.ok(onlyList.includes('<h2 id="h-sanatci">Onur Aydoğan</h2>'), 'the name stands in for an empty title');
+  assert.ok(!onlyList.includes('artist-lede'));
+  assert.ok(between(page({ about_text: '', highlights: '[]' }), 'id="sanatci"', '</section>').includes('<h2 id="h-sanatci">Onur Aydoğan</h2>'));
+  const noList = between(page({ highlights: '[]' }), 'id="sanatci"', '</section>');
+  assert.ok(!noList.includes('artist-list'));
+  assert.ok(noList.includes('artist-lede'));
+});
+
+test('hizmetler: one item per service under the artist, the empty description left out; no block without services', () => {
+  const section = between(page(), '<section class="sec" id="sanatci"', '</section>');
+  const block = between(section, '<div class="services" data-rise>', '</ul>');
+  assert.ok(block.includes('<p class="lbl">Hizmetler</p>'));
+  assert.equal(count(block, '<li>'), 4);
+  assert.ok(block.includes('<li><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
+  assert.ok(block.includes('<li><i class="num">02</i><h3>Geçici dövme</h3><p>Kalıcıya karar vermeden önce denemek isteyenlere.</p></li>'));
+  assert.ok(block.includes('<li><i class="num">03</i><h3>Titanyum piercing</h3><p>Kulak, burun, göbek; titanyum takıyla.</p></li>'));
+  assert.ok(block.includes('<li><i class="num">04</i><h3>Kalıcı makyaj</h3><p>Kalıcı makyaj uygulamaları; ayrıntı için yaz.</p></li>'));
+  const one = page({}, { services: [{ id: 9, name: "Onur'un <i>", description: '' }] });
+  assert.ok(one.includes('<li><i class="num">01</i><h3>Onur’un &lt;i&gt;</h3></li>'));
+  const none = page({}, { services: [] });
+  assert.ok(none.includes('id="sanatci"'));
+  assert.ok(!none.includes('class="services"'));
+  assert.ok(!none.includes('svc-list'));
+});
+
+test('hero: the logo is sized for the larger desktop sign, and stays whole under an announcement', () => {
+  const img = between(page(), '<img id="heroLogo"', '>');
+  assert.equal(attr(img, 'sizes'), '(max-width: 900px) 100vw, min(100vw, 120svh)');
+  const css = readFileSync(join(PUBLIC, 'assets/site.css'), 'utf8');
+  assert.ok(css.includes('.hero-sign{position:relative;height:100svh;overflow:hidden;padding-top:4rem}'));
+  assert.ok(css.includes('.hero-sign img{display:block;margin:0 auto;width:min(100%,calc((100svh - 4rem) * 1.2));height:auto}'));
+  assert.match(css, /\.hero-sign::after\{content:"";position:absolute;left:0;right:0;bottom:0;height:4svh;background:linear-gradient\(transparent,var\(--logo-ground\)\)/);
+  assert.ok(css.includes('.has-duyuru .hero-sign{padding-top:7rem}'));
+  assert.ok(css.includes('.has-duyuru .hero-sign img{width:min(100%,calc((100svh - 7rem) * 1.2))}'));
+  assert.ok(css.includes('.hero-sign::after{display:none}'), 'no fade on phones');
 });
 
 test('announcement: shown only when it is on and has a text', () => {
@@ -406,9 +478,20 @@ test('the booking form offers the services as chips, the first one checked, and 
   const form = between(html, '<form class="form" id="bookForm"', '</form>');
   assert.doesNotMatch(form, /\s(method|action)=/);
   assert.ok(form.includes('<input type="radio" name="kind" value="Kalıcı dövme" checked><span>Kalıcı dövme</span>'));
-  assert.ok(form.includes('<input type="radio" name="kind" value="Piercing"><span>Piercing</span>'));
+  assert.ok(form.includes('<input type="radio" name="kind" value="Titanyum piercing"><span>Titanyum piercing</span>'));
+  assert.ok(form.includes('<input type="radio" name="kind" value="Kalıcı makyaj"><span>Kalıcı makyaj</span>'));
   assert.ok(form.includes('value="Tam kol / sırt"'));
   assert.ok(form.includes(`<a class="btn" href="${WA_GENERIC}" target="_blank" rel="noopener" data-track="whatsapp">WhatsApp’tan yaz`));
+});
+
+test('SSS: five questions; piercing is with titanium, and permanent make-up and temporary tattoos are answered', () => {
+  const faq = between(page(), '<section class="sec" id="sss"', '</section>');
+  assert.equal(count(faq, '<details>'), 5);
+  assert.ok(faq.includes('Piercing de yapıyor musunuz?</summary><p class="ans">Evet, titanyum takıyla. '));
+  assert.ok(faq.includes('<i class="num">05</i>Kalıcı makyaj ve geçici dövme var mı?</summary><p class="ans">Evet, ikisi de var. Ne istediğini WhatsApp’tan yaz, ayrıntıları ve randevuyu birlikte konuşalım.</p>'));
+  const bare = between(page({ whatsapp: '' }), '<section class="sec" id="sss"', '</section>');
+  assert.ok(!bare.includes('WhatsApp'));
+  assert.ok(bare.includes('Evet, ikisi de var. Ne istediğini bize yaz, ayrıntıları ve randevuyu birlikte konuşalım.'));
 });
 
 test('the reels: four clips from /media with their posters', () => {

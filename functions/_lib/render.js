@@ -24,16 +24,20 @@ const WORKS_MAX = 48; // cards in the HTML at all (ruling T6-R8)
 const STRIP_MAX = 16;
 const THUMB_MAX = 640; // the long side of a thumb (T7's resize and dev/seed-images.py)
 const SEED_LOGO_ALT = 'Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa';
+const ARTIST_NAME = 'Onur Aydoğan';
+// public/media/sanatci.jpg: cropped so that no customer's face shows.
+const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 540, height: 1170, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
+const HIGHLIGHT_DASH = ' — '; // a highlight is "title — detail"
 const UNTITLED_WORK = 'Çınar Tattoo çalışması';
 const AREA_SERVED = ['Esenler', 'Bağcılar', 'Güngören', 'Bayrampaşa', 'Gaziosmanpaşa', 'İstanbul'];
 
 // The sections in page order: id, menu label, whether the desktop menu lists it. Each renders only
 // when its builder gives HTML.
 const SECTIONS = [
+  { id: 'sanatci', label: 'Sanatçı', menu: true },
   { id: 'calismalar', label: 'Çalışmalar', menu: true },
   { id: 'reels', label: 'Reels', menu: true },
   { id: 'surec', label: 'Süreç', menu: true },
-  { id: 'usta', label: 'Usta', menu: false },
   { id: 'yorumlar', label: 'Yorumlar', menu: true },
   { id: 'fiyatlar', label: 'Fiyatlar', menu: true },
   { id: 'bakim', label: 'Bakım', menu: false },
@@ -294,7 +298,7 @@ function hero(ctx) {
 
   return `<section class="hero" aria-labelledby="heroTitle">
   <div class="hero-top">
-    <div class="hero-sign"><img id="heroLogo" src="${escapeHtml(urls.full)}" srcset="${escapeHtml(urls.thumb)} ${thumbWidth}w, ${escapeHtml(urls.full)} ${image.width}w" sizes="(max-width: 900px) 100vw, 100svh" width="${image.width}" height="${image.height}" alt="${escapeHtml(alt)}" fetchpriority="high"></div>
+    <div class="hero-sign"><img id="heroLogo" src="${escapeHtml(urls.full)}" srcset="${escapeHtml(urls.thumb)} ${thumbWidth}w, ${escapeHtml(urls.full)} ${image.width}w" sizes="(max-width: 900px) 100vw, min(100vw, 120svh)" width="${image.width}" height="${image.height}" alt="${escapeHtml(alt)}" fetchpriority="high"></div>
     <div class="page hero-grid">
       <div class="hero-copy">
         <p class="lbl"><span class="dot" aria-hidden="true"></span><b>Esenler dövme &amp; piercing</b> · 2005’ten beri</p>
@@ -362,10 +366,10 @@ const section = (id, no, inner) => `<section class="sec" id="${id}" aria-labelle
   </div>
 </section>`;
 
-const SECTION_BUILDERS = { calismalar: works, reels, surec: process, usta: master, yorumlar: reviews, fiyatlar: prices, bakim: care, randevu: booking, sss: faq };
+const SECTION_BUILDERS = { sanatci: artist, calismalar: works, reels, surec: process, yorumlar: reviews, fiyatlar: prices, bakim: care, randevu: booking, sss: faq };
 // The sections that render only with their content; the others always do.
 const SECTION_SHOWN = {
-  usta: (ctx) => !blank(ctx.settings.about_title) || !blank(ctx.settings.about_text),
+  sanatci: (ctx) => !blank(ctx.settings.about_title) || !blank(ctx.settings.about_text) || listSetting(ctx.settings, 'highlights').length > 0,
   yorumlar: (ctx) => ctx.reviews.length > 0,
   fiyatlar: (ctx) => ctx.prices.length > 0,
 };
@@ -494,22 +498,52 @@ function process(ctx, no) {
   );
 }
 
-function master(ctx, no) {
+// Sanatçımız: his photo, the about title and text, the highlights as a numbered list, then the
+// services. Each highlight is "title — detail", split at its first dash; without one it is a title.
+function artist(ctx, no) {
   const { settings } = ctx;
-  const title = blank(settings.about_title) ? 'Usta' : smartApostrophes(String(settings.about_title).trim());
-  const highlights = listSetting(settings, 'highlights');
-  const list =
-    highlights.length === 0
-      ? ''
-      : `\n      <ol class="usta-list" data-rise>${highlights.map((item, index) => `<li><i class="num">${pad(index + 1)}</i>${text(item)}</li>`).join('')}</ol>`;
+  const title = blank(settings.about_title) ? ARTIST_NAME : String(settings.about_title).trim();
+  const lede = paragraphs(smartApostrophes(settings.about_text ?? ''));
+  const highlights = listSetting(settings, 'highlights').map((item) => {
+    const at = item.indexOf(HIGHLIGHT_DASH);
+    if (at === -1) return `<b>${text(item.trim())}</b>`;
+    const detail = item.slice(at + HIGHLIGHT_DASH.length).trim();
+    return `<b>${text(item.slice(0, at).trim())}</b>${detail === '' ? '' : `<span>${text(detail)}</span>`}`;
+  });
+  const list = highlights.length === 0 ? '' : `\n        <ol class="artist-list">${highlights.map((item, index) => `<li><i class="num">${pad(index + 1)}</i>${item}</li>`).join('')}</ol>`;
+  const ask = waLink(ctx, 'btn', `Onur Bey’e yaz${arrow}`);
   return section(
-    'usta',
+    'sanatci',
     no,
-    `${sectionTop('usta', no, 'Usta', title)}
-    <div class="usta">
-      <div class="usta-text" data-rise>${paragraphs(smartApostrophes(settings.about_text ?? ''))}</div>${list}
-    </div>`,
+    `<div class="artist">
+      <figure class="artist-ph">
+        <div class="artist-frame wipe"><img src="${ARTIST_PHOTO.src}" alt="${escapeHtml(ARTIST_PHOTO.alt)}" width="${ARTIST_PHOTO.width}" height="${ARTIST_PHOTO.height}" loading="lazy" decoding="async"></div>
+        <figcaption class="lbl"><span>${escapeHtml(ARTIST_NAME)}</span><span>Çınar Tattoo · Esenler</span></figcaption>
+      </figure>
+      <div class="artist-copy" data-rise>
+        <p class="sec-no num artist-no" aria-hidden="true">${no}</p>
+        <p class="lbl">Sanatçımız</p>
+        <h2 id="h-sanatci">${text(title)}</h2>${lede === '' ? '' : `\n        <div class="artist-lede">${lede}</div>`}${list}${ask === '' ? '' : `\n        ${ask}`}
+      </div>
+    </div>${services(ctx)}`,
   );
+}
+
+function services(ctx) {
+  if (ctx.services.length === 0) return '';
+  const items = ctx.services
+    .map((service, index) => {
+      const description = blank(service.description) ? '' : `<p>${text(String(service.description).trim())}</p>`;
+      return `<li><i class="num">${pad(index + 1)}</i><h3>${text(String(service.name ?? '').trim())}</h3>${description}</li>`;
+    })
+    .join('\n        ');
+  return `
+    <div class="services" data-rise>
+      <p class="lbl">Hizmetler</p>
+      <ul class="svc-list">
+        ${items}
+      </ul>
+    </div>`;
 }
 
 function reviews(ctx, no) {
@@ -682,7 +716,8 @@ function faq(ctx, no) {
     ['Fiyat ne kadar?', `Boyuta, detaya ve bölgeye göre değişir. Fikrini ve yaklaşık boyutu ${via} gönder, net fiyatı birlikte konuşalım.`],
     ['Yaş sınırı var mı?', 'Evet. 18 yaşından küçüklere dövme yapılmaz; seans günü kimliğini yanında getir.'],
     ['Seanstan önce ne yapmalıyım?', 'İyi uyu, doyurucu bir öğün ye, bol su iç. Seanstan önceki 24 saat alkol alma. Dövülecek bölgeye rahat erişilen kıyafetler giy.'],
-    ['Piercing de yapıyor musunuz?', `Evet. Hangi bölge için düşündüğünü ${via} yaz, uygun takı ve randevu için bilgi verelim.`],
+    ['Piercing de yapıyor musunuz?', `Evet, titanyum takıyla. Hangi bölge için düşündüğünü ${via} yaz, uygun takı ve randevu için bilgi verelim.`],
+    ['Kalıcı makyaj ve geçici dövme var mı?', `Evet, ikisi de var. Ne istediğini ${via} yaz, ayrıntıları ve randevuyu birlikte konuşalım.`],
   ];
   return section(
     'sss',

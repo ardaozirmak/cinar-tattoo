@@ -11,11 +11,11 @@ test('BRAND_NAME', () => {
 test('DEFAULT_SETTINGS holds the texts the site opens with', () => {
   assert.deepEqual(DEFAULT_SETTINGS, {
     seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
-    seo_description: 'Esenler’de 2005’ten beri dövme ve piercing: Onur Aydoğan’ın stüdyosu. Kişiye özel çizim, steril ortam, Google yorumlarının hepsi 5 yıldız. WhatsApp’tan randevu al.',
+    seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum piercing ve kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, hijyen ve güler yüz. WhatsApp’tan randevu al.',
     hero_title: 'Bir ömür taşıyacağın\ndövme.',
     hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
     about_title: 'Onur Aydoğan',
-    about_text: 'Onur Aydoğan 20 yılı aşkın süredir dövme yapıyor. Esenler’deki stüdyosunda dövme, piercing ve malzeme için seni bekliyor.',
+    about_text: '+20 yıllık tecrübe, güler yüz, hijyen ve müşteri memnuniyeti sunar.',
     hours: '10.00–23.00',
     hours_note: 'Duruma göre esneyebilir.',
     address: 'Nine Hatun Mah. İnönü Cd. No:11, Akman Ticaret Merkezi, 34220 Esenler / İstanbul',
@@ -25,7 +25,7 @@ test('DEFAULT_SETTINGS holds the texts the site opens with', () => {
     maps_url: '',
     announcement_text: '',
     announcement_on: '0',
-    highlights: '["20 yılı aşkın tecrübe","2005’ten beri Esenler’de","Kişiye özel çizim","Kalıcı ve geçici dövme","Profesyonel piercing"]',
+    highlights: '["+20 yıllık tecrübe — 2005’ten beri Esenler’de, aynı mahallede.","Güler yüz — Her soruna sabırla cevap; acele yok.","Hijyen — Tek kullanımlık iğne, paketi göz önünde açılır.","Müşteri memnuniyeti — Google yorumlarının hepsi 5 yıldız."]',
     hero_points: '["Kişiye özel dövme tasarımı","Profesyonel piercing uygulamaları","Kaliteli dövme malzemeleri"]',
     payment_text: '',
     instagram_followers: '18 bin+',
@@ -44,9 +44,18 @@ test('the hero title is two lines: its \\n is the line break the page draws', ()
   assert.deepEqual(DEFAULT_SETTINGS.hero_title.split('\n'), ['Bir ömür taşıyacağın', 'dövme.']);
 });
 
+test('the Google description fits its field and makes no review claim (the reviews can change)', () => {
+  assert.ok(DEFAULT_SETTINGS.seo_description.length <= 170, `${DEFAULT_SETTINGS.seo_description.length}`);
+  assert.ok(!DEFAULT_SETTINGS.seo_description.includes('yıldız'));
+});
+
+test('the default highlights are “title — detail”, as the Sanatçımız list splits them', () => {
+  for (const item of JSON.parse(DEFAULT_SETTINGS.highlights)) assert.match(item, /^[^—]+ — .+$/, item);
+});
+
 test('every default setting is a string, and the lists are stored as JSON strings', () => {
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) assert.equal(typeof value, 'string', key);
-  assert.equal(JSON.parse(DEFAULT_SETTINGS.highlights).length, 5);
+  assert.equal(JSON.parse(DEFAULT_SETTINGS.highlights).length, 4);
   assert.equal(JSON.parse(DEFAULT_SETTINGS.hero_points).length, 3);
 });
 
@@ -67,10 +76,10 @@ test('every default passes the rule of its own field', () => {
 
 test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
   assert.deepEqual(DEFAULT_SERVICES, [
-    { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan büyük parçalara, sana göre çizilen dövmeler.' },
-    { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenler için.' },
-    { id: 3, name: 'Piercing', description: 'Kulak, burun, göbek ve daha fazlası.' },
-    { id: 4, name: 'Dövme malzemeleri', description: 'Boya, iğne ve bakım ürünleri.' },
+    { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan tam kola, sana göre çizilen dövmeler.' },
+    { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenlere.' },
+    { id: 3, name: 'Titanyum piercing', description: 'Kulak, burun, göbek; titanyum takıyla.' },
+    { id: 4, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
   ]);
   const result = validateServices(DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
   assert.equal(result.ok, true, result.message);
