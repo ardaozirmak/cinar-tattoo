@@ -724,3 +724,30 @@ test('budget: the first load is at most 350 KiB (without the hero image, the gal
   assert.ok(total <= 358400, `${total}`);
   t.diagnostic(`hero image: ${file('seed/logo-full.jpg').length} bytes`);
 });
+
+test('the seed hero gives desktops the horizontal logo and phones the square one', () => {
+  const html = page();
+  assert.ok(html.includes('<div class="hero-sign wide"><picture><source media="(min-width: 901px)" srcset="/media/logo-yatay.jpg" width="1600" height="725"><img id="heroLogo" src="/seed/logo-full.jpg"'));
+  assert.ok(html.includes('</picture></div>'));
+  // A hero the owner uploaded is shown as it is, on every screen.
+  const own = page({}, { hero: { source: 'kv', image_key: 'f'.repeat(20), width: 1600, height: 1200 } });
+  assert.ok(!own.includes('logo-yatay'));
+  assert.ok(!own.includes('<picture>'));
+  assert.ok(own.includes(`<div class="hero-sign"><img id="heroLogo" src="/img/${'f'.repeat(20)}/full"`));
+});
+
+test('the horizontal logo file exists at its pinned size and within 400 KB', () => {
+  const file = join(PUBLIC, 'media/logo-yatay.jpg');
+  assert.ok(existsSync(file));
+  assert.ok(statSync(file).size <= 409600, `logo-yatay.jpg is ${statSync(file).size} bytes`);
+  const bytes = readFileSync(file);
+  let i = 2;
+  let size = null;
+  while (i < bytes.length) {
+    const marker = bytes[i + 1];
+    const length = bytes.readUInt16BE(i + 2);
+    if (marker === 0xc0 || marker === 0xc2) { size = { height: bytes.readUInt16BE(i + 5), width: bytes.readUInt16BE(i + 7) }; break; }
+    i += 2 + length;
+  }
+  assert.deepEqual(size, { width: 1600, height: 725 });
+});

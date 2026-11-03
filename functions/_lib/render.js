@@ -23,7 +23,9 @@ const WORKS_SHOWN = 24; // cards visible before "Daha fazla göster"
 const WORKS_MAX = 48; // cards in the HTML at all (ruling T6-R8)
 const STRIP_MAX = 16;
 const THUMB_MAX = 640; // the long side of a thumb (T7's resize and dev/seed-images.py)
-const SEED_LOGO_ALT = 'Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa';
+// public/media/logo-yatay.jpg: the shop's horizontal logo (2026-11-03), shown on desktops instead of the square seed.
+export const WIDE_LOGO = { src: '/media/logo-yatay.jpg', width: 1600, height: 725 };
+const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa';
 const ARTIST_NAME = 'Onur Aydoğan';
 // public/media/sanatci.jpg: the owner's solo studio photo (2026-11-03), cropped to 4:5.
 const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
@@ -295,10 +297,16 @@ function hero(ctx) {
     .join('');
   const sub = blank(settings.hero_text) ? '' : `\n        <p class="hero-sub">${text(String(settings.hero_text).trim())}</p>`;
   const actions = [waLink(ctx, 'btn', `WhatsApp’tan yaz${arrow}`), telLink(ctx, 'btn ghost', 'Ara'), dirLink(ctx, 'link link-gap', 'Yol tarifi')].join('');
+  const img = `<img id="heroLogo" src="${escapeHtml(urls.full)}" srcset="${escapeHtml(urls.thumb)} ${thumbWidth}w, ${escapeHtml(urls.full)} ${image.width}w" sizes="(max-width: 900px) 100vw, min(100vw, 120svh)" width="${image.width}" height="${image.height}" alt="${escapeHtml(alt)}" fetchpriority="high">`;
+  // The seed hero is the shop's logo: desktops get its horizontal version, phones keep the square one.
+  // A picture the owner uploaded in the panel is shown as it is.
+  const sign = image.source === 'seed'
+    ? `<div class="hero-sign wide"><picture><source media="(min-width: 901px)" srcset="${WIDE_LOGO.src}" width="${WIDE_LOGO.width}" height="${WIDE_LOGO.height}">${img}</picture></div>`
+    : `<div class="hero-sign">${img}</div>`;
 
   return `<section class="hero" aria-labelledby="heroTitle">
   <div class="hero-top">
-    <div class="hero-sign"><img id="heroLogo" src="${escapeHtml(urls.full)}" srcset="${escapeHtml(urls.thumb)} ${thumbWidth}w, ${escapeHtml(urls.full)} ${image.width}w" sizes="(max-width: 900px) 100vw, min(100vw, 120svh)" width="${image.width}" height="${image.height}" alt="${escapeHtml(alt)}" fetchpriority="high"></div>
+    ${sign}
     <div class="page hero-grid">
       <div class="hero-copy">
         <p class="lbl"><span class="dot" aria-hidden="true"></span><b>Esenler dövme &amp; piercing</b> · 2005’ten beri</p>
