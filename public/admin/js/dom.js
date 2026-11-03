@@ -38,7 +38,8 @@ export function uid(prefix = 'f') {
  * A labelled text field with its `n/max` counter, which counts like the server (`.length`):
  * { element, input, label }. `rows` makes it a <textarea>. `hideLabel` keeps the label for screen readers
  * only, for a field whose form title already says what it is. `singleLine` keeps a <textarea> to one
- * paragraph: Enter adds no line break (the server would turn it into a space anyway).
+ * paragraph: Enter adds no line break (the server would turn it into a space anyway). On an <input> it
+ * stops Enter (a phone's Go key) from submitting the form, so only the Kaydet button saves.
  */
 export function textField({ label, value = '', max, rows, name, type = 'text', placeholder, hint, hideLabel = false, singleLine = false, inputAttrs = {} }) {
   const id = uid();

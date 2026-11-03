@@ -78,8 +78,10 @@ export const SETTINGS_FIELDS = [
 ];
 
 // The settings forms of the panel, in the order it shows them. `tab` is the tab a group lives on.
+// `hero_points` is in no group: the Dergi hero (T6-R13) shows no points, so the panel does not offer
+// a field that would change nothing on the site. The key stays valid for the API and stored values.
 export const SETTINGS_GROUPS = [
-  { id: 'hero', title: 'Giriş', tab: 'texts', keys: ['hero_title', 'hero_text', 'hero_points'] },
+  { id: 'hero', title: 'Giriş', tab: 'texts', keys: ['hero_title', 'hero_text'] },
   { id: 'highlights', title: 'Öne çıkanlar', tab: 'texts', keys: ['highlights'] },
   { id: 'about', title: 'Hakkında', tab: 'texts', keys: ['about_title', 'about_text'] },
   { id: 'visit', title: 'Ziyaret', tab: 'texts', keys: ['hours', 'hours_note', 'address', 'phone', 'whatsapp', 'instagram_url', 'maps_url'] },

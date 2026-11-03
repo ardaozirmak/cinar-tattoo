@@ -197,6 +197,14 @@ test('an upload through XMLHttpRequest fails the same ways as fetch', async (t) 
   assert.equal(seen.calls, 1);
 });
 
+test('an upload that stalls times out after 2 minutes with the upload-dropped message', async (t) => {
+  // A weak signal can stall an upload forever; the timeout frees the queue and shows "Tekrar dene".
+  const sent = fakeXhr(t, (xhr) => xhr.ontimeout?.());
+
+  await assert.rejects(api('photos', { method: 'POST', form: new FormData(), onProgress() {} }), { status: 0, message: UPLOAD_DROPPED });
+  assert.equal(sent[0].timeout, 120000);
+});
+
 test('imageForm is the multipart form of a prepared photo: full, thumb, width and height', async () => {
   const full = new Blob(['full bytes'], { type: 'image/jpeg' });
   const thumb = new Blob(['thumb bytes'], { type: 'image/jpeg' });

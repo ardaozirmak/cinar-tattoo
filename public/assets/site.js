@@ -5,7 +5,10 @@
 import { animate, createTimeline, stagger } from '/assets/vendor/anime.esm.min.js';
 
 const root = document.documentElement;
-root.classList.add('m'); // first thing: the CSS fallback timers stop, anime owns the start states
+// The CSS start states give way to `kurtar` about 4 s after the page opens. A script that only starts
+// after 3.5 s (slow mobile data) plays no entrance: it would hide a page the visitor already sees and
+// replay the intro over it. html.m (anime owns the start states) is set only at the motion block.
+const late = performance.now() > 3500;
 
 const GREETING = 'Merhaba Onur Bey, siteden yazıyorum.';
 const motionOK = matchMedia('(prefers-reduced-motion: no-preference)').matches;
@@ -444,9 +447,15 @@ if (form) {
     const href = wa(message);
     if (href) window.open(href, '_blank', 'noopener');
   });
+  // Only now does the page swap its plain WhatsApp link for the form (site.css): a script that did
+  // not load or run leaves the link, never a form that cannot send.
+  root.classList.add('form-on');
 }
 
 /* ---------------- motion: the intro, then everything rises as it arrives ---------------- */
+// html.m is set only here, so an error anywhere above leaves `kurtar` to show the page at 4 s instead
+// of an intro that never ends. Late (see `late`) or after an error here, html.still shows the page at
+// once, as `kurtar` would.
 const intro = $('#intro');
 let introSeen = read('sessionStorage', 'cinar-intro') === '1';
 if (location.hash === '#intro') introSeen = false;
@@ -496,13 +505,12 @@ function playIntro() {
   setTimeout(done, 6000); // whatever happens to the timeline, the page opens
 }
 
-if (intro && motionOK && !introSeen) playIntro();
-else {
-  intro?.remove();
-  if (motionOK) heroIn();
-}
-
-if (motionOK) {
+function entrance() {
+  if (intro && !introSeen) playIntro();
+  else {
+    intro?.remove();
+    heroIn();
+  }
   // section headings rise letter by letter, their numbers count up
   $$('.sec-head h2').forEach((heading) => {
     const letters = $$('.ch', heading);
@@ -534,12 +542,6 @@ if (motionOK) {
       0.2,
     );
   });
-  $$('.faq details').forEach((details) =>
-    details.addEventListener('toggle', () => {
-      const answer = $('.ans', details);
-      if (details.open && answer) animate(answer, { opacity: [0, 1], y: [-8, 0], duration: 500, ease: 'outExpo' });
-    }),
-  );
   // The name is watched through the footer: an element clipped shut never counts as in view.
   const big = $('.foot-big');
   if (big) {
@@ -547,4 +549,29 @@ if (motionOK) {
     const reveal = () => animate(big, { clipPath: [SHUT_B, OPEN], y: ['40%', '0%'], duration: 1400, ease: 'outExpo', onComplete: () => (big.style.clipPath = 'none') });
     once(big.parentElement, reveal, 0.2);
   }
+}
+
+const showAll = () => {
+  intro?.remove();
+  document.body.classList.remove('is-locked');
+  root.classList.remove('m');
+  root.classList.add('still');
+};
+if (motionOK && !late) {
+  root.classList.add('m');
+  try {
+    entrance();
+  } catch (error) {
+    showAll(); // never leave the page covered or hidden
+    throw error;
+  }
+} else showAll();
+
+if (motionOK) {
+  $$('.faq details').forEach((details) =>
+    details.addEventListener('toggle', () => {
+      const answer = $('.ans', details);
+      if (details.open && answer) animate(answer, { opacity: [0, 1], y: [-8, 0], duration: 500, ease: 'outExpo' });
+    }),
+  );
 }

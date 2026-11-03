@@ -106,7 +106,7 @@ test('SETTINGS_FIELDS has a field for every default and nothing else, and goes t
 
 test('SETTINGS_GROUPS are in admin order, and the Google reviews link sits on the reviews tab', () => {
   assert.deepEqual(SETTINGS_GROUPS, [
-    { id: 'hero', title: 'Giriş', tab: 'texts', keys: ['hero_title', 'hero_text', 'hero_points'] },
+    { id: 'hero', title: 'Giriş', tab: 'texts', keys: ['hero_title', 'hero_text'] },
     { id: 'highlights', title: 'Öne çıkanlar', tab: 'texts', keys: ['highlights'] },
     { id: 'about', title: 'Hakkında', tab: 'texts', keys: ['about_title', 'about_text'] },
     { id: 'visit', title: 'Ziyaret', tab: 'texts', keys: ['hours', 'hours_note', 'address', 'phone', 'whatsapp', 'instagram_url', 'maps_url'] },
@@ -117,10 +117,16 @@ test('SETTINGS_GROUPS are in admin order, and the Google reviews link sits on th
   ]);
 });
 
-test('every setting belongs to exactly one group', () => {
+test('every setting the page shows belongs to exactly one group', () => {
   const grouped = SETTINGS_GROUPS.flatMap((group) => group.keys);
   assert.equal(new Set(grouped).size, grouped.length, 'a key is in two groups');
-  assert.deepEqual([...grouped].sort(), SETTINGS_FIELDS.map((field) => field.key).sort());
+  assert.deepEqual([...grouped].sort(), SETTINGS_FIELDS.map((field) => field.key).filter((key) => key !== 'hero_points').sort());
+});
+
+test('the panel does not offer hero_points: the Dergi hero shows no points, so editing them would change nothing', () => {
+  assert.equal(SETTINGS_GROUPS.some((group) => group.keys.includes('hero_points')), false);
+  // The key stays a valid setting (old saves and API calls keep working); only the form is gone.
+  assert.ok(SETTINGS_FIELDS.some((field) => field.key === 'hero_points'));
 });
 
 test('categories, review sources and click kinds', () => {

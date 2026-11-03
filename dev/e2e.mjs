@@ -6,8 +6,10 @@
 // It starts the emulator on a free port with a fresh, temporary database and image store, logs in
 // on a 390 px phone screen, uploads a photo, edits the texts, prices and reviews, and checks after
 // each step that the page at / shows the change. Review Focus 3: a hero title of 80 W and a caption
-// of 120 M must not make the phone page scroll sideways. At the end it saves three screenshots to
-// .dev/shots/ (e2e-admin-390.png, e2e-site-390.png, e2e-site-1440.png).
+// of 120 M must not make the phone page scroll sideways. It saves three screenshots to .dev/shots/
+// (e2e-admin-390.png, e2e-site-390.png, e2e-site-1440.png). Then it checks the page when site.js is
+// blocked, starts late or throws before its motion (the booking link and the page must still show),
+// and that Enter in a one-line panel field does not save the form.
 //
 // Exits 0 when every step passed. On a failure it prints the step and the reason, saves the page it
 // was on as .dev/shots/fail.png and exits 1. Either way it closes Edge and the server and removes
@@ -195,6 +197,59 @@ async function run(base, browser) {
   for (const [name, page] of [['admin', admin], ['site 390', site390], ['site 1440', site1440]]) {
     check(page.problems.length === 0, `the ${name} page reported:\n    ${page.problems.join('\n    ')}`);
   }
+
+  // ------------------------------------------------------------------------------------------
+  step = '8. with site.js running, the booking form replaces the plain WhatsApp link';
+  check((await formShown(site1440)) === 'form', `the normal page shows ${await formShown(site1440)}, not the booking form`);
+
+  step = '8. without site.js, the plain WhatsApp link stays and the page shows itself';
+  const noScript = await openPage(browser, 390, 844, true);
+  await noScript.send('Network.setBlockedURLs', { urls: ['*/assets/site.js'] });
+  await noScript.goto(`${base}/`);
+  check((await formShown(noScript)) === 'link', `without site.js the page shows ${await formShown(noScript)}, not the WhatsApp link`);
+  await sleep(INTRO_MS);
+  await assertPageShown(noScript);
+
+  step = '8. site.js that starts after 3.5 s shows the page at once, with no intro';
+  const late = await openPage(browser, 390, 844, true);
+  await late.send('Page.addScriptToEvaluateOnNewDocument', {
+    source: '{ const now = performance.now.bind(performance); performance.now = () => now() + 4000; }',
+  });
+  await late.goto(`${base}/`);
+  const lateClasses = await late.evaluate(`document.documentElement.className`);
+  check(/\bstill\b/.test(lateClasses) && !/\bm\b/.test(lateClasses), `a late site.js left html.className ${js(lateClasses)}`);
+  await assertPageShown(late); // at once, before the 4 s rescue
+  check((await formShown(late)) === 'form', 'a late site.js does not show the booking form');
+  await sleep(INTRO_MS);
+  await assertPageShown(late);
+  check(late.problems.length === 0, `the late page reported:\n    ${late.problems.join('\n    ')}`);
+
+  step = '8. an error in site.js before the motion starts never leaves the intro over the page';
+  const broken = await openPage(browser, 390, 844, true);
+  await broken.send('Page.addScriptToEvaluateOnNewDocument', {
+    source: "HTMLDialogElement.prototype.showModal = function () { throw new Error('e2e: showModal broken'); };",
+  });
+  await broken.goto(`${base}/#is-seed-kurt`); // opens the lightbox at load, which now throws
+  await sleep(INTRO_MS);
+  check(broken.problems.some((problem) => problem.includes('showModal broken')), 'the injected error did not happen');
+  await assertPageShown(broken);
+  check((await formShown(broken)) === 'link', `site.js stopped before the form, yet the page shows ${await formShown(broken)}`);
+
+  step = '8. Enter in a one-line field of the panel does not save the form';
+  current = admin;
+  await admin.send('Page.bringToFront');
+  await openTab(admin, 'texts');
+  await pressEnterIn(admin, `document.querySelector('form[data-group="visit"] [name="instagram_url"]')`, 'form[data-group="visit"]');
+  await openTab(admin, 'prices');
+  await pressEnterIn(
+    admin,
+    `${FIELD_BY_LABEL}(document.querySelector('form[data-group="prices"] .price-group:last-of-type .row:last-of-type'), 'Fiyat')`,
+    'form[data-group="prices"]',
+  );
+  // Last: a new, empty review leaves the tab with unsaved changes (the panel asks before leaving).
+  await openTab(admin, 'reviews');
+  await clickButton(admin, 'form[data-group="reviews"]', 'Yorum ekle');
+  await pressEnterIn(admin, `${FIELD_BY_LABEL}(${newReview}, 'Ad')`, 'form[data-group="reviews"]');
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -313,6 +368,61 @@ async function assertNoSideScroll(page) {
     .filter((figure) => figure.clientWidth > 0 && figure.scrollWidth > figure.clientWidth + 1)
     .map((figure) => (figure.closest('[id]')?.id ?? '?') + ': ' + figure.scrollWidth + ' > ' + figure.clientWidth + ' px')`);
   check(wide.length === 0, `picture cards wider than their box:\n    ${wide.join('\n    ')}`);
+}
+
+// Which booking path the page shows: 'form' (site.js wired it), 'link' (the plain WhatsApp link), or
+// what shows when that is both or neither.
+async function formShown(page) {
+  return page.evaluate(`(() => {
+    const shown = (selector) => {
+      const element = document.querySelector(selector);
+      return element !== null && getComputedStyle(element).display !== 'none';
+    };
+    const form = shown('#bookForm .form-js');
+    const link = shown('#bookForm .form-nojs') && document.querySelector('#bookForm .form-nojs a[href^="https://wa.me/"]') !== null;
+    return form && !link ? 'form' : link && !form ? 'link' : 'form ' + form + ', link ' + link;
+  })()`);
+}
+
+// The hero title is in place and nothing covers the page: no intro over its middle.
+async function assertPageShown(page) {
+  const state = await page.evaluate(`(() => {
+    const intro = document.getElementById('intro');
+    const line = document.querySelector('.hero h1 .ln > span');
+    const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+    return {
+      intro: intro !== null && getComputedStyle(intro).visibility !== 'hidden' && getComputedStyle(intro).display !== 'none',
+      covered: hit !== null && hit.closest('#intro') !== null,
+      title: line ? getComputedStyle(line).transform : 'no title',
+      bar: getComputedStyle(document.querySelector('.bar')).opacity,
+    };
+  })()`);
+  check(!state.intro && !state.covered, `the intro still covers the page: ${js(state)}`);
+  // `kurtar` ends at transform:none, which Edge reports as the identity matrix.
+  check(['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(state.title) && state.bar === '1', `the page is still hidden: ${js(state)}`);
+}
+
+// Presses Enter (a phone's Go key) in the field `expression` finds: the form must neither save nor
+// show a check error.
+async function pressEnterIn(page, expression, formSelector) {
+  const found = await page.evaluate(`(() => {
+    const field = ${expression};
+    if (!field) return false;
+    field.scrollIntoView({ block: 'center' });
+    field.focus();
+    return document.activeElement === field;
+  })()`);
+  check(found, `no field to press Enter in: ${expression}`);
+  await clearToast(page);
+  const key = { key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13 };
+  await page.send('Input.dispatchKeyEvent', { type: 'keyDown', text: '\r', ...key });
+  await page.send('Input.dispatchKeyEvent', { type: 'keyUp', ...key });
+  await sleep(1200);
+  const outcome = await page.evaluate(`({
+    toast: document.getElementById('toast').textContent,
+    error: document.querySelector(${js(`${formSelector} > .form-error`)})?.textContent.trim() ?? '',
+  })`);
+  check(!outcome.toast.includes('Kaydedildi') && outcome.error === '', `Enter in ${expression} submitted the form: ${js(outcome)}`);
 }
 
 // The page the failing step was on, as .dev/shots/fail.png (while Edge is still open).

@@ -3,8 +3,10 @@
 
    Motion: site.js (anime.js) moves the page. The states things start from before they move are here,
    only for visitors whose browser runs scripts and who do not ask for reduced motion. Each of those
-   states also runs `kurtar` after 4 s, so the page shows itself even if site.js never arrives;
-   site.js adds html.m first thing, which stops `kurtar` and leaves the elements to anime. */
+   states also runs `kurtar` after 4 s, so the page shows itself even if site.js never arrives or
+   fails. site.js adds html.m just before it starts the entrance, which stops `kurtar` and leaves the
+   elements to anime; when it starts too late (or the entrance fails) it adds html.still instead,
+   which ends `kurtar` at once. */
 
 @font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/instrument-serif-400-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/instrument-serif-400-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
@@ -302,8 +304,11 @@ button{font:inherit;color:inherit}
 .map button b{font:400 2rem/1 var(--serif);color:var(--fg)}
 .map button:focus-visible{outline:2px solid var(--fg);outline-offset:-6px}
 .form{grid-column:7/span 6;display:grid;gap:1.8rem;align-content:start;min-width:0}
-.form-js{display:grid;gap:1.8rem}
-.form-nojs{display:none}
+/* The form needs site.js; it shows only once site.js has wired it (html.form-on). Until then, and
+   whenever the script did not load or run, the plain WhatsApp link stands in for it. */
+.form-js{display:none;gap:1.8rem}
+.form-on .form-js{display:grid}
+.form-on .form-nojs{display:none}
 .form h3{font:400 2.4rem/1 var(--serif)}
 .f-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.4rem}
 @media (max-width:560px){.f-row{grid-template-columns:minmax(0,1fr)}}
@@ -364,9 +369,8 @@ button{font:inherit;color:inherit}
 /* ============ without JavaScript: everything is there and nothing waits for a script ============ */
 @media (scripting:none){
   .bar{background:var(--bg)}
-  .menu-btn,.tabs,.daha,.quote-nav button,.quote-prog,.quote-count,.form-js{display:none}
+  .menu-btn,.tabs,.daha,.quote-nav button,.quote-prog,.quote-count{display:none}
   .works .work[hidden]{display:grid}
-  .form-nojs{display:block}
   .dock{transform:none}
 }
 
@@ -389,5 +393,8 @@ button{font:inherit;color:inherit}
   .foot-big{clip-path:inset(100% 0% 0% 0%);animation:kurtar 0s 4s forwards}
   .m .intro,.m .bar,.m .hero-sub,.m .hero-act,.m .facts .fact,.m #heroLogo,.m .hero-copy .lbl,.m [data-rise],
   .m .hero h1 .ln>span,.m .sec-head h2 .ch,.m .wipe,.m .foot-big{animation:none}
+  .still .intro{display:none}
+  .still .bar,.still .hero-sub,.still .hero-act,.still .facts .fact,.still #heroLogo,.still .hero-copy .lbl,.still [data-rise],
+  .still .hero h1 .ln>span,.still .sec-head h2 .ch,.still .wipe,.still .foot-big{animation-delay:0s}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition-duration:1ms!important}}

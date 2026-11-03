@@ -198,7 +198,7 @@ export function setupTextForms({ drafts, onDirtyChange }) {
           blank: () => ({ name: '', description: '' }),
           edited,
           createRow: fieldsetRow('Hizmet', (row, item) => {
-            const name = textField({ label: 'Ad', value: item.name, max: limits.serviceNameMax });
+            const name = textField({ label: 'Ad', value: item.name, max: limits.serviceNameMax, singleLine: true });
             const description = textField({ label: 'Açıklama', value: item.description, max: limits.serviceDescriptionMax, rows: 2 });
             row.append(name.element, description.element);
             return () => ({ name: name.input.value, description: description.input.value });
@@ -214,9 +214,9 @@ export function setupTextForms({ drafts, onDirtyChange }) {
 
   function pricesForm(host, prices, limits) {
     const itemRow = fieldsetRow('Kalem', (row, item) => {
-      const name = textField({ label: 'Ad', value: item.name, max: limits.priceItemNameMax });
-      const detail = textField({ label: 'Açıklama', value: item.detail, max: limits.priceItemDetailMax });
-      const price = textField({ label: 'Fiyat', value: item.price, max: limits.priceItemPriceMax, placeholder: "Örn: 1.500₺'den ya da Teklif al" });
+      const name = textField({ label: 'Ad', value: item.name, max: limits.priceItemNameMax, singleLine: true });
+      const detail = textField({ label: 'Açıklama', value: item.detail, max: limits.priceItemDetailMax, singleLine: true });
+      const price = textField({ label: 'Fiyat', value: item.price, max: limits.priceItemPriceMax, placeholder: "Örn: 1.500₺'den ya da Teklif al", singleLine: true });
       row.append(name.element, detail.element, price.element);
       return () => ({ name: name.input.value, detail: detail.input.value, price: price.input.value });
     });
@@ -236,7 +236,7 @@ export function setupTextForms({ drafts, onDirtyChange }) {
           edited,
           createRow: fieldsetRow('Grup', (row, group) => {
             row.classList.add('price-group');
-            const title = textField({ label: 'Grup adı', value: group.title, max: limits.priceGroupTitleMax, placeholder: 'Örn: Dövme' });
+            const title = textField({ label: 'Grup adı', value: group.title, max: limits.priceGroupTitleMax, placeholder: 'Örn: Dövme', singleLine: true });
             const items = repeater({
               items: group.items,
               max: limits.maxPriceItems,
@@ -371,7 +371,7 @@ function settingsBuilder(fields, title) {
           value: value[field.key],
           max: field.max,
           rows: rowsOf(field),
-          singleLine: field.kind === 'text',
+          singleLine: field.kind !== 'multiline',
           type: INPUT_TYPES[field.kind],
           placeholder: field.kind === 'url' ? 'https://' : undefined,
           hint: HINTS[field.key],
@@ -410,7 +410,7 @@ function listField(field, values, edited, hideLabel) {
   }, 'button button-small');
 
   function itemRow(value) {
-    const { element, input, label } = textField({ label: field.label, name: field.key, value, max: field.max, hideLabel: true });
+    const { element, input, label } = textField({ label: field.label, name: field.key, value, max: field.max, hideLabel: true, singleLine: true });
     const remove = button('Kaldır', () => {
       if (Date.now() - lastRemoval < REMOVE_PAUSE_MS) return;
       lastRemoval = Date.now();
@@ -533,11 +533,11 @@ function reviewRow(item, isNew, limits, sources) {
   const slot = el('div', { class: 'review-body' });
   const row = el('details', { class: 'review', open: isNew, tabindex: '-1' }, [el('summary', { class: 'review-summary' }, [nameLine, starsLine, starsSpoken]), slot]);
 
-  const name = textField({ label: 'Ad', value: item.name, max: limits.reviewNameMax, inputAttrs: { autocapitalize: 'words' } });
+  const name = textField({ label: 'Ad', value: item.name, max: limits.reviewNameMax, singleLine: true, inputAttrs: { autocapitalize: 'words' } });
   const rating = starPicker(item.rating);
   const words = textField({ label: 'Yorum', value: item.text, max: limits.reviewTextMax, rows: 5 });
   const source = selectField('Kaynak', sources, item.source);
-  const date = textField({ label: 'Tarih (isteğe bağlı)', value: item.date_text, max: limits.reviewDateMax, placeholder: 'Örn: Ekim 2026' });
+  const date = textField({ label: 'Tarih (isteğe bağlı)', value: item.date_text, max: limits.reviewDateMax, placeholder: 'Örn: Ekim 2026', singleLine: true });
   slot.append(name.element, rating.element, words.element, source.element, date.element);
 
   let index = 0;

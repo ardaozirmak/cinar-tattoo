@@ -84,6 +84,8 @@ function sendWithXhr(url, { method, headers, body, onProgress }, dropped) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
+    // A stalled upload on a weak signal would hold the upload queue forever: give up after 2 minutes.
+    xhr.timeout = 120000;
     for (const [name, value] of Object.entries(headers)) xhr.setRequestHeader(name, value);
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable && event.total > 0) onProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));

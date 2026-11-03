@@ -84,7 +84,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
 | `ADMIN_PASSWORD` | Secret | Onur Bey'in ilk giriş şifresi (en az 8 karakter). Ona güvenli bir yoldan ilet. |
 | `APP_SECRET` | Secret | Az önce ürettiğin değer. |
 
-`APP_SECRET`'i bir yere not etmen gerekmez ama **değiştirme**: değişirse bütün oturumlar kapanır ve panelde değiştirilmiş şifre artık tutmaz (şifre özeti bu değere bağlıdır). O durumda 9. bölümdeki sıfırlamayı yap.
+`APP_SECRET`'i bir yere not etmen gerekmez ama **değiştirme**: değişirse bütün oturumlar kapanır ve panelde değiştirilmiş şifre artık tutmaz (şifre özeti bu değere bağlıdır). O durumda aşağıdaki "Şifre unutulursa (sıfırlama)" bölümündeki adımları yap.
 
 ## 7. Yeniden yayınla
 
