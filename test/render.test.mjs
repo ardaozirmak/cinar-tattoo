@@ -384,7 +384,7 @@ test('sanatçı: the first section (01), the photo, the about title and text, an
   assert.ok(section.includes('<div class="artist-lede"><p>+20 yıllık tecrübe, güler yüz, hijyen ve müşteri memnuniyeti sunar.</p></div>'));
   assert.ok(
     section.includes(
-      '<figure class="artist-ph">\n        <div class="artist-frame wipe"><img src="/media/sanatci.jpg" alt="Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda" width="540" height="1170" loading="lazy" decoding="async"></div>',
+      '<figure class="artist-ph">\n        <div class="artist-frame wipe"><img src="/media/sanatci.jpg" alt="Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda" width="800" height="1000" loading="lazy" decoding="async"></div>',
     ),
   );
   assert.ok(section.includes('<figcaption class="lbl"><span>Onur Aydoğan</span><span>Çınar Tattoo · Esenler</span></figcaption>'));

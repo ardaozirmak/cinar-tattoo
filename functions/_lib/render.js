@@ -25,8 +25,8 @@ const STRIP_MAX = 16;
 const THUMB_MAX = 640; // the long side of a thumb (T7's resize and dev/seed-images.py)
 const SEED_LOGO_ALT = 'Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa';
 const ARTIST_NAME = 'Onur Aydoğan';
-// public/media/sanatci.jpg: cropped so that no customer's face shows.
-const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 540, height: 1170, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
+// public/media/sanatci.jpg: the owner's solo studio photo (2026-11-03), cropped to 4:5.
+const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
 const HIGHLIGHT_DASH = ' — '; // a highlight is "title — detail"
 const UNTITLED_WORK = 'Çınar Tattoo çalışması';
 const AREA_SERVED = ['Esenler', 'Bağcılar', 'Güngören', 'Bayrampaşa', 'Gaziosmanpaşa', 'İstanbul'];
