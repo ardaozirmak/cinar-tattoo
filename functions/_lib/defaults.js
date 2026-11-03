@@ -49,35 +49,41 @@ export const DEFAULT_SERVICES = [
   { id: 4, name: 'Ağrısız kulak delme', description: 'Ağrısız, acısız kulak delme; steril ortamda.' },
 ];
 
-// The gallery a new site opens with, in position order: the Dergi prototype's 32 works (photos of
-// Onur Bey's work from his friend's site, ruling T6-R12; k03 and k04 are close-ups and not seeded),
-// then the five earlier crops. The sizes are those of public/seed/<seed_path>-full.jpg, which
-// dev/seed-images.py makes.
-const work = (id, caption) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 });
+// The gallery a new site opens with, in position order: the photos the owner picked on 2026-11-03,
+// one folder per category (kalıcı, geçici, piercing), mixed so that "Tümü" alternates them. They
+// are the studio's own work, from its Instagram. The sizes are those of
+// public/seed/<seed_path>-full.jpg, which dev/seed-images.py makes.
+const photo = (path, caption, category, width, height) => ({ id: `seed-${path}`, caption, category, seed_path: path, width, height });
 
 export const SEED_PHOTOS = [
-  work('w03', 'Üçgen içinde gül, el üstü'),
-  work('k01', 'Renkli omuz, saat ve yazı'),
-  work('w01', 'Hançer ve gül'),
-  work('w04', 'Orman ve kurt'),
-  work('w05', 'Portre ve güller'),
-  work('w09', 'Siyah-gri tam kol'),
-  work('w13', 'Defne ve Roma rakamı'),
-  work('k02', 'Renkli kol, güller'),
-  work('w02', 'Yılan'),
-  work('w08', 'Kırlangıç, boyun'),
-  work('w12', 'Ornamental ön kol'),
-  work('w14', 'Pusula ve ok'),
-  work('w15', 'Çiçekli figür'),
-  work('w17', 'Yaprak dalı'),
-  work('w18', 'Zambak'),
-  work('w19', 'Kuşlar, köprücük'),
-  work('w20', 'Kafatası ve çiçek'),
-  { id: 'seed-chicano-kol', caption: 'Chicano kol', category: 'dovme', seed_path: 'chicano-kol', width: 475, height: 797 },
-  { id: 'seed-renkli-gul', caption: 'Renkli güller', category: 'dovme', seed_path: 'renkli-gul', width: 463, height: 800 },
-  { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', seed_path: 'kurt', width: 487, height: 790 },
-  { id: 'seed-yazi-gogus', caption: 'Chicano yazı', category: 'dovme', seed_path: 'yazi-gogus', width: 502, height: 641 },
-  { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
+  photo('gecici-06', 'Chicano kol', 'gecici', 474, 790),
+  photo('kalici-07', 'Kadın portresi ve yapraklar', 'dovme', 469, 546),
+  photo('piercing-08', 'Sallantılı göbek piercing', 'piercing', 466, 776),
+  photo('gecici-02', 'Renkli güller', 'gecici', 466, 791),
+  photo('kalici-03', 'Tüy ve kuşlar', 'dovme', 471, 770),
+  photo('piercing-04', 'Kaş piercing', 'piercing', 345, 499),
+  photo('gecici-08', 'Aslan', 'gecici', 476, 690),
+  photo('kalici-08', 'Yıldırım', 'dovme', 471, 695),
+  photo('piercing-01', 'Göbek piercing, kalp uçlu', 'piercing', 466, 574),
+  photo('gecici-10', 'Uluyan kurt', 'gecici', 467, 781),
+  photo('kalici-09', 'Örümcek', 'dovme', 342, 369),
+  photo('piercing-05', 'Göbek piercing, taşlı', 'piercing', 475, 636),
+  photo('gecici-03', 'Renkli tam kol', 'gecici', 474, 804),
+  photo('kalici-02', 'Kuşlar, köprücük', 'dovme', 470, 772),
+  photo('piercing-02', 'Göbek piercing', 'piercing', 464, 789),
+  photo('gecici-05', 'Kartlar ve şişe', 'gecici', 481, 776),
+  photo('kalici-01', 'Bebek ayak izi', 'dovme', 464, 771),
+  photo('piercing-07', 'Göbek piercing, sade', 'piercing', 471, 790),
+  photo('gecici-07', 'Maskeli portre', 'gecici', 464, 792),
+  photo('kalici-06', 'Kalp ritmi ve kuş', 'dovme', 339, 491),
+  photo('piercing-09', 'Göğüs arası piercing', 'piercing', 466, 776),
+  photo('gecici-04', 'Yılan', 'gecici', 471, 787),
+  photo('kalici-04', 'Ay yıldız ve harf', 'dovme', 475, 731),
+  photo('piercing-03', 'Göbek piercing, uygulama', 'piercing', 345, 501),
+  photo('gecici-09', 'Kanatlar ve taç, ense', 'gecici', 474, 741),
+  photo('kalici-05', 'Roma rakamı', 'dovme', 464, 790),
+  photo('piercing-06', 'Göbek piercing, steril uygulama', 'piercing', 469, 780),
+  photo('gecici-01', 'Göğüs yazısı', 'gecici', 471, 481),
 ];
 
 // The shop's logo, shown whole and sharp as the hero until the owner uploads another picture. (The

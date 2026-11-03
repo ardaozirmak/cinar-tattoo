@@ -325,11 +325,11 @@ test('PATCH photos/:id changes the caption and the type, whichever are sent, and
 
 test('PATCH works on a seed photo too, and its URLs are the static files', async (t) => {
   const { env, cookie } = await signedIn(t);
-  const response = await edit(env, cookie, 'seed-kurt', { caption: 'Kurt', category: 'diger' });
+  const response = await edit(env, cookie, 'seed-gecici-10', { caption: 'Kurt', category: 'diger' });
   assert.equal(response.status, 200);
   const { photo } = await response.json();
-  assert.deepEqual([photo.id, photo.caption, photo.category, photo.source], ['seed-kurt', 'Kurt', 'diger', 'seed']);
-  assert.deepEqual([photo.full, photo.thumb], ['/seed/kurt-full.jpg', '/seed/kurt-thumb.jpg']);
+  assert.deepEqual([photo.id, photo.caption, photo.category, photo.source], ['seed-gecici-10', 'Kurt', 'diger', 'seed']);
+  assert.deepEqual([photo.full, photo.thumb], ['/seed/gecici-10-full.jpg', '/seed/gecici-10-thumb.jpg']);
 });
 
 test('PATCH: a caption over 120 characters, a type that is not one, or something that is not text is 400, and nothing is changed', async (t) => {
@@ -447,12 +447,12 @@ test('replacing a photo gives it a new image key, deletes the old KV keys and ke
 test('replacing a seed photo makes it a KV photo, and no KV key is deleted', async (t) => {
   const { env, cookie } = await signedIn(t);
   await putDecoy(env);
-  const response = await replace(env, cookie, 'seed-kurt', { width: 20, height: 30 });
+  const response = await replace(env, cookie, 'seed-gecici-10', { width: 20, height: 30 });
   assert.equal(response.status, 200);
   const { photo } = await response.json();
   assert.deepEqual(
     [photo.id, photo.source, photo.seed_path, photo.caption, photo.width, photo.height],
-    ['seed-kurt', 'kv', null, 'Kurt ve orman', 20, 30],
+    ['seed-gecici-10', 'kv', null, 'Uluyan kurt', 20, 30],
   );
   assert.match(photo.full, /^\/img\/[0-9a-f]{20}\/full$/);
   assert.deepEqual(await keysOf(env), [...imageKeys(photo.image_key), ...imageKeys(DECOY)].sort());
@@ -534,10 +534,10 @@ test('deleting a seed photo removes the row only; KV is not touched', async (t) 
   const { env, cookie } = await signedIn(t);
   await putDecoy(env);
   const before = await stored(env);
-  const response = await remove(env, cookie, 'seed-renkli-gul');
+  const response = await remove(env, cookie, 'seed-gecici-02');
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { ok: true });
-  assert.deepEqual(await orderOf(env, cookie), SEED_IDS.filter((id) => id !== 'seed-renkli-gul'));
+  assert.deepEqual(await orderOf(env, cookie), SEED_IDS.filter((id) => id !== 'seed-gecici-02'));
   assert.deepEqual(await stored(env), before, 'row removed, IMAGES untouched');
   assert.equal((await getContent(env.DB)).photos.length, SEED_IDS.length - 1, 'and it does not come back with the next request');
 });

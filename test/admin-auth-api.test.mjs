@@ -240,7 +240,7 @@ test('state holds everything the panel shows and edits, every photo and the hero
   const state = await response.json();
   assert.deepEqual(Object.keys(state).sort(), ['categories', 'fields', 'groups', 'hero', 'limits', 'photos', 'prices', 'reviewSources', 'reviews', 'services', 'settings']);
   assert.deepEqual(state.hero, { source: 'seed', seed_path: 'logo', width: 1254, height: 1254, full: '/seed/logo-full.jpg', thumb: '/seed/logo-thumb.jpg' });
-  assert.equal(state.photos.length, 23);
+  assert.equal(state.photos.length, 29);
   assert.deepEqual(state.photos[0], {
     id: 'a'.repeat(20),
     caption: 'Yeni iş',
@@ -256,18 +256,18 @@ test('state holds everything the panel shows and edits, every photo and the hero
     thumb: `/img/${key}/thumb`,
   });
   assert.deepEqual(state.photos[1], {
-    id: 'seed-w03',
-    caption: 'Üçgen içinde gül, el üstü',
-    category: 'dovme',
+    id: 'seed-gecici-06',
+    caption: 'Chicano kol',
+    category: 'gecici',
     position: 0,
     source: 'seed',
-    seed_path: 'w03',
+    seed_path: 'gecici-06',
     image_key: null,
-    width: 400,
-    height: 711,
+    width: 474,
+    height: 790,
     created_at: 0,
-    full: '/seed/w03-full.jpg',
-    thumb: '/seed/w03-thumb.jpg',
+    full: '/seed/gecici-06-full.jpg',
+    thumb: '/seed/gecici-06-thumb.jpg',
   });
   assert.deepEqual(state.services, DEFAULT_SERVICES);
   assert.deepEqual(state.prices, [{ id: 1, title: 'Dövme', items: [{ id: 1, name: 'Minimal yazı', detail: '', price: 'Teklif al' }] }]);
@@ -420,7 +420,7 @@ test('matchRoute: among the routes with this path the method decides, and a stat
   assert.deepEqual(matchRoute(table, 'PUT', ['photos', 'abc']), { route: anyPut, params: ['abc'] });
   assert.deepEqual(matchRoute(table, 'PATCH', ['photos', 'order']), { route: edit, params: ['order'] });
   assert.deepEqual(matchRoute(table, 'DELETE', ['photos', 'a/b']), { route: remove, params: ['a/b'] });
-  assert.deepEqual(matchRoute(table, 'POST', ['photos', 'seed-kurt', 'replace']), { route: replace, params: ['seed-kurt'] });
+  assert.deepEqual(matchRoute(table, 'POST', ['photos', 'seed-gecici-10', 'replace']), { route: replace, params: ['seed-gecici-10'] });
   assert.deepEqual(matchRoute(table, 'GET', ['photos', 'abc']), { route: null, allowed: ['PUT', 'PATCH', 'DELETE'] });
   assert.deepEqual(matchRoute(table, 'GET', ['photos']), { route: null, allowed: ['POST'] });
   assert.equal(matchRoute(table, 'GET', ['photos', 'abc', 'other']), null);

@@ -118,7 +118,7 @@ const SEEDED_COUNTS = {
   meta: 2,
   settings: SETTINGS_ROWS,
   services: 4,
-  photos: 22,
+  photos: 28,
   admin_auth: 1,
   login_attempts: 0,
   price_groups: 0,
@@ -145,7 +145,7 @@ test('schema v1: the tables, columns, defaults and keys of the plan', async (t) 
   await assert.rejects(db.prepare('INSERT INTO admin_auth (id) VALUES (2)').run(), /CHECK constraint failed/, 'there is one admin row');
 });
 
-test('ensureSchema seeds the site: settings, 4 services, the 22 seed photos, 13 reviews, the admin row, no prices', async (t) => {
+test('ensureSchema seeds the site: settings, 4 services, the 28 seed photos, 13 reviews, the admin row, no prices', async (t) => {
   const db = await seededDb(t);
   assert.deepEqual(await tableCounts(db), SEEDED_COUNTS);
   assert.deepEqual(await rows(db, 'SELECT key, value FROM meta ORDER BY key'), [
@@ -220,7 +220,7 @@ test('seeding is INSERT OR IGNORE: even if the seeded flag is lost, nothing the 
   const db = await seededDb(t);
   await db.batch([
     db.prepare("UPDATE settings SET value = 'Benim başlığım' WHERE key = 'hero_title'"),
-    db.prepare("UPDATE photos SET caption = 'Yeni açıklama' WHERE id = 'seed-kurt'"),
+    db.prepare("UPDATE photos SET caption = 'Yeni açıklama' WHERE id = 'seed-gecici-10'"),
     db.prepare("UPDATE services SET name = 'Düzenlendi' WHERE id = 1"),
     db.prepare("UPDATE reviews SET text = 'Düzenlendi' WHERE id = 1"),
     db.prepare("DELETE FROM meta WHERE key = 'seeded'"),
@@ -228,7 +228,7 @@ test('seeding is INSERT OR IGNORE: even if the seeded flag is lost, nothing the 
   await ensureSchema({ ...db });
   const content = await getContent(db);
   assert.equal(content.settings.hero_title, 'Benim başlığım');
-  assert.equal(content.photos.find((photo) => photo.id === 'seed-kurt').caption, 'Yeni açıklama');
+  assert.equal(content.photos.find((photo) => photo.id === 'seed-gecici-10').caption, 'Yeni açıklama');
   assert.equal(content.services[0].name, 'Düzenlendi');
   assert.equal(content.reviews[0].text, 'Düzenlendi');
   assert.deepEqual(await tableCounts(db), SEEDED_COUNTS);
@@ -238,15 +238,15 @@ test('seeding is INSERT OR IGNORE: even if the seeded flag is lost, nothing the 
 // Reading the content
 // ---------------------------------------------------------------------------------------------
 
-test('getContent on a new database: the default texts, 4 services, the 22 seed photos in order, 13 reviews and no prices', async (t) => {
+test('getContent on a new database: the default texts, 4 services, the 28 seed photos in order, 13 reviews and no prices', async (t) => {
   const db = await seededDb(t);
   const content = await getContent(db);
   assert.deepEqual(content.settings, SEEDED_SETTINGS);
   assert.deepEqual(content.hero, DEFAULT_HERO);
   assert.deepEqual(content.services, DEFAULT_SERVICES);
-  assert.equal(content.photos.length, 22);
-  assert.deepEqual(content.photos.slice(0, 3).map((photo) => photo.id), ['seed-w03', 'seed-k01', 'seed-w01']);
-  assert.deepEqual(content.photos.slice(17, 22).map((photo) => photo.id), ['seed-chicano-kol', 'seed-renkli-gul', 'seed-kurt', 'seed-yazi-gogus', 'seed-gobek-piercing']);
+  assert.equal(content.photos.length, 28);
+  assert.deepEqual(content.photos.slice(0, 3).map((photo) => photo.id), ['seed-gecici-06', 'seed-kalici-07', 'seed-piercing-08']);
+  assert.deepEqual(content.photos.slice(-2).map((photo) => photo.id), ['seed-piercing-06', 'seed-gecici-01']);
   for (const [index, photo] of content.photos.entries()) {
     assert.deepEqual(photo, { ...SEED_PHOTOS[index], position: index, source: 'seed', image_key: null, created_at: 0 });
   }
@@ -275,7 +275,7 @@ test('defaultContent hands out fresh copies: changing one never changes the defa
   assert.notEqual(DEFAULT_SETTINGS.hero_title, 'değişti');
   assert.equal(DEFAULT_HERO.width, 1254);
   assert.notEqual(DEFAULT_SERVICES[0].name, 'değişti');
-  assert.equal(SEED_PHOTOS.length, 22);
+  assert.equal(SEED_PHOTOS.length, 28);
   assert.notEqual(SEED_PHOTOS[0].caption, 'değişti');
   assert.notEqual(SEED_REVIEWS[0].text, 'değişti');
 });
@@ -611,9 +611,9 @@ test('getClickStats totals the days from sinceDay on, and gives 0 for a kind wit
 
 test('countPhotos', async (t) => {
   const db = await seededDb(t);
-  assert.equal(await countPhotos(db), 22);
+  assert.equal(await countPhotos(db), 28);
   await insertPhoto(db, newPhoto(1));
-  assert.equal(await countPhotos(db), 23);
+  assert.equal(await countPhotos(db), 29);
   await db.prepare('DELETE FROM photos').run();
   assert.equal(await countPhotos(db), 0);
 });
@@ -657,21 +657,21 @@ test('insertPhoto without a caption or a type uses the defaults of the table', a
 
 test('getPhoto gives the row, or null', async (t) => {
   const db = await seededDb(t);
-  assert.deepEqual(await getPhoto(db, 'seed-kurt'), seedRow('seed-kurt'));
+  assert.deepEqual(await getPhoto(db, 'seed-gecici-10'), seedRow('seed-gecici-10'));
   assert.equal(await getPhoto(db, 'seed-yok'), null);
   assert.equal(await getPhoto(db, idOf(9)), null);
 });
 
 test('updatePhotoMeta changes only what it is given and returns the new row', async (t) => {
   const db = await seededDb(t);
-  const before = await getPhoto(db, 'seed-kurt');
-  assert.deepEqual(await updatePhotoMeta(db, 'seed-kurt', { caption: 'Yeni' }), { ...before, caption: 'Yeni' });
-  assert.deepEqual(await updatePhotoMeta(db, 'seed-kurt', { category: 'piercing' }), { ...before, caption: 'Yeni', category: 'piercing' });
-  assert.deepEqual(await updatePhotoMeta(db, 'seed-kurt', { caption: 'Üçüncü', category: 'diger' }), { ...before, caption: 'Üçüncü', category: 'diger' });
-  assert.deepEqual(await updatePhotoMeta(db, 'seed-kurt', { caption: '' }), { ...before, caption: '', category: 'diger' }, 'an empty caption is a caption');
-  assert.deepEqual(await updatePhotoMeta(db, 'seed-kurt', {}), { ...before, caption: '', category: 'diger' }, 'nothing to change');
-  assert.deepEqual(await getPhoto(db, 'seed-kurt'), { ...before, caption: '', category: 'diger' });
-  assert.deepEqual(await getPhoto(db, 'seed-renkli-gul'), seedRow('seed-renkli-gul'), 'the others are untouched');
+  const before = await getPhoto(db, 'seed-gecici-10');
+  assert.deepEqual(await updatePhotoMeta(db, 'seed-gecici-10', { caption: 'Yeni' }), { ...before, caption: 'Yeni' });
+  assert.deepEqual(await updatePhotoMeta(db, 'seed-gecici-10', { category: 'piercing' }), { ...before, caption: 'Yeni', category: 'piercing' });
+  assert.deepEqual(await updatePhotoMeta(db, 'seed-gecici-10', { caption: 'Üçüncü', category: 'diger' }), { ...before, caption: 'Üçüncü', category: 'diger' });
+  assert.deepEqual(await updatePhotoMeta(db, 'seed-gecici-10', { caption: '' }), { ...before, caption: '', category: 'diger' }, 'an empty caption is a caption');
+  assert.deepEqual(await updatePhotoMeta(db, 'seed-gecici-10', {}), { ...before, caption: '', category: 'diger' }, 'nothing to change');
+  assert.deepEqual(await getPhoto(db, 'seed-gecici-10'), { ...before, caption: '', category: 'diger' });
+  assert.deepEqual(await getPhoto(db, 'seed-gecici-02'), seedRow('seed-gecici-02'), 'the others are untouched');
 });
 
 test('updatePhotoMeta on an unknown id is null and writes nothing', async (t) => {
@@ -683,13 +683,13 @@ test('updatePhotoMeta on an unknown id is null and writes nothing', async (t) =>
 
 test('replacePhotoImage turns a seed photo into a stored one and hands back the row from before and after', async (t) => {
   const db = await seededDb(t);
-  const before = await getPhoto(db, 'seed-kurt');
-  const result = await replacePhotoImage(db, 'seed-kurt', { image_key: keyOf(7), width: 1200, height: 1600 });
+  const before = await getPhoto(db, 'seed-gecici-10');
+  const result = await replacePhotoImage(db, 'seed-gecici-10', { image_key: keyOf(7), width: 1200, height: 1600 });
   assert.deepEqual(result.old, before);
   assert.equal(result.old.source, 'seed');
-  assert.equal(result.old.seed_path, 'kurt');
+  assert.equal(result.old.seed_path, 'gecici-10');
   assert.deepEqual(result.updated, { ...before, source: 'kv', seed_path: null, image_key: keyOf(7), width: 1200, height: 1600 });
-  assert.deepEqual(await getPhoto(db, 'seed-kurt'), result.updated);
+  assert.deepEqual(await getPhoto(db, 'seed-gecici-10'), result.updated);
   assert.deepEqual(await photoIds(db), SEED_IDS, 'it keeps its place');
 });
 
@@ -715,7 +715,7 @@ test('setPhotoOrder takes exactly the current ids, renumbers them from 0 and say
   const db = await seededDb(t);
   await insertPhoto(db, newPhoto(1));
   const ids = (await photoIds(db)).reverse();
-  assert.equal(ids.length, 23);
+  assert.equal(ids.length, 29);
   assert.equal(await setPhotoOrder(db, ids), true);
   const { photos } = await getContent(db);
   assert.deepEqual(photos.map((photo) => photo.id), ids);
@@ -745,7 +745,7 @@ test('setPhotoOrder says false, and changes nothing, unless it gets exactly the 
     null,
     undefined,
     ids.join(','),
-    'seed-kurt',
+    'seed-gecici-10',
     { length: ids.length },
     new Set(ids),
   ];
@@ -782,17 +782,17 @@ test('deletePhoto returns the row it removed, and only that row goes', async (t)
   assert.equal(await getPhoto(db, idOf(1)), null);
   assert.deepEqual(await photoIds(db), SEED_IDS);
 
-  const seed = await getPhoto(db, 'seed-renkli-gul');
-  assert.deepEqual(await deletePhoto(db, 'seed-renkli-gul'), seed);
-  assert.deepEqual(await photoIds(db), SEED_IDS.filter((id) => id !== 'seed-renkli-gul'));
+  const seed = await getPhoto(db, 'seed-gecici-02');
+  assert.deepEqual(await deletePhoto(db, 'seed-gecici-02'), seed);
+  assert.deepEqual(await photoIds(db), SEED_IDS.filter((id) => id !== 'seed-gecici-02'));
 });
 
 test('deletePhoto of an unknown id, or one that was deleted already, is null', async (t) => {
   const db = await seededDb(t);
   assert.equal(await deletePhoto(db, idOf(1)), null);
-  assert.deepEqual(await deletePhoto(db, 'seed-kurt'), seedRow('seed-kurt'));
-  assert.equal(await deletePhoto(db, 'seed-kurt'), null);
-  assert.equal(await countPhotos(db), 21);
+  assert.deepEqual(await deletePhoto(db, 'seed-gecici-10'), seedRow('seed-gecici-10'));
+  assert.equal(await deletePhoto(db, 'seed-gecici-10'), null);
+  assert.equal(await countPhotos(db), 27);
 });
 
 // ---------------------------------------------------------------------------------------------

@@ -86,31 +86,22 @@ test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
   assert.deepEqual(result.services, DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
 });
 
-// The Dergi prototype's works that stay in the gallery: [id, caption], in its order. The weak or
-// repeated ones (w06, w07, w10, w11, w16, w21-w30) left on 2026-11-03.
-const WORKS = [
-  ['w03', 'Üçgen içinde gül, el üstü'], ['k01', 'Renkli omuz, saat ve yazı'], ['w01', 'Hançer ve gül'],
-  ['w04', 'Orman ve kurt'], ['w05', 'Portre ve güller'], ['w09', 'Siyah-gri tam kol'],
-  ['w13', 'Defne ve Roma rakamı'], ['k02', 'Renkli kol, güller'], ['w02', 'Yılan'],
-  ['w08', 'Kırlangıç, boyun'], ['w12', 'Ornamental ön kol'], ['w14', 'Pusula ve ok'],
-  ['w15', 'Çiçekli figür'], ['w17', 'Yaprak dalı'], ['w18', 'Zambak'],
-  ['w19', 'Kuşlar, köprücük'], ['w20', 'Kafatası ve çiçek'],
+// The owner's picks (2026-11-03), one folder per category, mixed: [seed_path, caption].
+const PICKS = [
+  ['gecici-06', 'Chicano kol'], ['kalici-07', 'Kadın portresi ve yapraklar'], ['piercing-08', 'Sallantılı göbek piercing'],
+  ['gecici-02', 'Renkli güller'], ['kalici-03', 'Tüy ve kuşlar'], ['piercing-04', 'Kaş piercing'],
 ];
 
-test('SEED_PHOTOS: 17 prototype works, then the five earlier crops (22 in all, the studio’s own)', () => {
-  assert.equal(SEED_PHOTOS.length, 22);
-  assert.deepEqual(
-    SEED_PHOTOS.slice(0, 17),
-    WORKS.map(([id, caption]) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 })),
-  );
-  assert.deepEqual(SEED_PHOTOS.slice(17, 22), [
-    { id: 'seed-chicano-kol', caption: 'Chicano kol', category: 'dovme', seed_path: 'chicano-kol', width: 475, height: 797 },
-    { id: 'seed-renkli-gul', caption: 'Renkli güller', category: 'dovme', seed_path: 'renkli-gul', width: 463, height: 800 },
-    { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', seed_path: 'kurt', width: 487, height: 790 },
-    { id: 'seed-yazi-gogus', caption: 'Chicano yazı', category: 'dovme', seed_path: 'yazi-gogus', width: 502, height: 641 },
-    { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
-  ]);
-  assert.ok(!SEED_PHOTOS.some((photo) => ['seed-k03', 'seed-k04', 'seed-w06', 'seed-w30'].includes(photo.id)));
+test('SEED_PHOTOS: the owner’s 28 picks, 10 geçici, 9 kalıcı and 9 piercing, mixed', () => {
+  assert.equal(SEED_PHOTOS.length, 28);
+  assert.deepEqual(SEED_PHOTOS.slice(0, 6).map(({ seed_path, caption }) => [seed_path, caption]), PICKS);
+  const per = (category) => SEED_PHOTOS.filter((photo) => photo.category === category).length;
+  assert.deepEqual([per('gecici'), per('dovme'), per('piercing')], [10, 9, 9]);
+  for (const photo of SEED_PHOTOS) {
+    const folder = photo.seed_path.split('-')[0];
+    assert.equal(photo.category, { gecici: 'gecici', kalici: 'dovme', piercing: 'piercing' }[folder], photo.id);
+  }
+  assert.deepEqual(SEED_PHOTOS[0], { id: 'seed-gecici-06', caption: 'Chicano kol', category: 'gecici', seed_path: 'gecici-06', width: 474, height: 790 });
 });
 
 test('SEED_PHOTOS are consistent: ids, paths, categories, captions and sizes', () => {

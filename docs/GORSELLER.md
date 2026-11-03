@@ -1,58 +1,43 @@
 # Sitedeki görseller
 
-## Hizmet kartları
-
-| Kart | Görsel | Kaynak |
-|---|---|---|
-| Kalıcı dövme | `public/media/hizmet-kalici.jpg` | Stüdyonun kendi işi (üçgen içinde gül, `seed/w03`) |
-| Geçici dövme | `/seed/logo-thumb.jpg` | Logo. Çıkartma dövme fotoğrafı gelince değişecek. |
-| Titanyum & çelik piercing | `public/media/hizmet-piercing.jpg` | Stüdyonun kendi işi (göbek piercing) |
-| Ağrısız kulak delme | `public/media/hizmet-kulak.jpg` | CC0: [rawpixel 6038024](https://www.rawpixel.com/image/6038024/photo-image-public-domain-person-fashion) |
-
-Kartlardaki fotoğraflar 560×700 (4:5) boyutunda kırpılmıştır. Her kartın görseli hizmetin adına göre seçilir (`render.js` içindeki `SERVICE_PHOTOS`). Eşleşen kelimeler şunlardır:
-
-- "kulak" → kulak delme görseli
-- "piercing" → piercing görseli
-- "geçici" ya da "çıkartma" → logo
-- "dövme" → kalıcı dövme görseli
-
-Adı bu kelimelerden hiçbirini içermeyen bir hizmet kartı görselsiz görünür.
+Sitede yalnızca stüdyonun kendi fotoğrafları var. Hazır (stok) görsellerin hepsi kaldırıldı.
 
 ## Çalışmalar galerisi
 
-Galeride yalnızca stüdyonun kendi işleri vardır: 21 kalıcı dövme ve 1 göbek piercing. Stok ya da temsili görsel kullanılmaz; kullanıcının isteğiyle 2026-11-03'te hepsi kaldırıldı.
+Galerideki 28 fotoğrafı stüdyo sahibi seçti (2026-11-03). Fotoğraflar masaüstündeki üç klasörden alındı; her klasör galeride bir kategoriye karşılık gelir:
 
-Galerinin kategorileri şunlardır:
+| Klasör | Galerideki kategori | Fotoğraf sayısı |
+|---|---|---|
+| `kalıcı` | Kalıcı dövme | 9 |
+| `geçici` | Geçici dövme | 10 |
+| `piercing` | Piercing | 9 |
 
-- Kalıcı dövme
-- Geçici dövme
-- Piercing
-- Kulak delme
-- Diğer
+"Tümü" sekmesinde kategoriler karışık sırayla gösterilir.
 
-Bir kategoride fotoğraf yoksa o kategorinin sekmesi gösterilmez.
+Bu görseller `dev/seed-images.py` ile üretilir:
 
-Kalıcı makyaj hizmeti yoktur; siteden tamamen kaldırıldı. Logonun alt yayında "Kalıcı makyaj" yazısı hâlâ duruyor, çünkü logo stüdyonun kendi tasarımıdır.
+```
+python -I dev/seed-images.py <klasörlerin bulunduğu dizin> public
+```
 
-### Galeriden çıkarılan işler (2026-11-03)
+Betik her fotoğrafın kenarındaki ince arayüz çizgisini kırpar. Göğüs yazısı fotoğrafında müşterinin yüzü de kırpılır.
 
-Görüntüsü zayıf olan ya da aynı işin tekrarı olan 15 fotoğraf çıkarıldı:
+Üretilen fotoğrafların sırası, başlığı ve boyutu `functions/_lib/defaults.js` dosyasındaki `SEED_PHOTOS` listesinde tutulur.
 
-- w06 Boğa
-- w07 Renkli güller (renkli-gul ile aynı iş)
-- w10 Çift kurt (kurt ile aynı iş)
-- w11 Renkli tam kol
-- w16 Jilet ve şapka
-- w21 Göğüs yazısı (yazi-gogus ile aynı iş)
-- w22 Siyah-gri kol
-- w23 Tek gül
-- w24 Kalp ritmi
-- w25 Dalga
-- w26 Tüy
-- w27 Ay yıldız
-- w28 Zeytin dalı
-- w29 Çift kalp
-- w30 Gül, bel
+## Hizmet kartları
+
+| Kart | Görsel |
+|---|---|
+| Kalıcı dövme | Kadın portresi ve yapraklar (`kalici-07`) |
+| Geçici dövme | Renkli güller (`gecici-02`) |
+| Titanyum & çelik piercing | Sallantılı göbek piercing (`piercing-08`) |
+| Ağrısız kulak delme | Logo (küpe fotoğrafları gelince değişecek) |
+
+Kart görselleri `public/media/hizmet-*.jpg` dosyalarıdır; 560×700 boyutunda kırpılmıştır.
+
+Süreç bölümünde ("Fikirden deriye") yalnızca dövme fotoğrafları kullanılır. Bu bölüm piercing fotoğraflarını göstermez.
+
+Kalıcı makyaj hizmeti yoktur ve sitede hiçbir yerde geçmez. Logonun alt yayındaki "Kalıcı makyaj" yazısı istisnadır; logo stüdyonun kendi tasarımı olduğu için olduğu gibi bırakıldı.
 
 ## Yeni fotoğraf ve video eklemek
 

@@ -31,13 +31,13 @@ const ARTIST_NAME = 'Onur Aydoğan';
 // public/media/sanatci.jpg: Onur Bey's portrait (2026-11-03, the user's pick), cropped to 4:5.
 const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
 // One picture per kind of service, matched on the service's name (the owner can rename and reorder
-// them). Kalıcı dövme and piercing show the studio's own work; kulak delme a CC0 photo of an earring
-// (docs/GORSELLER.md); geçici dövme, with no photo yet, the logo. Order matters: "kulak" first.
+// them): the studio's own work from the gallery's seed photos, cropped to 4:5 (docs/GORSELLER.md).
+// Kulak delme has no photo yet (the earrings are coming), so it shows the logo. "kulak" goes first.
 const SERVICE_PHOTOS = [
-  { key: 'kulak', words: ['kulak'], src: '/media/hizmet-kulak.jpg', width: 560, height: 700, alt: 'Küpe takılı bir kulak memesi' },
-  { key: 'piercing', words: ['piercing'], src: '/media/hizmet-piercing.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan göbek piercing' },
-  { key: 'gecici', words: ['geçici', 'çıkartma'], src: '/seed/logo-thumb.jpg', width: 640, height: 640, alt: '', logo: true },
-  { key: 'kalici', words: ['dövme'], src: '/media/hizmet-kalici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan üçgen içinde gül dövmesi, el üstü' },
+  { key: 'kulak', words: ['kulak'], src: '/seed/logo-thumb.jpg', width: 640, height: 640, alt: '', logo: true },
+  { key: 'piercing', words: ['piercing'], src: '/media/hizmet-piercing.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan göbek piercing, sallantılı taşlı uç' },
+  { key: 'gecici', words: ['geçici', 'çıkartma'], src: '/media/hizmet-gecici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan renkli güller, ön kol' },
+  { key: 'kalici', words: ['dövme'], src: '/media/hizmet-kalici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan kadın portresi ve yapraklar dövmesi' },
 ];
 const HIGHLIGHT_DASH = ' — '; // a highlight is "title — detail"
 const UNTITLED_WORK = 'Çınar Tattoo çalışması';
@@ -518,8 +518,11 @@ function banner(ctx) {
 
 function process(ctx, no) {
   const heroFull = imageUrls(ctx.hero).full;
+  // The steps are a tattoo's, so they show tattoos when the gallery has four; else any photos.
+  const tattoos = ctx.photos.filter((photo) => photo.category === 'dovme' || photo.category === 'gecici');
+  const pool = tattoos.length >= 4 ? tattoos : ctx.photos;
   const pictures = [0, 1, 2, 3].map((index) => {
-    const photo = ctx.photos[index];
+    const photo = pool[index];
     return photo === undefined ? { src: heroFull, width: ctx.hero.width, height: ctx.hero.height } : { src: imageUrls(photo).full, width: photo.width, height: photo.height };
   });
   const steps = [

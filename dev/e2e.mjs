@@ -24,8 +24,8 @@ import { startServer } from './server.mjs';
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const SHOTS = join(ROOT, '.dev', 'shots');
 const PASSWORD = 'e2e-sifre-123';
-const UPLOAD = join(ROOT, 'public', 'seed', 'renkli-gul-full.jpg');
-const SEED_PHOTO_COUNT = 22; // the studio's own photos (2026-11-03)
+const UPLOAD = join(ROOT, 'public', 'seed', 'gecici-02-full.jpg');
+const SEED_PHOTO_COUNT = 28; // the owner's picks: 10 geçici, 9 kalıcı, 9 piercing (2026-11-03)
 const TITLE = 'E2E başlık testi';
 const LONG_TITLE = 'W'.repeat(80);
 const LONG_CAPTION = 'M'.repeat(120);
@@ -229,7 +229,7 @@ async function run(base, browser) {
   await broken.send('Page.addScriptToEvaluateOnNewDocument', {
     source: "HTMLDialogElement.prototype.showModal = function () { throw new Error('e2e: showModal broken'); };",
   });
-  await broken.goto(`${base}/#is-seed-kurt`); // opens the lightbox at load, which now throws
+  await broken.goto(`${base}/#is-seed-gecici-10`); // opens the lightbox at load, which now throws
   await sleep(INTRO_MS);
   check(broken.problems.some((problem) => problem.includes('showModal broken')), 'the injected error did not happen');
   await assertPageShown(broken);

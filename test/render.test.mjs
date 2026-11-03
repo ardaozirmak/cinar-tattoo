@@ -82,20 +82,20 @@ test('defaults: the WhatsApp number on <html>, the two-line H1, the logo, the li
   assert.ok(html.includes('Esenler dövme &amp; piercing</b> · 2005’ten beri'));
 });
 
-test('defaults: 22 work cards, the first is seed-w03, all shown and no “Daha fazla göster”', () => {
+test('defaults: 28 work cards, the first is seed-gecici-06, 24 shown and 4 behind “Daha fazla göster”', () => {
   const html = page();
-  assert.equal(count(html, '<figure class="work"'), 22);
-  assert.ok(html.includes('<figure class="work" id="is-seed-w03" data-i="0" data-no="1" data-style="dovme">'));
+  assert.equal(count(html, '<figure class="work"'), 28);
+  assert.ok(html.includes('<figure class="work" id="is-seed-gecici-06" data-i="0" data-no="1" data-style="gecici">'));
   const cards = html.match(/<figure class="work"[^>]*>/g);
-  assert.equal(cards.filter((card) => card.endsWith(' hidden>')).length, 0);
+  assert.equal(cards.filter((card) => card.endsWith(' hidden>')).length, 4);
   assert.ok(cards.slice(0, 24).every((card) => !card.includes('hidden')));
-  assert.equal(count(html, 'Daha fazla göster'), 0);
-  const first = between(html, '<figure class="work" id="is-seed-w03"', '</figure>');
-  assert.ok(first.includes('src="/seed/w03-thumb.jpg" data-full="/seed/w03-full.jpg"'));
-  assert.ok(first.includes('width="400" height="711" loading="lazy"'));
-  assert.ok(first.includes('alt="Üçgen içinde gül, el üstü"'));
-  assert.ok(first.includes('<figcaption><b>Üçgen içinde gül, el üstü</b><span class="num">No. 01</span></figcaption>'));
-  assert.ok(html.includes('<figure class="work" id="is-seed-gobek-piercing" data-i="21" data-no="22" data-style="piercing">'));
+  assert.equal(count(html, 'Daha fazla göster'), 1);
+  const first = between(html, '<figure class="work" id="is-seed-gecici-06"', '</figure>');
+  assert.ok(first.includes('src="/seed/gecici-06-thumb.jpg" data-full="/seed/gecici-06-full.jpg"'));
+  assert.ok(first.includes('width="474" height="790" loading="lazy"'));
+  assert.ok(first.includes('alt="Chicano kol"'));
+  assert.ok(first.includes('<figcaption><b>Chicano kol</b><span class="num">No. 01</span></figcaption>'));
+  assert.ok(html.includes('<figure class="work" id="is-seed-gecici-01" data-i="27" data-no="28" data-style="gecici" hidden>'));
   assert.ok(html.includes('Stüdyodan, gerçek işler.'));
   assert.ok(!html.includes('Temsili') && !html.includes('temsili'));
 });
@@ -432,10 +432,10 @@ test('hizmetler: one item per service under the artist, the empty description le
   const block = between(section, '<div class="services" data-rise>', '</ul>');
   assert.ok(block.includes('<p class="lbl">Hizmetler</p>'));
   assert.equal(count(block, '<li>'), 4);
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kalici.jpg" alt="Çınar Tattoo’da yapılan üçgen içinde gül dövmesi, el üstü" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph logo"><img src="/seed/logo-thumb.jpg" alt="" width="640" height="640" loading="lazy" decoding="async"></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Yapıştırma (çıkartma) dövme; kalıcıya karar vermeden önce dene.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Çınar Tattoo’da yapılan göbek piercing" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek; titanyum ya da çelik takıyla.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kulak.jpg" alt="Küpe takılı bir kulak memesi" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Ağrısız, acısız kulak delme; steril ortamda.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kalici.jpg" alt="Çınar Tattoo’da yapılan kadın portresi ve yapraklar dövmesi" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-gecici.jpg" alt="Çınar Tattoo’da yapılan renkli güller, ön kol" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Yapıştırma (çıkartma) dövme; kalıcıya karar vermeden önce dene.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Çınar Tattoo’da yapılan göbek piercing, sallantılı taşlı uç" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek; titanyum ya da çelik takıyla.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph logo"><img src="/seed/logo-thumb.jpg" alt="" width="640" height="640" loading="lazy" decoding="async"></figure><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Ağrısız, acısız kulak delme; steril ortamda.</p></li>'));
   const one = page({}, { services: [{ id: 9, name: "Onur'un <i>", description: '' }] });
   assert.ok(one.includes('<li><i class="num">01</i><h3>Onur’un &lt;i&gt;</h3></li>'));
   const none = page({}, { services: [] });
@@ -509,10 +509,11 @@ test('tabs: none with one category; the defaults count every category that has p
   const one = page({}, { photos: [photo(1), photo(2)] });
   assert.ok(!one.includes('class="tabs"'));
   const html = page();
-  assert.ok(html.includes('Tümü <sup>22</sup>'));
-  assert.ok(html.includes('Kalıcı dövme <sup>21</sup>'));
-  assert.ok(html.includes('Piercing <sup>1</sup>'));
-  assert.ok(!html.includes('data-f="gecici"') && !html.includes('data-f="kulak"'));
+  assert.ok(html.includes('Tümü <sup>28</sup>'));
+  assert.ok(html.includes('Kalıcı dövme <sup>9</sup>'));
+  assert.ok(html.includes('Geçici dövme <sup>10</sup>'));
+  assert.ok(html.includes('Piercing <sup>9</sup>'));
+  assert.ok(!html.includes('data-f="kulak"'));
   assert.ok(!html.includes('data-f="diger"'));
 });
 
@@ -551,7 +552,8 @@ test('the strip and the wall show the first 16 thumbs; the process uses photos 1
   const wall = between(html, '<div class="wall"', '</div>');
   assert.equal(count(wall, '<img'), 16);
   const proc = between(html, 'id="surec"', '</section>');
-  for (const id of ['w03', 'k01', 'w01', 'w04']) assert.equal(count(proc, `src="/seed/${id}-full.jpg"`), 2, id);
+  for (const id of ['gecici-06', 'kalici-07', 'gecici-02', 'kalici-03']) assert.equal(count(proc, `src="/seed/${id}-full.jpg"`), 2, id);
+  assert.ok(!proc.includes('piercing-'), 'the steps of a tattoo show tattoos');
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -790,17 +792,17 @@ test('service cards: a picture by the name, each used once, with no label; none 
     { id: 5, name: 'Lazer', description: '' },
   ];
   const block = between(page({}, { services }), '<ul class="svc-list">', '</ul>');
-  assert.equal(count(block, '<figure class="svc-ph">'), 3);
+  assert.equal(count(block, '<figure class="svc-ph'), 3);
   assert.ok(!block.includes('figcaption'));
   assert.ok(block.includes('<li><i class="num">04</i><h3>İkinci dövme</h3></li>'));
-  assert.ok(block.includes('hizmet-kulak.jpg" alt="Küpe takılı bir kulak memesi"'));
+  assert.ok(block.includes('<figure class="svc-ph logo"><img src="/seed/logo-thumb.jpg"'), 'kulak: the logo until the earrings come');
   assert.ok(block.includes('hizmet-piercing.jpg'));
   assert.equal(count(block, 'hizmet-kalici.jpg'), 1);
   assert.ok(block.includes('<li><i class="num">05</i><h3>Lazer</h3></li>'));
 });
 
 test('the three service pictures are 560 by 700 JPEGs of at most 120 KB', () => {
-  for (const key of ['kalici', 'piercing', 'kulak']) {
+  for (const key of ['kalici', 'gecici', 'piercing']) {
     const file = join(PUBLIC, 'media', `hizmet-${key}.jpg`);
     assert.ok(existsSync(file), key);
     assert.ok(statSync(file).size <= 122880, `${key} is ${statSync(file).size} bytes`);
