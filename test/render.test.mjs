@@ -766,9 +766,10 @@ test('the hero card under the logo names the services, the address, the hours an
   assert.ok(!bare.includes('class="hero-info"'));
 });
 
-test('the opening shows a big Esenler and flashes the service names under the line', () => {
+test('the opening shows Çınar Tattoo over ESENLER · 2005 and flashes the service names under the line', () => {
   const html = page();
-  assert.ok(html.includes('<div class="intro-name" id="introName"><span class="ch">E</span><span class="ch">s</span><span class="ch">e</span><span class="ch">n</span><span class="ch">l</span><span class="ch">e</span><span class="ch">r</span></div>'));
+  assert.ok(html.includes('<div class="intro-name" id="introName"><span class="in-row in-brand"><span class="ch">Ç</span><span class="ch">ı</span><span class="ch">n</span><span class="ch">a</span><span class="ch">r</span><span class="ch">&nbsp;</span><span class="ch">T</span>'));
+  assert.ok(html.includes('<span class="in-row in-place"><span class="ch">E</span><span class="ch">S</span><span class="ch">E</span><span class="ch">N</span><span class="ch">L</span><span class="ch">E</span><span class="ch">R</span><span class="ch">&nbsp;</span><span class="ch">·</span><span class="ch">&nbsp;</span><span class="ch">2</span><span class="ch">0</span><span class="ch">0</span><span class="ch">5</span></span></div>'));
   assert.ok(html.includes('<p class="intro-svc" id="introSvc"><span>Kalıcı dövme</span><span>Geçici dövme</span><span>Titanyum piercing</span><span>Kalıcı makyaj</span></p>'));
   assert.ok(!html.includes('id="introSub"'));
   assert.ok(page({}, { services: [{ id: 1, name: '<i>x</i>', description: '' }] }).includes('<span>&lt;i&gt;x&lt;/i&gt;</span></p>'));

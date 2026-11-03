@@ -75,7 +75,11 @@ button{font:inherit;color:inherit}
 .intro-half{position:absolute;left:0;right:0;height:50.5%;background:var(--shade);pointer-events:auto}
 .intro-half.t{top:0}.intro-half.b{bottom:0}
 .intro-line{position:absolute;left:var(--g);right:var(--g);top:50%;height:1px;background:var(--fg);transform:scaleX(0);transform-origin:left}
-.intro-name{position:absolute;left:var(--g);bottom:50%;font:400 clamp(4.4rem,16vw,16rem)/.8 var(--serif);letter-spacing:-.02em;display:flex;overflow:hidden;padding:.14em 0 .14em;margin-bottom:-.14em}
+.intro-name{position:absolute;left:var(--g);bottom:50%;display:grid;justify-items:start}
+/* each row is its own mask for the letters rising into it; the brand row's bottom padding holds the Ç's cedilla */
+.intro-name .in-row{display:flex;overflow:hidden;padding:.12em 0 .16em}
+.in-brand{font:400 clamp(3.6rem,11vw,11rem)/.8 var(--serif);letter-spacing:-.02em}
+.in-place{font:500 clamp(2.4rem,7vw,7.6rem)/.85 var(--display-2);letter-spacing:.12em;color:var(--fg-2);margin-top:-.1em}
 .intro-name .ch{display:inline-block;transform:translateY(105%)}
 /* the services flash past one by one right under the line */
 .intro-svc{position:absolute;left:var(--g);right:var(--g);top:calc(50% + max(1rem, 1.6vw));height:1.2em;margin:0;overflow:hidden;

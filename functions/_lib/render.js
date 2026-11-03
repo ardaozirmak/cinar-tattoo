@@ -226,11 +226,13 @@ function structuredData(ctx) {
 // Intro, bar, menu sheet
 // ---------------------------------------------------------------------------------------------
 
-// The opening: a big "Esenler" over the line, and under it the service names flashing past one by one.
-const INTRO_WORD = 'Esenler';
+// The opening: "Çınar Tattoo" and under it "ESENLER · 2005", big, over the line; under the line the service
+// names flash past one by one.
+const INTRO_PLACE = 'ESENLER · 2005';
 
 function intro(year, services = []) {
-  const name = [...INTRO_WORD].map((ch) => `<span class="ch">${escapeHtml(ch)}</span>`).join('');
+  const letters = (word) => [...word].map((ch) => `<span class="ch">${ch === ' ' ? '&nbsp;' : escapeHtml(ch)}</span>`).join('');
+  const name = `<span class="in-row in-brand">${letters(BRAND_NAME)}</span><span class="in-row in-place">${letters(INTRO_PLACE)}</span>`;
   const names = services.map((service) => String(service.name ?? '').trim()).filter(Boolean);
   const ticker = names.length
     ? `\n  <p class="intro-svc" id="introSvc">${names.map((name) => `<span>${text(name)}</span>`).join('')}</p>`

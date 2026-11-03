@@ -500,7 +500,7 @@ function playIntro() {
   };
   const timeline = createTimeline({ defaults: { ease: 'outExpo' }, onComplete: done })
     .add('#introLine', { scaleX: [0, 1], duration: 900, ease: 'inOutQuart' }, 0)
-    .add('#introName .ch', { y: ['105%', '0%'], duration: 1100, delay: stagger(60) }, 500)
+    .add('#introName .ch', { y: ['105%', '0%'], duration: 950, delay: stagger(28) }, 450) // 26 letters, all home by ~2.1 s
     .add('#introYear', { opacity: [0, 1], duration: 500 }, 700)
     .add(counter, { v: [2005, to], duration: 1500, ease: 'inOutQuad', onUpdate: () => year && (year.textContent = String(Math.round(counter.v))) }, 700)
     .add(['#introName', '#introYear', '#introSkip'], { opacity: [1, 0], duration: 450, ease: 'inQuad' }, 2350)
