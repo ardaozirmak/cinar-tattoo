@@ -26,21 +26,19 @@ const THUMB_MAX = 640; // the long side of a thumb (T7's resize and dev/seed-ima
 // The seed hero stands in front of a studio photo (Onur Bey drawing a design), dimmed and with dark edges as on
 // nikkohurtado.com: a wide crop for desktops, a tall one for phones. Decorative, so its alt is empty.
 export const HERO_BACKDROP = { wide: { src: '/media/hero-arka-genis.jpg', width: 1440, height: 1648 }, tall: { src: '/media/hero-arka-dik.jpg', width: 720, height: 900 } };
-const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar İnk, Tattoo, 2005 ve çapa; dövme, piercing, kalıcı makyaj';
+const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar İnk, Tattoo, 2005 ve çapa';
 const ARTIST_NAME = 'Onur Aydoğan';
 // public/media/sanatci.jpg: Onur Bey's portrait (2026-11-03, the user's pick), cropped to 4:5.
 const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
 // One picture per kind of service, matched on the service's name (the owner can rename and reorder
-// them). These are CC0 stock photos, not the studio's work, so each card says "Temsili görsel";
-// the sources are listed in docs/GORSELLER.md. Order matters: "kulak" before "piercing".
+// them). Kalıcı dövme and piercing show the studio's own work; kulak delme a CC0 photo of an earring
+// (docs/GORSELLER.md); geçici dövme, with no photo yet, the logo. Order matters: "kulak" first.
 const SERVICE_PHOTOS = [
-  { key: 'kulak', words: ['kulak'], alt: 'Küpe takılı bir kulak memesi' },
-  { key: 'piercing', words: ['piercing'], alt: 'Kaşta titanyum piercing' },
-  { key: 'makyaj', words: ['makyaj', 'kaş', 'microblading'], alt: 'Belirgin, dolgun bir kaş' },
-  { key: 'gecici', words: ['geçici', 'kına'], alt: 'Ele kınayla çiçek deseni çizilirken' },
-  { key: 'kalici', words: ['dövme'], alt: 'Eldivenli ellerle dövme yapılırken' },
+  { key: 'kulak', words: ['kulak'], src: '/media/hizmet-kulak.jpg', width: 560, height: 700, alt: 'Küpe takılı bir kulak memesi' },
+  { key: 'piercing', words: ['piercing'], src: '/media/hizmet-piercing.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan göbek piercing' },
+  { key: 'gecici', words: ['geçici', 'çıkartma'], src: '/seed/logo-thumb.jpg', width: 640, height: 640, alt: '', logo: true },
+  { key: 'kalici', words: ['dövme'], src: '/media/hizmet-kalici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan üçgen içinde gül dövmesi, el üstü' },
 ];
-const SERVICE_PHOTO_SIZE = { width: 560, height: 700 };
 const HIGHLIGHT_DASH = ' — '; // a highlight is "title — detail"
 const UNTITLED_WORK = 'Çınar Tattoo çalışması';
 const AREA_SERVED = ['Esenler', 'Bağcılar', 'Güngören', 'Bayrampaşa', 'Gaziosmanpaşa', 'İstanbul'];
@@ -382,8 +380,7 @@ function facts(ctx) {
 
 const caption = (photo) => (blank(photo.caption) ? '' : text(String(photo.caption).trim()));
 // A seeded CC0 stock photo (defaults.js, "sample"), not the studio's own work: marked "Temsili".
-const isSample = (photo) => String(photo.seed_path ?? '').startsWith('temsili-');
-const altOf = (photo) => `${caption(photo) || UNTITLED_WORK}${isSample(photo) ? ' (temsili görsel)' : ''}`;
+const altOf = (photo) => caption(photo) || UNTITLED_WORK;
 
 function strip(ctx) {
   const photos = ctx.photos.slice(0, STRIP_MAX);
@@ -432,9 +429,8 @@ function works(ctx, no) {
   const counts = new Map(CATEGORIES.map((category) => [category, ctx.photos.filter((photo) => photo.category === category).length]));
   const used = CATEGORIES.filter((category) => counts.get(category) > 0);
   const hasTabs = used.length >= 2;
-  const samples = ctx.photos.some(isSample);
-  const side = `Esenler’deki stüdyoda yapılan dövmeler: siyah-gri, ince çizgi, renkli ve yazı.${samples ? ' “Temsili” yazanlar hizmeti tanıtan örnek görsellerdir.' : ''} ${hasTabs ? 'Türe göre süz, büyütmek için dokun.' : 'Büyütmek için dokun.'}`;
-  const top = sectionTop('calismalar', no, 'Çalışmalar', samples ? 'Stüdyodan işler, hizmetlerden örnekler.' : 'Stüdyodan, gerçek işler.', side);
+  const side = `Esenler’deki stüdyoda yapılan dövmeler: siyah-gri, ince çizgi, renkli ve yazı. ${hasTabs ? 'Türe göre süz, büyütmek için dokun.' : 'Büyütmek için dokun.'}`;
+  const top = sectionTop('calismalar', no, 'Çalışmalar', 'Stüdyodan, gerçek işler.', side);
 
   if (photos.length === 0) {
     const more = instaLink(ctx, 'link', 'Instagram’da işlere bak ↗');
@@ -456,7 +452,7 @@ function works(ctx, no) {
       const label = altOf(photo);
       return `<figure class="work" id="is-${escapeHtml(photo.id)}" data-i="${index}" data-no="${index + 1}" data-style="${escapeHtml(photo.category)}"${index >= WORKS_SHOWN ? ' hidden' : ''}>
         <button type="button" class="wipe" aria-label="${label}, büyüt"><img src="${escapeHtml(thumb)}" data-full="${escapeHtml(full)}" alt="${label}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></button>
-        <figcaption><b>${caption(photo)}${isSample(photo) ? ' <i class="sample">Temsili</i>' : ''}</b><span class="num">No. ${pad(index + 1)}</span></figcaption>
+        <figcaption><b>${caption(photo)}</b><span class="num">No. ${pad(index + 1)}</span></figcaption>
       </figure>`;
     })
     .join('\n      ');
@@ -593,7 +589,7 @@ function services(ctx) {
       const photo = servicePhoto(name, used);
       const figure = photo === null
         ? ''
-        : `<figure class="svc-ph"><img src="/media/hizmet-${photo.key}.jpg" alt="${escapeHtml(photo.alt)}" width="${SERVICE_PHOTO_SIZE.width}" height="${SERVICE_PHOTO_SIZE.height}" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure>`;
+        : `<figure class="svc-ph${photo.logo ? ' logo' : ''}"><img src="${photo.src}" alt="${escapeHtml(photo.alt)}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></figure>`;
       return `<li>${figure}<i class="num">${pad(index + 1)}</i><h3>${text(name)}</h3>${description}</li>`;
     })
     .join('\n        ');
@@ -786,7 +782,7 @@ function faq(ctx, no) {
     ['Yaş sınırı var mı?', 'Evet. 18 yaşından küçüklere dövme yapılmaz; seans günü kimliğini yanında getir.'],
     ['Seanstan önce ne yapmalıyım?', 'İyi uyu, doyurucu bir öğün ye, bol su iç. Seanstan önceki 24 saat alkol alma. Dövülecek bölgeye rahat erişilen kıyafetler giy.'],
     ['Piercing de yapıyor musunuz?', `Evet, titanyum ya da çelik takıyla; kulak delme de ağrısız yapılır. Hangi bölge için düşündüğünü ${via} yaz, uygun takı ve randevu için bilgi verelim.`],
-    ['Kalıcı makyaj ve geçici dövme var mı?', `Evet, ikisi de var. Ne istediğini ${via} yaz, ayrıntıları ve randevuyu birlikte konuşalım.`],
+    ['Geçici dövme var mı?', `Evet, yapıştırma (çıkartma) geçici dövme var; kalıcıya karar vermeden önce deneyebilirsin. Ne istediğini ${via} yaz.`],
   ];
   return section(
     'sss',

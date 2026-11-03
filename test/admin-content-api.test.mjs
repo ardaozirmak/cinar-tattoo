@@ -151,7 +151,7 @@ test('PUT services: a body without the list, with something else than a list, or
   const { env, cookie } = await signedIn(t);
   const bad = [{}, { services: 'Piercing' }, { services: { name: 'x' } }, { services: ['Piercing'] }, { services: [{ name: 5, description: '' }] }, { hizmetler: SERVICES }, [], null];
   for (const json of bad) await assertError(await put(env, cookie, 'services', json), 400, UNREADABLE, JSON.stringify(json));
-  assert.deepEqual((await stateOf(env, cookie)).services.map(({ name }) => name), ['Kalıcı dövme', 'Geçici dövme', 'Titanyum & çelik piercing', 'Ağrısız kulak delme', 'Kalıcı makyaj']);
+  assert.deepEqual((await stateOf(env, cookie)).services.map(({ name }) => name), ['Kalıcı dövme', 'Geçici dövme', 'Titanyum & çelik piercing', 'Ağrısız kulak delme']);
 });
 
 // ---------------------------------------------------------------------------------------------

@@ -11,7 +11,7 @@ test('BRAND_NAME', () => {
 test('DEFAULT_SETTINGS holds the texts the site opens with', () => {
   assert.deepEqual(DEFAULT_SETTINGS, {
     seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
-    seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme, kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz.',
+    seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz. Randevu al.',
     hero_title: 'Bir ömür taşıyacağın\ndövme.',
     hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
     about_title: 'Onur Aydoğan',
@@ -74,13 +74,12 @@ test('every default passes the rule of its own field', () => {
   assert.deepEqual(result.values, DEFAULT_SETTINGS); // nothing about a default changes when it is saved as it is
 });
 
-test('DEFAULT_SERVICES: ids 1 to 5, in order', () => {
+test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
   assert.deepEqual(DEFAULT_SERVICES, [
     { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan tam kola, sana göre çizilen dövmeler.' },
-    { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenlere.' },
+    { id: 2, name: 'Geçici dövme', description: 'Yapıştırma (çıkartma) dövme; kalıcıya karar vermeden önce dene.' },
     { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek; titanyum ya da çelik takıyla.' },
     { id: 4, name: 'Ağrısız kulak delme', description: 'Ağrısız, acısız kulak delme; steril ortamda.' },
-    { id: 5, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
   ]);
   const result = validateServices(DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
   assert.equal(result.ok, true, result.message);
@@ -98,8 +97,8 @@ const WORKS = [
   ['w19', 'Kuşlar, köprücük'], ['w20', 'Kafatası ve çiçek'],
 ];
 
-test('SEED_PHOTOS: 17 prototype works, the five earlier crops, then 24 CC0 samples by category (46 in all)', () => {
-  assert.equal(SEED_PHOTOS.length, 46);
+test('SEED_PHOTOS: 17 prototype works, then the five earlier crops (22 in all, the studio’s own)', () => {
+  assert.equal(SEED_PHOTOS.length, 22);
   assert.deepEqual(
     SEED_PHOTOS.slice(0, 17),
     WORKS.map(([id, caption]) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 })),
@@ -111,10 +110,6 @@ test('SEED_PHOTOS: 17 prototype works, the five earlier crops, then 24 CC0 sampl
     { id: 'seed-yazi-gogus', caption: 'Chicano yazı', category: 'dovme', seed_path: 'yazi-gogus', width: 502, height: 641 },
     { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
   ]);
-  const samples = SEED_PHOTOS.slice(22);
-  assert.ok(samples.every((photo) => photo.seed_path === `temsili-${photo.category}-${photo.seed_path.split('-').pop()}`));
-  const per = (category) => samples.filter((photo) => photo.category === category).length;
-  assert.deepEqual([per('gecici'), per('piercing'), per('kulak'), per('makyaj'), per('dovme')], [7, 5, 5, 7, 0]);
   assert.ok(!SEED_PHOTOS.some((photo) => ['seed-k03', 'seed-k04', 'seed-w06', 'seed-w30'].includes(photo.id)));
 });
 

@@ -73,7 +73,7 @@ test('defaults: the WhatsApp number on <html>, the two-line H1, the logo, the li
   assert.ok(html.includes('src="/seed/logo-full.jpg"'));
   assert.ok(html.includes('srcset="/seed/logo-thumb.jpg 640w, /seed/logo-full.jpg 1254w"'));
   assert.ok(html.includes('sizes="(max-width: 900px) 100vw, min(100vw, 120svh)"'));
-  assert.ok(html.includes('alt="Çınar Tattoo logosu: Çınar İnk, Tattoo, 2005 ve çapa; dövme, piercing, kalıcı makyaj"'));
+  assert.ok(html.includes('alt="Çınar Tattoo logosu: Çınar İnk, Tattoo, 2005 ve çapa"'));
   assert.ok(html.includes('href="tel:+905372631546"'));
   assert.ok(html.includes(`href="${WA_GENERIC}"`));
   assert.ok(html.includes('© 2031 Çınar Tattoo'));
@@ -82,30 +82,22 @@ test('defaults: the WhatsApp number on <html>, the two-line H1, the logo, the li
   assert.ok(html.includes('Esenler dövme &amp; piercing</b> · 2005’ten beri'));
 });
 
-test('defaults: 46 work cards, the first is seed-w03, 24 shown and 22 behind “Daha fazla göster”', () => {
+test('defaults: 22 work cards, the first is seed-w03, all shown and no “Daha fazla göster”', () => {
   const html = page();
-  assert.equal(count(html, '<figure class="work"'), 46);
+  assert.equal(count(html, '<figure class="work"'), 22);
   assert.ok(html.includes('<figure class="work" id="is-seed-w03" data-i="0" data-no="1" data-style="dovme">'));
   const cards = html.match(/<figure class="work"[^>]*>/g);
-  assert.equal(cards.filter((card) => card.endsWith(' hidden>')).length, 22);
+  assert.equal(cards.filter((card) => card.endsWith(' hidden>')).length, 0);
   assert.ok(cards.slice(0, 24).every((card) => !card.includes('hidden')));
-  assert.equal(count(html, 'Daha fazla göster'), 1);
+  assert.equal(count(html, 'Daha fazla göster'), 0);
   const first = between(html, '<figure class="work" id="is-seed-w03"', '</figure>');
   assert.ok(first.includes('src="/seed/w03-thumb.jpg" data-full="/seed/w03-full.jpg"'));
   assert.ok(first.includes('width="400" height="711" loading="lazy"'));
   assert.ok(first.includes('alt="Üçgen içinde gül, el üstü"'));
   assert.ok(first.includes('<figcaption><b>Üçgen içinde gül, el üstü</b><span class="num">No. 01</span></figcaption>'));
   assert.ok(html.includes('<figure class="work" id="is-seed-gobek-piercing" data-i="21" data-no="22" data-style="piercing">'));
-  // the CC0 samples come after the studio's own work, each marked "Temsili"
-  const sample = between(html, '<figure class="work" id="is-seed-temsili-gecici-1"', '</figure>');
-  assert.ok(sample.includes('alt="Kınayla çiçek deseni (temsili görsel)"'));
-  assert.ok(sample.includes('<figcaption><b>Kınayla çiçek deseni <i class="sample">Temsili</i></b><span class="num">No. 23</span></figcaption>'));
-  assert.equal(count(html, '<i class="sample">Temsili</i>'), 24);
-  assert.ok(html.includes('Stüdyodan işler, hizmetlerden örnekler.'));
-  assert.ok(html.includes('“Temsili” yazanlar hizmeti tanıtan örnek görsellerdir.'));
-  const own = page({}, { photos: [photo(1), photo(2)] });
-  assert.ok(own.includes('Stüdyodan, gerçek işler.'));
-  assert.ok(!own.includes('class="sample"') && !own.includes('“Temsili” yazanlar'));
+  assert.ok(html.includes('Stüdyodan, gerçek işler.'));
+  assert.ok(!html.includes('Temsili') && !html.includes('temsili'));
 });
 
 test('defaults: 13 reviews, the facts 26 years and 13 / 13, and never ÇINAR or the old lacivert', () => {
@@ -124,7 +116,7 @@ test('defaults: 13 reviews, the facts 26 years and 13 / 13, and never ÇINAR or 
 test('defaults: the head carries the local SEO, the share tags, the icons and the two font preloads', () => {
   const html = page();
   assert.ok(html.includes('<title>Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri</title>'));
-  assert.ok(html.includes('<meta name="description" content="Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme, kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz.">'));
+  assert.ok(html.includes('<meta name="description" content="Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz. Randevu al.">'));
   assert.ok(html.includes('<link rel="canonical" href="https://cinar.test/">'));
   for (const tag of [
     '<meta property="og:type" content="website">',
@@ -439,12 +431,11 @@ test('hizmetler: one item per service under the artist, the empty description le
   const section = between(page(), '<section class="sec" id="sanatci"', '</section>');
   const block = between(section, '<div class="services" data-rise>', '</ul>');
   assert.ok(block.includes('<p class="lbl">Hizmetler</p>'));
-  assert.equal(count(block, '<li>'), 5);
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kalici.jpg" alt="Eldivenli ellerle dövme yapılırken" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-gecici.jpg" alt="Ele kınayla çiçek deseni çizilirken" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Kalıcıya karar vermeden önce denemek isteyenlere.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Kaşta titanyum piercing" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek; titanyum ya da çelik takıyla.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kulak.jpg" alt="Küpe takılı bir kulak memesi" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Ağrısız, acısız kulak delme; steril ortamda.</p></li>'));
-  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-makyaj.jpg" alt="Belirgin, dolgun bir kaş" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">05</i><h3>Kalıcı makyaj</h3><p>Kalıcı makyaj uygulamaları; ayrıntı için yaz.</p></li>'));
+  assert.equal(count(block, '<li>'), 4);
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kalici.jpg" alt="Çınar Tattoo’da yapılan üçgen içinde gül dövmesi, el üstü" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph logo"><img src="/seed/logo-thumb.jpg" alt="" width="640" height="640" loading="lazy" decoding="async"></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Yapıştırma (çıkartma) dövme; kalıcıya karar vermeden önce dene.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Çınar Tattoo’da yapılan göbek piercing" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek; titanyum ya da çelik takıyla.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kulak.jpg" alt="Küpe takılı bir kulak memesi" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Ağrısız, acısız kulak delme; steril ortamda.</p></li>'));
   const one = page({}, { services: [{ id: 9, name: "Onur'un <i>", description: '' }] });
   assert.ok(one.includes('<li><i class="num">01</i><h3>Onur’un &lt;i&gt;</h3></li>'));
   const none = page({}, { services: [] });
@@ -491,19 +482,18 @@ test('the booking form offers the services as chips, the first one checked, and 
   assert.ok(form.includes('<input type="radio" name="kind" value="Kalıcı dövme" checked><span>Kalıcı dövme</span>'));
   assert.ok(form.includes('<input type="radio" name="kind" value="Titanyum &amp; çelik piercing"><span>Titanyum &amp; çelik piercing</span>'));
   assert.ok(form.includes('<input type="radio" name="kind" value="Ağrısız kulak delme"><span>Ağrısız kulak delme</span>'));
-  assert.ok(form.includes('<input type="radio" name="kind" value="Kalıcı makyaj"><span>Kalıcı makyaj</span>'));
   assert.ok(form.includes('value="Tam kol / sırt"'));
   assert.ok(form.includes(`<a class="btn" href="${WA_GENERIC}" target="_blank" rel="noopener" data-track="whatsapp">WhatsApp’tan yaz`));
 });
 
-test('SSS: five questions; piercing is with titanium, and permanent make-up and temporary tattoos are answered', () => {
+test('SSS: five questions; piercing is with titanium and steel, and the sticker temporary tattoo is answered', () => {
   const faq = between(page(), '<section class="sec" id="sss"', '</section>');
   assert.equal(count(faq, '<details>'), 5);
   assert.ok(faq.includes('Piercing de yapıyor musunuz?</summary><p class="ans">Evet, titanyum ya da çelik takıyla; kulak delme de ağrısız yapılır. '));
-  assert.ok(faq.includes('<i class="num">05</i>Kalıcı makyaj ve geçici dövme var mı?</summary><p class="ans">Evet, ikisi de var. Ne istediğini WhatsApp’tan yaz, ayrıntıları ve randevuyu birlikte konuşalım.</p>'));
+  assert.ok(faq.includes('<i class="num">05</i>Geçici dövme var mı?</summary><p class="ans">Evet, yapıştırma (çıkartma) geçici dövme var; kalıcıya karar vermeden önce deneyebilirsin. Ne istediğini WhatsApp’tan yaz.</p>'));
   const bare = between(page({ whatsapp: '' }), '<section class="sec" id="sss"', '</section>');
   assert.ok(!bare.includes('WhatsApp'));
-  assert.ok(bare.includes('Evet, ikisi de var. Ne istediğini bize yaz, ayrıntıları ve randevuyu birlikte konuşalım.'));
+  assert.ok(bare.includes('kalıcıya karar vermeden önce deneyebilirsin. Ne istediğini bize yaz.'));
 });
 
 test('the reels: four clips from /media with their posters', () => {
@@ -519,12 +509,10 @@ test('tabs: none with one category; the defaults count every category that has p
   const one = page({}, { photos: [photo(1), photo(2)] });
   assert.ok(!one.includes('class="tabs"'));
   const html = page();
-  assert.ok(html.includes('Tümü <sup>46</sup>'));
+  assert.ok(html.includes('Tümü <sup>22</sup>'));
   assert.ok(html.includes('Kalıcı dövme <sup>21</sup>'));
-  assert.ok(html.includes('Geçici dövme <sup>7</sup>'));
-  assert.ok(html.includes('Kulak delme <sup>5</sup>'));
-  assert.ok(html.includes('Kalıcı makyaj <sup>7</sup>'));
-  assert.ok(html.includes('Piercing <sup>6</sup>'));
+  assert.ok(html.includes('Piercing <sup>1</sup>'));
+  assert.ok(!html.includes('data-f="gecici"') && !html.includes('data-f="kulak"'));
   assert.ok(!html.includes('data-f="diger"'));
 });
 
@@ -773,7 +761,7 @@ test('the hero backdrop crops exist at their pinned sizes and within 150 KB', ()
 
 test('the hero card under the logo names the services, the address, the hours and the route', () => {
   const html = page();
-  assert.ok(html.includes('<div class="hero-info"><div class="hi-what"><p class="hi-label">Hizmetler</p><ul><li>Kalıcı dövme</li><li>Geçici dövme</li><li>Titanyum &amp; çelik piercing</li><li>Ağrısız kulak delme</li><li>Kalıcı makyaj</li></ul></div>'));
+  assert.ok(html.includes('<div class="hero-info"><div class="hi-what"><p class="hi-label">Hizmetler</p><ul><li>Kalıcı dövme</li><li>Geçici dövme</li><li>Titanyum &amp; çelik piercing</li><li>Ağrısız kulak delme</li></ul></div>'));
   assert.ok(html.includes('<div class="hi-where"><p class="hi-label"><span class="dot" aria-hidden="true"></span>Adres</p><p class="hi-place"><span class="hi-addr">Nine Hatun Mah. İnönü Cd. No:11, Akman Ticaret Merkezi, 34220 Esenler / İstanbul</span><span class="hi-hours">10.00–23.00</span><a class="hi-route" href='));
   assert.ok(/<a class="hi-route" href="[^"]+" target="_blank" rel="noopener" data-track="directions">Yol tarifi <span class="ar">→<\/span><\/a><\/p><\/div><\/div>/.test(html));
   // Owner text is escaped; empty parts drop out, and with nothing at all there is no card.
@@ -787,13 +775,13 @@ test('the opening shows Çınar Tattoo over ESENLER · 2005 and flashes the serv
   const html = page();
   assert.ok(html.includes('<div class="intro-name" id="introName"><span class="in-row in-brand"><span class="ch">Ç</span><span class="ch">ı</span><span class="ch">n</span><span class="ch">a</span><span class="ch">r</span><span class="ch">&nbsp;</span><span class="ch">T</span>'));
   assert.ok(html.includes('<span class="in-row in-place"><span class="ch">E</span><span class="ch">S</span><span class="ch">E</span><span class="ch">N</span><span class="ch">L</span><span class="ch">E</span><span class="ch">R</span><span class="ch">&nbsp;</span><span class="ch">·</span><span class="ch">&nbsp;</span><span class="ch">2</span><span class="ch">0</span><span class="ch">0</span><span class="ch">5</span></span></div>'));
-  assert.ok(html.includes('<p class="intro-svc" id="introSvc"><span>Kalıcı dövme</span><span>Geçici dövme</span><span>Titanyum &amp; çelik piercing</span><span>Ağrısız kulak delme</span><span>Kalıcı makyaj</span></p>'));
+  assert.ok(html.includes('<p class="intro-svc" id="introSvc"><span>Kalıcı dövme</span><span>Geçici dövme</span><span>Titanyum &amp; çelik piercing</span><span>Ağrısız kulak delme</span></p>'));
   assert.ok(!html.includes('id="introSub"'));
   assert.ok(page({}, { services: [{ id: 1, name: '<i>x</i>', description: '' }] }).includes('<span>&lt;i&gt;x&lt;/i&gt;</span></p>'));
   assert.ok(!page({}, { services: [] }).includes('id="introSvc"'));
 });
 
-test('service cards: a CC0 picture by the name, each used once, marked as illustrative; none for an unknown name', () => {
+test('service cards: a picture by the name, each used once, with no label; none for an unknown name', () => {
   const services = [
     { id: 1, name: 'Kulak piercing', description: '' },
     { id: 2, name: 'Burun piercing', description: '' },
@@ -803,7 +791,7 @@ test('service cards: a CC0 picture by the name, each used once, marked as illust
   ];
   const block = between(page({}, { services }), '<ul class="svc-list">', '</ul>');
   assert.equal(count(block, '<figure class="svc-ph">'), 3);
-  assert.equal(count(block, 'Temsili görsel'), 3);
+  assert.ok(!block.includes('figcaption'));
   assert.ok(block.includes('<li><i class="num">04</i><h3>İkinci dövme</h3></li>'));
   assert.ok(block.includes('hizmet-kulak.jpg" alt="Küpe takılı bir kulak memesi"'));
   assert.ok(block.includes('hizmet-piercing.jpg'));
@@ -811,8 +799,8 @@ test('service cards: a CC0 picture by the name, each used once, marked as illust
   assert.ok(block.includes('<li><i class="num">05</i><h3>Lazer</h3></li>'));
 });
 
-test('the five service pictures are 560 by 700 JPEGs of at most 120 KB', () => {
-  for (const key of ['kalici', 'gecici', 'piercing', 'kulak', 'makyaj']) {
+test('the three service pictures are 560 by 700 JPEGs of at most 120 KB', () => {
+  for (const key of ['kalici', 'piercing', 'kulak']) {
     const file = join(PUBLIC, 'media', `hizmet-${key}.jpg`);
     assert.ok(existsSync(file), key);
     assert.ok(statSync(file).size <= 122880, `${key} is ${statSync(file).size} bytes`);

@@ -11,7 +11,7 @@ export const BRAND_NAME = 'Çınar Tattoo';
 export const DEFAULT_SETTINGS = {
   seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
   // No review claim here: the reviews can change, a fixed claim in Google's snippet cannot.
-  seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme, kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz.',
+  seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz. Randevu al.',
   // Each line of the hero title is one line of the H1; the last of two or three is set in italics.
   hero_title: 'Bir ömür taşıyacağın\ndövme.',
   hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
@@ -44,10 +44,9 @@ export const DEFAULT_SETTINGS = {
 
 export const DEFAULT_SERVICES = [
   { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan tam kola, sana göre çizilen dövmeler.' },
-  { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenlere.' },
+  { id: 2, name: 'Geçici dövme', description: 'Yapıştırma (çıkartma) dövme; kalıcıya karar vermeden önce dene.' },
   { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek; titanyum ya da çelik takıyla.' },
   { id: 4, name: 'Ağrısız kulak delme', description: 'Ağrısız, acısız kulak delme; steril ortamda.' },
-  { id: 5, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
 ];
 
 // The gallery a new site opens with, in position order: the Dergi prototype's 32 works (photos of
@@ -55,10 +54,6 @@ export const DEFAULT_SERVICES = [
 // then the five earlier crops. The sizes are those of public/seed/<seed_path>-full.jpg, which
 // dev/seed-images.py makes.
 const work = (id, caption) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 });
-
-// Representative CC0 stock photos for the services the studio has few photos of yet: the page marks
-// them "Temsili" (see isSample in render.js) and docs/GORSELLER.md lists their sources.
-const sample = (path, caption, category, width, height) => ({ id: `seed-${path}`, caption, category, seed_path: path, width, height });
 
 export const SEED_PHOTOS = [
   work('w03', 'Üçgen içinde gül, el üstü'),
@@ -83,30 +78,6 @@ export const SEED_PHOTOS = [
   { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', seed_path: 'kurt', width: 487, height: 790 },
   { id: 'seed-yazi-gogus', caption: 'Chicano yazı', category: 'dovme', seed_path: 'yazi-gogus', width: 502, height: 641 },
   { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
-  sample('temsili-gecici-1', 'Kınayla çiçek deseni', 'gecici', 1000, 666),
-  sample('temsili-gecici-2', 'El üstü kına deseni', 'gecici', 750, 1000),
-  sample('temsili-gecici-3', 'İki avuç içi kına', 'gecici', 1000, 666),
-  sample('temsili-gecici-4', 'Kına, el ve bilek', 'gecici', 750, 1000),
-  sample('temsili-gecici-5', 'Avuç içi mandala kına', 'gecici', 750, 1000),
-  sample('temsili-gecici-6', 'Bilekten parmağa kına', 'gecici', 750, 1000),
-  sample('temsili-gecici-7', 'Avuç içine kına çizimi', 'gecici', 1000, 800),
-  sample('temsili-piercing-1', 'Kaşta titanyum piercing', 'piercing', 960, 860),
-  sample('temsili-piercing-2', 'Burun piercing', 'piercing', 894, 1000),
-  sample('temsili-piercing-3', 'Burun piercing, taş uçlu', 'piercing', 960, 640),
-  sample('temsili-piercing-4', 'Göbek piercing, taşlı', 'piercing', 960, 713),
-  sample('temsili-piercing-5', 'Göbek piercing', 'piercing', 960, 654),
-  sample('temsili-kulak-1', 'Sallantılı küpe', 'kulak', 1000, 1000),
-  sample('temsili-kulak-2', 'Kulak memesine küpe', 'kulak', 960, 640),
-  sample('temsili-kulak-3', 'Kalp küpe', 'kulak', 726, 1000),
-  sample('temsili-kulak-4', 'Taşlı top küpe', 'kulak', 500, 500),
-  sample('temsili-kulak-5', 'Yıldız küpe', 'kulak', 438, 500),
-  sample('temsili-makyaj-1', 'Kaş, yakın çekim', 'makyaj', 960, 540),
-  sample('temsili-makyaj-2', 'Kaş ve kirpik', 'makyaj', 960, 636),
-  sample('temsili-makyaj-3', 'Kaş ve bakış', 'makyaj', 960, 619),
-  sample('temsili-makyaj-4', 'Kalıcı kaş', 'makyaj', 1000, 750),
-  sample('temsili-makyaj-5', 'Kalıcı kaş, yakından', 'makyaj', 1000, 750),
-  sample('temsili-makyaj-6', 'Belirgin kaş', 'makyaj', 1000, 667),
-  sample('temsili-makyaj-7', 'Dudak rengi', 'makyaj', 464, 500),
 ];
 
 // The shop's logo, shown whole and sharp as the hero until the owner uploads another picture. (The

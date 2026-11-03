@@ -252,16 +252,12 @@ button{font:inherit;color:inherit}
 .work:nth-child(3n+1) button{aspect-ratio:3/4}
 .work:nth-child(3n+2) button{aspect-ratio:9/16}
 .work:nth-child(3n) button{aspect-ratio:4/5}
-/* a CC0 sample keeps its own shape: a product shot or a wide henna photo would crop badly */
-.work:has(.sample) button{aspect-ratio:auto}
-.work:has(.sample) img{height:auto;display:block}
 .work img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease),filter .6s var(--ease);filter:saturate(.88)}
 .work:hover img{transform:scale(1.05);filter:saturate(1.05)}
 .work button:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
 .work figcaption{display:flex;justify-content:space-between;gap:.6rem;font-size:.76rem;color:var(--mute)}
 .work figcaption b{color:var(--fg-2);font-weight:600;min-width:0;overflow-wrap:anywhere}
 .work figcaption span{flex:none}
-.work figcaption .sample{font-style:normal;font-weight:500;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border:1px solid var(--line);padding:.05rem .35rem;margin-left:.3rem;white-space:nowrap}
 .works-more{display:flex;flex-wrap:wrap;gap:1.4rem;align-items:center;margin-top:2rem}
 .empty{display:grid;gap:1rem;justify-items:start;padding:3rem 0;border-top:1px solid var(--line)}
 .empty p{font:400 clamp(1.8rem,3.4vw,2.8rem)/1.1 var(--serif);color:var(--fg-2)}
@@ -338,16 +334,17 @@ button{font:inherit;color:inherit}
 
 .services{margin-top:clamp(3rem,7vw,5rem);display:grid;gap:1rem}
 /* one card per service: its picture on top, then the number, the name and the line */
-.svc-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2.4rem 1.2rem;border-top:1px solid var(--line);padding-top:1.4rem}
+.svc-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2.4rem 1.2rem;border-top:1px solid var(--line);padding-top:1.4rem}
 .svc-list li{display:grid;gap:.5rem;align-content:start;min-width:0}
 .svc-ph{position:relative;margin:0 0 .5rem;aspect-ratio:4/5;overflow:hidden;background:var(--line)}
 .svc-ph img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.8) brightness(.92);transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .8s}
 .svc-list li:hover .svc-ph img{transform:scale(1.04);filter:none}
-.svc-ph figcaption{position:absolute;left:.6rem;bottom:.5rem;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-2);text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.svc-ph.logo{background:var(--logo-ground)}
+.svc-ph.logo img{object-fit:contain;padding:12%;filter:none}
 .svc-list i{font-style:normal;font-size:.75rem;font-weight:600;color:var(--mute)}
 .svc-list h3{font:400 clamp(1.6rem,2vw,2.1rem)/1 var(--serif);overflow-wrap:anywhere}
 .svc-list p{color:var(--fg-2);font-size:.92rem}
-@media (max-width:1100px){.svc-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:1100px){.svc-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){.svc-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:2rem .9rem}.svc-list h3{font-size:1.45rem}}
 @media (prefers-reduced-motion:reduce){.svc-ph img{transition:none}.svc-list li:hover .svc-ph img{transform:none}}
 
