@@ -14,8 +14,13 @@ import { isSameOrigin, requireSession, setupProblems } from '../auth.js';
 import { ensureSchema } from '../db.js';
 import { HttpError, errorJson, json } from '../http.js';
 import { changePassword, login, logout, state } from './auth-handlers.js';
+import { savePrices, saveReviews, saveServices, saveSettings, stats } from './content-handlers.js';
+import { createPhoto, editPhoto, removePhoto, reorderPhotos, replaceHero, replacePhoto } from './photo-handlers.js';
 
 const PREFIX = '/api/admin/';
+
+/** The answer to a request that does not come from the site itself. The public beacon (api/track.js) uses it too. */
+export const ORIGIN_REFUSED = 'İstek reddedildi. Sayfayı yenileyip tekrar dene.';
 
 /**
  * The routes. A path is a list of segments; one that starts with ':' is a parameter, whose value the
@@ -27,12 +32,23 @@ const ROUTES = [
   { method: 'POST', path: ['logout'], auth: false, handler: logout },
   { method: 'GET', path: ['state'], auth: true, handler: state },
   { method: 'POST', path: ['password'], auth: true, handler: changePassword },
+  { method: 'PUT', path: ['settings'], auth: true, handler: saveSettings },
+  { method: 'PUT', path: ['services'], auth: true, handler: saveServices },
+  { method: 'PUT', path: ['prices'], auth: true, handler: savePrices },
+  { method: 'PUT', path: ['reviews'], auth: true, handler: saveReviews },
+  { method: 'GET', path: ['stats'], auth: true, handler: stats },
+  { method: 'POST', path: ['photos'], auth: true, handler: createPhoto },
+  { method: 'PUT', path: ['photos', 'order'], auth: true, handler: reorderPhotos },
+  { method: 'PATCH', path: ['photos', ':id'], auth: true, handler: editPhoto },
+  { method: 'DELETE', path: ['photos', ':id'], auth: true, handler: removePhoto },
+  { method: 'POST', path: ['photos', ':id', 'replace'], auth: true, handler: replacePhoto },
+  { method: 'POST', path: ['hero-image'], auth: true, handler: replaceHero },
 ];
 
 /** Answers a request to /api/admin/*. The route comes from the URL: context.params is not used. */
 export async function handleAdmin({ request, env }) {
   try {
-    if (!isSameOrigin(request)) return errorJson(403, 'İstek reddedildi. Sayfayı yenileyip tekrar dene.');
+    if (!isSameOrigin(request)) return errorJson(403, ORIGIN_REFUSED);
     const problems = setupProblems(env);
     if (problems.length > 0) return errorJson(503, `Kurulum eksik: ${problems.join(', ')}.`);
     const db = env.DB;
