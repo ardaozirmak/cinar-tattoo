@@ -68,6 +68,19 @@ async function assertError(response, status, message, label = message) {
   assert.deepEqual(await response.json(), { message }, label);
 }
 
+// Sends `count` requests at once (send(i) makes the i-th) and counts the answers by status. Every
+// answer must be one of the errors in `expected`, { status: message }.
+async function sendAtOnce(count, send, expected) {
+  const responses = await Promise.all(Array.from({ length: count }, (_, i) => send(i)));
+  const tally = Object.fromEntries(Object.keys(expected).map((status) => [status, 0]));
+  for (const response of responses) {
+    assert.ok(Object.hasOwn(expected, response.status), `unexpected status ${response.status}`);
+    await assertError(response, response.status, expected[response.status]);
+    tally[response.status] += 1;
+  }
+  return tally;
+}
+
 // ---------------------------------------------------------------------------------------------
 // Login
 // ---------------------------------------------------------------------------------------------
@@ -128,6 +141,21 @@ test('login: after 5 failed attempts from one IP the 6th is 429, even with the r
   assert.equal(await countRecentFailures(env.DB, '203.0.113.10', 0), 1, 'failures are kept per CF-Connecting-IP');
 });
 
+test('login: of 10 wrong passwords sent at once from one IP, at most 5 are checked (401) and the rest are 429; the right password is 429 after them', async (t) => {
+  const env = freshEnv(t);
+  const tally = await sendAtOnce(10, (i) => login(env, `yanlis-${i}`), { 401: 'Şifre yanlış.', 429: TOO_MANY });
+  assert.ok(tally[401] <= 5, `${tally[401]} of 10 were checked`);
+  await assertError(await login(env, PASSWORD), 429, TOO_MANY, 'the right password after them');
+});
+
+test('login: failures already recorded and attempts sent at once add up: after 4, at most 1 of 2 more is checked', async (t) => {
+  const env = freshEnv(t);
+  for (let i = 0; i < 4; i += 1) await assertError(await login(env, 'yanlis'), 401, 'Şifre yanlış.');
+  const tally = await sendAtOnce(2, (i) => login(env, `yanlis-${i}`), { 401: 'Şifre yanlış.', 429: TOO_MANY });
+  assert.ok(tally[401] <= 1, `${tally[401]} of 2 were checked after 4 failures`);
+  await assertError(await login(env, PASSWORD), 429, TOO_MANY, 'the right password after them');
+});
+
 test('login: only the failures of the last 15 minutes count', async (t) => {
   const old = freshEnv(t);
   await ensureSchema(old.DB);
@@ -148,12 +176,13 @@ test('login: a good login forgets the failures of that IP', async (t) => {
   assert.equal((await login(env, PASSWORD)).status, 200, '4 failures since the last good login, not 8');
 });
 
-test('login without a stored password and without ADMIN_PASSWORD is 503 and lets nobody in', async (t) => {
+test('login without a stored password and without ADMIN_PASSWORD is 503, lets nobody in and is not a failed attempt', async (t) => {
   for (const ADMIN_PASSWORD of [undefined, '']) {
     const env = freshEnv(t, { vars: { ADMIN_PASSWORD } });
     for (const password of ['x', 'undefined']) {
       await assertError(await login(env, password), 503, 'Kurulum eksik: ADMIN_PASSWORD tanımlı değil.', `${ADMIN_PASSWORD} / ${password}`);
     }
+    assert.equal(await countRecentFailures(env.DB, 'unknown', 0), 0, `${ADMIN_PASSWORD}: no failure recorded`);
   }
 });
 
@@ -493,6 +522,28 @@ test('password change: after 5 failures from the IP (password form and login tog
   await login(env, 'yanlis');
   await assertError(await changePassword(env, cookie, PASSWORD, 'yeni-sifre-2026'), 429, TOO_MANY);
   assert.equal((await getAuth(env.DB)).hash, null, 'nothing was changed');
+  assert.equal(await countRecentFailures(env.DB, 'unknown', 0), 5, 'a refused attempt is not counted again');
+});
+
+test('password change: of 10 wrong current passwords sent at once, at most 5 are checked and the rest are 429; nothing is changed', async (t) => {
+  const env = freshEnv(t);
+  const cookie = await loginCookie(env);
+  const tally = await sendAtOnce(10, (i) => changePassword(env, cookie, `yanlis-${i}`, 'yeni-sifre-2026'), { 400: 'Mevcut şifre yanlış.', 429: TOO_MANY });
+  assert.ok(tally[400] <= 5, `${tally[400]} of 10 were checked`);
+  await assertError(await changePassword(env, cookie, PASSWORD, 'yeni-sifre-2026'), 429, TOO_MANY, 'the right current password after them');
+  assert.equal((await getAuth(env.DB)).hash, null, 'nothing was changed');
+});
+
+test('password change: a right current password forgets the failures of the IP, as a good login does, also when the new password is refused', async (t) => {
+  const env = freshEnv(t);
+  const cookie = await loginCookie(env);
+  for (let i = 0; i < 4; i += 1) await assertError(await changePassword(env, cookie, 'yanlis', 'yeni-sifre-2026'), 400, 'Mevcut şifre yanlış.');
+  await assertError(await changePassword(env, cookie, PASSWORD, 'kisa'), 400, 'Yeni şifre en az 8 karakter olmalı.');
+  assert.equal(await countRecentFailures(env.DB, 'unknown', 0), 0, 'after a refused new password');
+
+  for (let i = 0; i < 4; i += 1) await assertError(await login(env, 'yanlis'), 401, 'Şifre yanlış.');
+  assert.equal((await changePassword(env, cookie, PASSWORD, 'yeni-sifre-2026')).status, 200);
+  assert.equal(await countRecentFailures(env.DB, 'unknown', 0), 0, 'after a changed password');
 });
 
 test('password change: the new password must have 8 to 128 characters', async (t) => {

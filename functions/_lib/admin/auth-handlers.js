@@ -49,6 +49,7 @@ const PASSWORD_MAX = 128;
 
 const UNREADABLE = 'İstek okunamadı.';
 const NO_ADMIN_PASSWORD = 'Kurulum eksik: ADMIN_PASSWORD tanımlı değil.';
+const TOO_MANY = 'Çok fazla deneme yaptın. 15 dakika sonra tekrar dene.';
 
 // ---------------------------------------------------------------------------------------------
 // Handlers
@@ -62,11 +63,7 @@ export async function login({ request, env, db, now }) {
   await refuseWhenLockedOut(db, ip, now);
   const auth = await getAuth(db);
   if (!hasPassword(env, auth)) throw new HttpError(503, NO_ADMIN_PASSWORD);
-  if (!(await verifyPassword(env, auth, password))) {
-    await recordFailure(db, ip, now);
-    throw new HttpError(401, 'Şifre yanlış.');
-  }
-  await clearFailures(db, ip);
+  if (!(await tryPassword(db, ip, now, env, auth, password))) throw new HttpError(401, 'Şifre yanlış.');
   return sessionResponse(request, env, auth.session_version, now);
 }
 
@@ -104,10 +101,7 @@ export async function changePassword({ request, env, db, now }) {
   await refuseWhenLockedOut(db, ip, now);
   const auth = await getAuth(db);
   if (!hasPassword(env, auth)) throw new HttpError(503, NO_ADMIN_PASSWORD);
-  if (!(await verifyPassword(env, auth, current))) {
-    await recordFailure(db, ip, now);
-    throw new HttpError(400, 'Mevcut şifre yanlış.');
-  }
+  if (!(await tryPassword(db, ip, now, env, auth, current))) throw new HttpError(400, 'Mevcut şifre yanlış.');
   if (next.length < PASSWORD_MIN) throw new HttpError(400, `Yeni şifre en az ${PASSWORD_MIN} karakter olmalı.`);
   if (next.length > PASSWORD_MAX) throw new HttpError(400, `Yeni şifre en fazla ${PASSWORD_MAX} karakter olabilir.`);
 
@@ -176,11 +170,32 @@ async function readTexts(request, names) {
   return texts;
 }
 
-// A refused attempt is not counted, so the wait ends 15 minutes after the fifth failure.
+// The quick check: an IP with 5 failures in the last 15 minutes is refused before anything is
+// recorded, so trying again while locked out does not make the wait longer.
 async function refuseWhenLockedOut(db, ip, now) {
-  if ((await countRecentFailures(db, ip, now - FAILURE_WINDOW_MS)) >= MAX_FAILURES) {
-    throw new HttpError(429, 'Çok fazla deneme yaptın. 15 dakika sonra tekrar dene.');
-  }
+  if ((await recentFailures(db, ip, now)) >= MAX_FAILURES) throw new HttpError(429, TOO_MANY);
+}
+
+// Whether `password` is the admin password, checked as one of the IP's 5 attempts. The attempt is
+// recorded as a failure first and the failures are counted again; only then is the password
+// checked, and a right one forgets the IP's failures, this attempt's included.
+//
+// Recording only after a wrong password would let attempts sent at once all pass
+// refuseWhenLockedOut on the same old count, so one burst of any size would get through. D1 runs
+// the inserts one at a time, so the attempt that adds the k-th row of the window counts at least k
+// rows, and only the attempts that add rows 1 to 5 can reach verifyPassword, however many arrive
+// together. An attempt refused here, or one whose check ends in an error, stays recorded.
+async function tryPassword(db, ip, now, env, auth, password) {
+  await recordFailure(db, ip, now);
+  if ((await recentFailures(db, ip, now)) > MAX_FAILURES) throw new HttpError(429, TOO_MANY);
+  if (!(await verifyPassword(env, auth, password))) return false;
+  await clearFailures(db, ip);
+  return true;
+}
+
+// The failures of this IP in the last 15 minutes.
+function recentFailures(db, ip, now) {
+  return countRecentFailures(db, ip, now - FAILURE_WINDOW_MS);
 }
 
 // { ok: true } with a new session cookie for `sessionVersion`.
