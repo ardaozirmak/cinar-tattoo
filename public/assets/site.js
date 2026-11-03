@@ -81,11 +81,15 @@ document.addEventListener(
 const notice = $('.duyuru');
 if (notice) {
   const message = $('p', notice)?.textContent ?? '';
-  if (read('localStorage', 'cinar-duyuru') === message) notice.remove();
+  const close = () => {
+    notice.remove();
+    document.body.classList.remove('has-duyuru');
+  };
+  if (read('localStorage', 'cinar-duyuru') === message) close();
   else
     $('.duyuru-kapat', notice)?.addEventListener('click', () => {
       write('localStorage', 'cinar-duyuru', message);
-      notice.remove();
+      close();
     });
 }
 
@@ -171,7 +175,7 @@ const cards = worksEl ? $$('.work', worksEl) : [];
 const PAGE = 24;
 let shownCount = PAGE;
 let filter = 'all';
-let visible = cards; // the cards the viewer steps through, in order
+let visible = cards.filter((card) => !card.hidden); // the cards the viewer steps through, in order
 const moreButton = $('#daha');
 const applyFilter = (animateIn) => {
   const matching = cards.filter((card) => filter === 'all' || card.dataset.style === filter);
@@ -536,6 +540,11 @@ if (motionOK) {
       if (details.open && answer) animate(answer, { opacity: [0, 1], y: [-8, 0], duration: 500, ease: 'outExpo' });
     }),
   );
+  // The name is watched through the footer: an element clipped shut never counts as in view.
   const big = $('.foot-big');
-  if (big) once(big, () => animate(big, { clipPath: [SHUT_B, OPEN], y: ['40%', '0%'], duration: 1400, ease: 'outExpo' }), 0.3);
+  if (big) {
+    // Unclipped at the end: the cedilla of Ç hangs below the line box.
+    const reveal = () => animate(big, { clipPath: [SHUT_B, OPEN], y: ['40%', '0%'], duration: 1400, ease: 'outExpo', onComplete: () => (big.style.clipPath = 'none') });
+    once(big.parentElement, reveal, 0.2);
+  }
 }

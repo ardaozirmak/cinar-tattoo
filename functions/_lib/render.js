@@ -89,7 +89,7 @@ export function renderPage({ content, origin, assetVersion, year }) {
   return `<!doctype html>
 <html lang="tr"${ctx.waDigits ? ` data-wa="${ctx.waDigits}"` : ''}>
 ${head(ctx, assetVersion)}
-<body id="top">
+<body id="top"${hasNotice(ctx) ? ' class="has-duyuru"' : ''}>
 ${intro(year)}
 ${bar(ctx, built)}
 ${sheet(ctx, built)}
@@ -231,14 +231,16 @@ function intro(year) {
 </div>`;
 }
 
+// The announcement shows when it is on and has a text. The page then moves the logo down under it.
+const hasNotice = (ctx) => ctx.settings.announcement_on === '1' && !blank(ctx.settings.announcement_text);
+
 function bar(ctx, sections) {
   const menu = sections
     .filter((section) => section.menu)
     .map((section) => `<a href="#${section.id}"><i>${section.no}</i>${section.label}</a>`)
     .join('');
   const { settings } = ctx;
-  const notice =
-    settings.announcement_on === '1' && !blank(settings.announcement_text)
+  const notice = hasNotice(ctx)
       ? `\n  <div class="duyuru" role="note"><p>${text(String(settings.announcement_text).trim())}</p><button type="button" class="duyuru-kapat" aria-label="Duyuruyu kapat">✕</button></div>`
       : '';
   return `<header class="bar" id="bar">

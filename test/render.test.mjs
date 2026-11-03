@@ -384,6 +384,8 @@ test('usta: left out without an about text and title; the default shows the text
 
 test('announcement: shown only when it is on and has a text', () => {
   assert.ok(!page().includes('class="duyuru"'));
+  assert.ok(page().includes('<body id="top">'));
+  assert.ok(page({ announcement_on: '1', announcement_text: 'Bayramda kapalıyız' }).includes('<body id="top" class="has-duyuru">'), 'the logo moves down under it');
   assert.ok(!page({ announcement_on: '1', announcement_text: '' }).includes('class="duyuru"'));
   assert.ok(!page({ announcement_on: '0', announcement_text: 'Bayramda kapalıyız' }).includes('class="duyuru"'));
   const html = page({ announcement_on: '1', announcement_text: 'Bayramda kapalıyız' });

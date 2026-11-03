@@ -121,7 +121,12 @@ button{font:inherit;color:inherit}
 .hero-side{grid-column:9/span 4;display:grid;gap:1.2rem;justify-items:start;min-width:0}
 .hero-sub{max-width:40ch;color:var(--fg-2);font-size:clamp(.95rem,1.1vw,1.05rem)}
 .hero-act{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+/* with an announcement under the bar, the logo starts below both, so nothing covers it */
+.has-duyuru .hero-sign{padding-top:7rem}
+.has-duyuru .hero-sign img{height:calc(100svh - 7rem)}
 @media (max-width:900px){
+  .has-duyuru .hero-sign{padding-top:8rem}
+  .has-duyuru .hero-sign img{height:auto}
   .hero-top{background:linear-gradient(to bottom,var(--logo-ground) 0,var(--logo-ground) 60%,var(--bg) 100%)}
   .hero-sign{height:auto;padding-top:4.2rem}
   .hero-sign img{height:auto;width:100%}
@@ -341,7 +346,7 @@ button{font:inherit;color:inherit}
 .foot-cols a{text-decoration:none}
 .foot-cols a:hover{color:var(--fg)}
 @media (max-width:760px){.foot-cols>div{grid-column:span 6}}
-.foot-big{font:400 clamp(3rem,13.4vw,13.5rem)/.85 var(--serif);letter-spacing:-.03em;text-align:center;white-space:nowrap}
+.foot-big{font:400 clamp(3rem,13.4vw,13.5rem)/.85 var(--serif);letter-spacing:-.03em;text-align:center;white-space:nowrap;padding-bottom:.16em}
 .foot-bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;padding:1.2rem 0 2rem;border-top:1px solid var(--line);font-size:.8rem;color:var(--mute)}
 
 /* mobile dock */
