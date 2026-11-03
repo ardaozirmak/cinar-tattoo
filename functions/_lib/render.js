@@ -97,7 +97,7 @@ export function renderPage({ content, origin, assetVersion, year }) {
 <html lang="tr"${ctx.waDigits ? ` data-wa="${ctx.waDigits}"` : ''}>
 ${head(ctx, assetVersion)}
 <body id="top"${hasNotice(ctx) ? ' class="has-duyuru"' : ''}>
-${intro(year)}
+${intro(year, content.services)}
 ${bar(ctx, built)}
 ${sheet(ctx, built)}
 <main>
@@ -226,13 +226,19 @@ function structuredData(ctx) {
 // Intro, bar, menu sheet
 // ---------------------------------------------------------------------------------------------
 
-function intro(year) {
-  const name = [...BRAND_NAME].map((ch) => `<span class="ch">${ch === ' ' ? '&nbsp;' : escapeHtml(ch)}</span>`).join('');
+// The opening: a big "Esenler" over the line, and under it the service names flashing past one by one.
+const INTRO_WORD = 'Esenler';
+
+function intro(year, services = []) {
+  const name = [...INTRO_WORD].map((ch) => `<span class="ch">${escapeHtml(ch)}</span>`).join('');
+  const names = services.map((service) => String(service.name ?? '').trim()).filter(Boolean);
+  const ticker = names.length
+    ? `\n  <p class="intro-svc" id="introSvc">${names.map((name) => `<span>${text(name)}</span>`).join('')}</p>`
+    : '';
   return `<div class="intro" id="intro" aria-hidden="true">
   <div class="intro-half t"></div><div class="intro-half b"></div>
   <div class="intro-name" id="introName">${name}</div>
-  <div class="intro-line" id="introLine"></div>
-  <p class="intro-sub lbl" id="introSub">Dövme &amp; piercing · Esenler</p>
+  <div class="intro-line" id="introLine"></div>${ticker}
   <p class="intro-year num" id="introYear" data-to="${escapeHtml(year)}">${FOUNDED}</p>
   <button class="intro-skip" id="introSkip" type="button">Atla</button>
 </div>`;

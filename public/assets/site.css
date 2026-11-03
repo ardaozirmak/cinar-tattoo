@@ -75,9 +75,12 @@ button{font:inherit;color:inherit}
 .intro-half{position:absolute;left:0;right:0;height:50.5%;background:var(--shade);pointer-events:auto}
 .intro-half.t{top:0}.intro-half.b{bottom:0}
 .intro-line{position:absolute;left:var(--g);right:var(--g);top:50%;height:1px;background:var(--fg);transform:scaleX(0);transform-origin:left}
-.intro-name{position:absolute;left:var(--g);bottom:50%;font:400 clamp(3.2rem,11vw,11rem)/.8 var(--serif);letter-spacing:-.02em;display:flex;overflow:hidden;padding:.14em 0 .14em;margin-bottom:-.14em}
+.intro-name{position:absolute;left:var(--g);bottom:50%;font:400 clamp(4.4rem,16vw,16rem)/.8 var(--serif);letter-spacing:-.02em;display:flex;overflow:hidden;padding:.14em 0 .14em;margin-bottom:-.14em}
 .intro-name .ch{display:inline-block;transform:translateY(105%)}
-.intro-sub{position:absolute;left:var(--g);top:calc(50% + max(1.4rem, 2.4vw));opacity:0} /* below the Ç's cedilla, which reaches .14em under the line */
+/* the services flash past one by one right under the line */
+.intro-svc{position:absolute;left:var(--g);right:var(--g);top:calc(50% + max(1rem, 1.6vw));height:1.2em;margin:0;overflow:hidden;
+  font:500 clamp(1.8rem,3.6vw,3.8rem)/1.1 var(--display-2);letter-spacing:.03em;text-transform:uppercase;color:var(--fg)}
+.intro-svc span{position:absolute;left:0;top:0;white-space:nowrap;opacity:0}
 .intro-year{position:absolute;right:var(--g);top:calc(50% + .6rem);font:400 clamp(2rem,5vw,4rem)/1 var(--serif);opacity:0}
 .intro-skip{position:absolute;top:1.25rem;right:var(--g);background:none;border:1px solid var(--line-2);color:var(--fg-2);padding:.6em 1.1em;cursor:pointer;font-size:.8rem;pointer-events:auto}
 .intro-skip:hover{color:var(--fg);border-color:var(--fg)}

@@ -765,3 +765,12 @@ test('the hero card under the logo names the services, the address, the hours an
   const bare = page({ address: '', hours: '', maps_url: '' }, { services: [] });
   assert.ok(!bare.includes('class="hero-info"'));
 });
+
+test('the opening shows a big Esenler and flashes the service names under the line', () => {
+  const html = page();
+  assert.ok(html.includes('<div class="intro-name" id="introName"><span class="ch">E</span><span class="ch">s</span><span class="ch">e</span><span class="ch">n</span><span class="ch">l</span><span class="ch">e</span><span class="ch">r</span></div>'));
+  assert.ok(html.includes('<p class="intro-svc" id="introSvc"><span>Kalıcı dövme</span><span>Geçici dövme</span><span>Titanyum piercing</span><span>Kalıcı makyaj</span></p>'));
+  assert.ok(!html.includes('id="introSub"'));
+  assert.ok(page({}, { services: [{ id: 1, name: '<i>x</i>', description: '' }] }).includes('<span>&lt;i&gt;x&lt;/i&gt;</span></p>'));
+  assert.ok(!page({}, { services: [] }).includes('id="introSvc"'));
+});

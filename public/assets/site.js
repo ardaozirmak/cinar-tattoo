@@ -501,13 +501,20 @@ function playIntro() {
   const timeline = createTimeline({ defaults: { ease: 'outExpo' }, onComplete: done })
     .add('#introLine', { scaleX: [0, 1], duration: 900, ease: 'inOutQuart' }, 0)
     .add('#introName .ch', { y: ['105%', '0%'], duration: 1100, delay: stagger(60) }, 500)
-    .add('#introSub', { opacity: [0, 1], y: [10, 0], duration: 800 }, 900)
     .add('#introYear', { opacity: [0, 1], duration: 500 }, 700)
     .add(counter, { v: [2005, to], duration: 1500, ease: 'inOutQuad', onUpdate: () => year && (year.textContent = String(Math.round(counter.v))) }, 700)
-    .add(['#introName', '#introSub', '#introYear', '#introSkip'], { opacity: [1, 0], duration: 450, ease: 'inQuad' }, 2350)
+    .add(['#introName', '#introYear', '#introSkip'], { opacity: [1, 0], duration: 450, ease: 'inQuad' }, 2350)
     .add('#introLine', { scaleX: [1, 0], duration: 600, ease: 'inOutQuart', transformOrigin: 'right' }, 2350)
     .add('.intro-half.t', { y: ['0%', '-101%'], duration: 1000, ease: 'inOutQuart', onBegin: heroIn }, 2700)
     .add('.intro-half.b', { y: ['0%', '101%'], duration: 1000, ease: 'inOutQuart' }, 2700);
+  // the service names flash past under the line, one every 360 ms; the last one stays until the fade
+  const names = [...document.querySelectorAll('#introSvc span')];
+  names.forEach((name, index) => {
+    const at = 900 + index * 360;
+    timeline.add(name, { opacity: [0, 1], y: ['100%', '0%'], duration: 280, ease: 'outQuart' }, at);
+    if (index < names.length - 1) timeline.add(name, { opacity: [1, 0], y: ['0%', '-100%'], duration: 220, ease: 'inQuad' }, at + 300);
+    else timeline.add(name, { opacity: [1, 0], duration: 450, ease: 'inQuad' }, 2350);
+  });
   $('#introSkip')?.addEventListener('click', () => {
     timeline.pause();
     heroIn();
