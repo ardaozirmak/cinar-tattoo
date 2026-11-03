@@ -23,8 +23,9 @@ const WORKS_SHOWN = 24; // cards visible before "Daha fazla göster"
 const WORKS_MAX = 48; // cards in the HTML at all (ruling T6-R8)
 const STRIP_MAX = 16;
 const THUMB_MAX = 640; // the long side of a thumb (T7's resize and dev/seed-images.py)
-// public/media/logo-yatay.jpg: the shop's horizontal logo (2026-11-03), shown on desktops instead of the square seed.
-export const WIDE_LOGO = { src: '/media/logo-yatay.jpg', width: 1600, height: 725 };
+// The seed hero stands in front of a studio photo (Onur Bey drawing a design), dimmed and with dark edges as on
+// nikkohurtado.com: a wide crop for desktops, a tall one for phones. Decorative, so its alt is empty.
+export const HERO_BACKDROP = { wide: { src: '/media/hero-arka-genis.jpg', width: 1600, height: 727 }, tall: { src: '/media/hero-arka-dik.jpg', width: 720, height: 900 } };
 const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa';
 const ARTIST_NAME = 'Onur Aydoğan';
 // public/media/sanatci.jpg: the owner's solo studio photo (2026-11-03), cropped to 4:5.
@@ -298,10 +299,12 @@ function hero(ctx) {
   const sub = blank(settings.hero_text) ? '' : `\n        <p class="hero-sub">${text(String(settings.hero_text).trim())}</p>`;
   const actions = [waLink(ctx, 'btn', `WhatsApp’tan yaz${arrow}`), telLink(ctx, 'btn ghost', 'Ara'), dirLink(ctx, 'link link-gap', 'Yol tarifi')].join('');
   const img = `<img id="heroLogo" src="${escapeHtml(urls.full)}" srcset="${escapeHtml(urls.thumb)} ${thumbWidth}w, ${escapeHtml(urls.full)} ${image.width}w" sizes="(max-width: 900px) 100vw, min(100vw, 120svh)" width="${image.width}" height="${image.height}" alt="${escapeHtml(alt)}" fetchpriority="high">`;
-  // The seed hero is the shop's logo: desktops get its horizontal version, phones keep the square one.
-  // A picture the owner uploaded in the panel is shown as it is.
+  // The seed hero is the shop's square logo in front of the dimmed studio photo. A picture the owner
+  // uploaded in the panel is shown as it is.
+  const { wide, tall } = HERO_BACKDROP;
+  const backdrop = `<div class="hero-bg" aria-hidden="true"><picture><source media="(min-width: 901px)" srcset="${wide.src}" width="${wide.width}" height="${wide.height}"><img src="${tall.src}" width="${tall.width}" height="${tall.height}" alt="" decoding="async"></picture></div>`;
   const sign = image.source === 'seed'
-    ? `<div class="hero-sign wide"><picture><source media="(min-width: 901px)" srcset="${WIDE_LOGO.src}" width="${WIDE_LOGO.width}" height="${WIDE_LOGO.height}">${img}</picture></div>`
+    ? `<div class="hero-sign stage">${backdrop}${img}</div>`
     : `<div class="hero-sign">${img}</div>`;
 
   return `<section class="hero" aria-labelledby="heroTitle">

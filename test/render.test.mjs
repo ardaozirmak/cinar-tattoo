@@ -725,29 +725,29 @@ test('budget: the first load is at most 350 KiB (without the hero image, the gal
   t.diagnostic(`hero image: ${file('seed/logo-full.jpg').length} bytes`);
 });
 
-test('the seed hero gives desktops the horizontal logo and phones the square one', () => {
+test('the seed hero stands the square logo in front of the dimmed studio photo', () => {
   const html = page();
-  assert.ok(html.includes('<div class="hero-sign wide"><picture><source media="(min-width: 901px)" srcset="/media/logo-yatay.jpg" width="1600" height="725"><img id="heroLogo" src="/seed/logo-full.jpg"'));
-  assert.ok(html.includes('</picture></div>'));
+  assert.ok(html.includes('<div class="hero-sign stage"><div class="hero-bg" aria-hidden="true"><picture><source media="(min-width: 901px)" srcset="/media/hero-arka-genis.jpg" width="1600" height="727"><img src="/media/hero-arka-dik.jpg" width="720" height="900" alt="" decoding="async"></picture></div><img id="heroLogo" src="/seed/logo-full.jpg"'));
   // A hero the owner uploaded is shown as it is, on every screen.
   const own = page({}, { hero: { source: 'kv', image_key: 'f'.repeat(20), width: 1600, height: 1200 } });
-  assert.ok(!own.includes('logo-yatay'));
+  assert.ok(!own.includes('hero-arka'));
   assert.ok(!own.includes('<picture>'));
   assert.ok(own.includes(`<div class="hero-sign"><img id="heroLogo" src="/img/${'f'.repeat(20)}/full"`));
 });
 
-test('the horizontal logo file exists at its pinned size and within 400 KB', () => {
-  const file = join(PUBLIC, 'media/logo-yatay.jpg');
-  assert.ok(existsSync(file));
-  assert.ok(statSync(file).size <= 409600, `logo-yatay.jpg is ${statSync(file).size} bytes`);
-  const bytes = readFileSync(file);
-  let i = 2;
-  let size = null;
-  while (i < bytes.length) {
-    const marker = bytes[i + 1];
-    const length = bytes.readUInt16BE(i + 2);
-    if (marker === 0xc0 || marker === 0xc2) { size = { height: bytes.readUInt16BE(i + 5), width: bytes.readUInt16BE(i + 7) }; break; }
-    i += 2 + length;
+test('the hero backdrop crops exist at their pinned sizes and within 150 KB', () => {
+  const sof = (file) => {
+    const bytes = readFileSync(file);
+    for (let i = 2; i < bytes.length; i += 2 + bytes.readUInt16BE(i + 2)) {
+      const marker = bytes[i + 1];
+      if (marker === 0xc0 || marker === 0xc2) return { width: bytes.readUInt16BE(i + 7), height: bytes.readUInt16BE(i + 5) };
+    }
+    return null;
+  };
+  for (const [name, size] of [['hero-arka-genis.jpg', { width: 1600, height: 727 }], ['hero-arka-dik.jpg', { width: 720, height: 900 }]]) {
+    const file = join(PUBLIC, 'media', name);
+    assert.ok(existsSync(file), name);
+    assert.ok(statSync(file).size <= 153600, `${name} is ${statSync(file).size} bytes`);
+    assert.deepEqual(sof(file), size, name);
   }
-  assert.deepEqual(size, { width: 1600, height: 725 });
 });

@@ -117,13 +117,22 @@ button{font:inherit;color:inherit}
 .hero-sign{position:relative;height:100svh;overflow:hidden;padding-top:4rem}
 .hero-sign img{display:block;margin:0 auto;width:min(100%,calc((100svh - 4rem) * 1.2));height:auto}
 .hero-sign::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4svh;background:linear-gradient(transparent,var(--logo-ground));pointer-events:none}
-/* the shop's horizontal logo (2.2:1) fills the space under the bar on desktops, whole and centred;
-   phones get the square one from the same <picture> */
-.hero-sign.wide{display:grid;place-items:center;height:auto}
-.hero-sign.wide picture{display:contents}
-.hero-sign.wide img{width:min(100%,calc((100svh - 4rem) * 2.2));height:auto}
-.hero-sign.wide::after{display:none}
-.has-duyuru .hero-sign.wide img{width:min(100%,calc((100svh - 7rem) * 2.2))}
+/* seed hero: the studio photo behind the square logo, dimmed and dark at the edges (as on nikkohurtado.com) so it
+   does not pull the eye; the logo's own edges fade into it instead of hitting the eye as a hard gold square */
+.hero-sign.stage{display:grid;place-items:center;isolation:isolate;padding-bottom:2rem}
+.hero-sign.stage::after{display:none}
+.hero-sign.stage .hero-bg{position:absolute;inset:0;z-index:-1;overflow:hidden}
+.hero-sign.stage .hero-bg picture{display:contents}
+.hero-sign.stage .hero-bg img{display:block;margin:0;width:100%;height:100%;object-fit:cover;object-position:35% 40%;filter:brightness(.5) saturate(.75)}
+.hero-sign.stage .hero-bg::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse 72% 78% at 50% 50%,transparent 30%,color-mix(in oklch,var(--logo-ground) 92%,transparent) 100%),
+             linear-gradient(to bottom,color-mix(in oklch,var(--logo-ground) 70%,transparent),transparent 22%,transparent 70%,var(--logo-ground))}
+.hero-sign.stage #heroLogo{width:min(100%,calc(100svh - 6rem));height:auto;
+  -webkit-mask-image:linear-gradient(to right,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent),linear-gradient(to bottom,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent),linear-gradient(to bottom,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent);
+  mask-composite:intersect}
+.has-duyuru .hero-sign.stage #heroLogo{width:min(100%,calc(100svh - 9rem))}
 .hero-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--g);align-items:end;padding-block:clamp(1.5rem,4vh,2.5rem) clamp(1rem,3vh,2rem)}
 .hero-copy{grid-column:1/span 8;display:grid;gap:1rem;min-width:0}
 .hero h1{font:400 clamp(2.6rem,5.4vw,5.6rem)/.9 var(--serif);letter-spacing:-.02em}
@@ -144,6 +153,8 @@ button{font:inherit;color:inherit}
   .hero-sign::after{display:none}
   .hero-sign img{height:auto;width:100%}
   .hero-copy,.hero-side{grid-column:1/-1}
+  .hero-sign.stage{padding-bottom:1.5rem}
+  .hero-sign.stage #heroLogo,.has-duyuru .hero-sign.stage #heroLogo{width:min(84%,28rem)}
 }
 .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);margin-top:clamp(2.5rem,6vw,4.5rem)}
 .facts.f3{grid-template-columns:repeat(3,minmax(0,1fr))}
