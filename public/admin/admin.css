@@ -1,34 +1,36 @@
 /* Çınar Tattoo panel. Mobile first: one centred column of at most 640 px and a fixed tab bar at the
-   bottom. It wears the shop's sign, quieter than the site: walnut, brass and bone (spec §5.2).
+   bottom. It wears the site's colours and type (the Dergi palette: near-black ground, bone text,
+   one red accent; Instrument Serif and Manrope), quieter than the site.
 
    Every colour is a variable in :root, and the tints are mixed from them, so a palette change
    touches that block only. The CSP of /admin allows no inline style, so the scripts change looks
    through classes and the hidden attribute alone. */
 
 /* Fonts are served by the site itself (/assets/fonts/). Until they are there, the "Yedek" faces
-   (local fonts with matching metrics) and the system fonts stand in. */
-@font-face{font-family:"Bodoni Moda";font-style:normal;font-weight:900;font-display:swap;src:url(/assets/fonts/bodoni-moda-900-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"Bodoni Moda";font-style:normal;font-weight:900;font-display:swap;src:url(/assets/fonts/bodoni-moda-900-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:Figtree;font-style:normal;font-weight:300 900;font-display:swap;src:url(/assets/fonts/figtree-var-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:Figtree;font-style:normal;font-weight:300 900;font-display:swap;src:url(/assets/fonts/figtree-var-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Bodoni Yedek";src:local("Georgia Bold"),local("Georgia-Bold"),local("Georgia");size-adjust:103%;ascent-override:92%;descent-override:24%;line-gap-override:0%}
-@font-face{font-family:"Figtree Yedek";src:local("Arial");size-adjust:98%;ascent-override:96%;descent-override:26%;line-gap-override:0%}
+   (local fonts with close metrics) and the system fonts stand in. Instrument Serif has one weight;
+   its faces cover 400–900 so that the panel's heavy headings use it as drawn, without a fake bold. */
+@font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400 900;font-display:swap;src:url(/assets/fonts/instrument-serif-400-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400 900;font-display:swap;src:url(/assets/fonts/instrument-serif-400-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Manrope;font-style:normal;font-weight:400 800;font-display:swap;src:url(/assets/fonts/manrope-var-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Manrope;font-style:normal;font-weight:400 800;font-display:swap;src:url(/assets/fonts/manrope-var-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Instrument Yedek";font-weight:400 900;src:local("Times New Roman"),local("TimesNewRomanPSMT"),local("Georgia");size-adjust:96%;ascent-override:96%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:"Manrope Yedek";font-weight:400 800;src:local("Arial");size-adjust:104%;ascent-override:102%;descent-override:29%;line-gap-override:0%}
 
 :root {
   color-scheme: dark;
 
-  /* The palette */
-  --bg: #15110d;        /* walnut black: the ground */
-  --panel: #1d1712;     /* dark panel: forms and cards */
-  --brass: #c9a46a;     /* brass: accents, numbers, the active tab */
-  --brass2: #8c6f45;    /* dark brass: frames and field borders */
-  --bone: #eee5d5;      /* bone: text */
-  --muted: #a69a87;     /* faded: secondary text */
-  --cta: #c9a46a;       /* the main button */
-  --cta-ink: #15110d;   /* text on the main button */
-  --danger: #e57361;    /* delete and errors */
-  --danger-ink: #15110d;
-  --ok: #9ccb8a;        /* a finished upload */
+  /* The palette: the site's tokens */
+  --bg: oklch(13% 0.004 80);      /* the ground */
+  --panel: oklch(18% 0.005 80);   /* forms and cards */
+  --brass: oklch(95% 0.01 85);    /* accents, numbers, the active tab (bone, as on the site) */
+  --brass2: oklch(40% 0.006 80);  /* frames and field borders */
+  --bone: oklch(95% 0.01 85);     /* text */
+  --muted: oklch(63% 0.008 85);   /* secondary text */
+  --cta: oklch(95% 0.01 85);      /* the main button: bone, as the site's .btn */
+  --cta-ink: oklch(13% 0.004 80); /* text on the main button */
+  --danger: oklch(60% 0.2 28);    /* delete and errors: the site's red dot */
+  --danger-ink: oklch(13% 0.004 80);
+  --ok: oklch(80% 0.01 85);       /* a finished upload */
   --scrim: rgb(0 0 0 / 0.62);
 
   /* Made from the palette */
@@ -38,8 +40,8 @@
   --line: color-mix(in srgb, var(--brass) 22%, transparent);
   --glow: color-mix(in srgb, var(--brass) 14%, var(--panel));
 
-  --font-display: "Bodoni Moda", "Bodoni Yedek", Georgia, "Times New Roman", serif;
-  --font-text: Figtree, "Figtree Yedek", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "Instrument Serif", "Instrument Yedek", "Times New Roman", serif;
+  --font-text: Manrope, "Manrope Yedek", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 
   --gutter: 16px;
   --tabbar: 62px;

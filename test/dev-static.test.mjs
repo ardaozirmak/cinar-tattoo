@@ -442,3 +442,54 @@ test('parseHeadersFile skips what it cannot read: header lines before a pattern,
   assert.deepEqual(parseHeadersFile(''), []);
   assert.deepEqual(parseHeadersFile('# only a comment\n\n'), []);
 });
+
+// ---------------------------------------------------------------------------------------------
+// Video and byte ranges (Task 6): iOS Safari plays a video only from a server that answers ranges.
+// ---------------------------------------------------------------------------------------------
+
+const CLIP = Buffer.from('0123456789abcdefghij'); // 20 bytes
+
+test('an .mp4 is video/mp4, and every file says it takes byte ranges', async (t) => {
+  const { assets } = await publicOf(t, { 'clip.mp4': CLIP });
+  const res = await get(assets, '/clip.mp4');
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('content-type'), 'video/mp4');
+  assert.equal(res.headers.get('accept-ranges'), 'bytes');
+  assert.deepEqual(Buffer.from(await res.arrayBuffer()), CLIP);
+});
+
+test('Range: bytes=2-5 is a 206 with those 4 bytes; bytes=15- runs to the end; an end past the file is capped', async (t) => {
+  const { assets } = await publicOf(t, { 'clip.mp4': CLIP });
+  const res = await get(assets, '/clip.mp4', { headers: { Range: 'bytes=2-5' } });
+  assert.equal(res.status, 206);
+  assert.equal(res.headers.get('content-range'), 'bytes 2-5/20');
+  assert.equal(res.headers.get('content-length'), '4');
+  assert.equal(res.headers.get('content-type'), 'video/mp4');
+  assert.equal(Buffer.from(await res.arrayBuffer()).toString(), '2345');
+
+  const tail = await get(assets, '/clip.mp4', { headers: { Range: 'bytes=15-' } });
+  assert.equal(tail.status, 206);
+  assert.equal(tail.headers.get('content-range'), 'bytes 15-19/20');
+  assert.equal(Buffer.from(await tail.arrayBuffer()).toString(), 'fghij');
+
+  const capped = await get(assets, '/clip.mp4', { headers: { Range: 'bytes=18-99' } });
+  assert.equal(capped.status, 206);
+  assert.equal(capped.headers.get('content-range'), 'bytes 18-19/20');
+});
+
+test('Range: bytes=20- starts past the end: 416 with Content-Range bytes */20', async (t) => {
+  const { assets } = await publicOf(t, { 'clip.mp4': CLIP });
+  const res = await get(assets, '/clip.mp4', { headers: { Range: 'bytes=20-' } });
+  assert.equal(res.status, 416);
+  assert.equal(res.headers.get('content-range'), 'bytes */20');
+  await res.arrayBuffer();
+});
+
+test('a range this server does not do (other units, several ranges, a suffix, start after end) gets the whole file', async (t) => {
+  const { assets } = await publicOf(t, { 'clip.mp4': CLIP });
+  for (const range of ['lines=1', 'bytes=0-1,4-5', 'bytes=-5', 'bytes=6-2', 'bytes=x-']) {
+    const res = await get(assets, '/clip.mp4', { headers: { Range: range } });
+    assert.equal(res.status, 200, range);
+    assert.deepEqual(Buffer.from(await res.arrayBuffer()), CLIP, range);
+  }
+});
