@@ -471,6 +471,17 @@ function heroIn() {
     .add('.facts .fact', { opacity: [0, 1], y: [20, 0], duration: 1000, delay: stagger(90) }, 750);
   animate('#heroLogo', { opacity: [0, 1], scale: [1.08, 1], duration: 2000, ease: 'outExpo' });
   animate('.hero-copy .lbl', { opacity: [0, 1], duration: 900, delay: 200, ease: 'outQuad' });
+  // the services slide in from the left edge, the address from the right one
+  const left = $('.hi-what');
+  const right = $('.hi-where');
+  if (left) {
+    animate(left, { opacity: [0, 1], x: ['-45vw', '0vw'], duration: 1700, delay: 450, ease: 'outExpo' });
+    animate(left.querySelectorAll('li'), { x: ['-12vw', '0vw'], duration: 1500, delay: stagger(110, { start: 550 }), ease: 'outExpo' });
+  }
+  if (right) {
+    animate(right, { opacity: [0, 1], x: ['45vw', '0vw'], duration: 1700, delay: 600, ease: 'outExpo' });
+    animate(right.querySelectorAll('.hi-place > *'), { x: ['12vw', '0vw'], duration: 1500, delay: stagger(110, { start: 700 }), ease: 'outExpo' });
+  }
 }
 
 function playIntro() {

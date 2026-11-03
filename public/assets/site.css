@@ -77,7 +77,7 @@ button{font:inherit;color:inherit}
 .intro-line{position:absolute;left:var(--g);right:var(--g);top:50%;height:1px;background:var(--fg);transform:scaleX(0);transform-origin:left}
 .intro-name{position:absolute;left:var(--g);bottom:50%;font:400 clamp(3.2rem,11vw,11rem)/.8 var(--serif);letter-spacing:-.02em;display:flex;overflow:hidden;padding:.14em 0 .14em;margin-bottom:-.14em}
 .intro-name .ch{display:inline-block;transform:translateY(105%)}
-.intro-sub{position:absolute;left:var(--g);top:calc(50% + 1rem);opacity:0}
+.intro-sub{position:absolute;left:var(--g);top:calc(50% + max(1.4rem, 2.4vw));opacity:0} /* below the Ç's cedilla, which reaches .14em under the line */
 .intro-year{position:absolute;right:var(--g);top:calc(50% + .6rem);font:400 clamp(2rem,5vw,4rem)/1 var(--serif);opacity:0}
 .intro-skip{position:absolute;top:1.25rem;right:var(--g);background:none;border:1px solid var(--line-2);color:var(--fg-2);padding:.6em 1.1em;cursor:pointer;font-size:.8rem;pointer-events:auto}
 .intro-skip:hover{color:var(--fg);border-color:var(--fg)}
@@ -145,30 +145,30 @@ button{font:inherit;color:inherit}
   background:color-mix(in oklch,var(--logo-ground) 72%,transparent);border:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .hi-label{display:none}
 .hi-what ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:0 .5em;
-  font:500 1.05rem/1.35 var(--display-2);letter-spacing:.04em;text-transform:uppercase;color:var(--fg)}
+  font:500 1.6rem/1.2 var(--display-2);letter-spacing:.03em;text-transform:uppercase;color:var(--fg)}
 .hi-what li:not(:last-child)::after{content:"·";margin-left:.5em}
-.hi-place{font:400 .98rem/1.45 var(--display-2);letter-spacing:.02em;color:var(--fg-2);overflow-wrap:anywhere}
+.hi-place{font:400 1.15rem/1.4 var(--display-2);letter-spacing:.02em;color:var(--fg-2);overflow-wrap:anywhere}
 .hi-place>*+*::before{content:" · "}
 .hi-place>.hi-route::before{content:" "}
 .hi-route{color:var(--fg);font-weight:600;white-space:nowrap;text-decoration:none;border-bottom:1px solid var(--line-2)}
 .hi-route:hover{border-bottom-color:var(--fg)}
 /* wide desktops: services on the left of the logo, the address on its right, over the dimmed photo */
 @media (min-width:1100px){
-  .hero-sign:has(.hero-info) #heroLogo{width:min(100%,calc(100svh - 6rem))}
-  .has-duyuru .hero-sign:has(.hero-info) #heroLogo{width:min(100%,calc(100svh - 9rem))}
+  .hero-sign:has(.hero-info) #heroLogo{width:min(100%,calc(100svh - 9rem))}
+  .has-duyuru .hero-sign:has(.hero-info) #heroLogo{width:min(100%,calc(100svh - 12rem))}
   .hero-info{display:contents}
-  .hi-what,.hi-where{position:absolute;top:calc(50% + 2rem);transform:translateY(-50%);display:grid;gap:1rem;
-    width:calc((100% - min(100%, 100svh - 6rem)) / 2 - 2 * var(--g))}
+  .hi-what,.hi-where{position:absolute;top:calc(50% + 2rem);translate:0 -50%;display:grid;gap:1.2rem;
+    width:calc((100% - min(100%, 100svh - 9rem)) / 2 - 2 * var(--g))}
   .hi-what{left:var(--g);justify-items:start;text-align:left}
   .hi-where{right:var(--g);justify-items:end;text-align:right}
-  .hi-label{display:block;font:500 .9rem/1.2 var(--display-2);letter-spacing:.22em;text-transform:uppercase;color:var(--mute)}
-  .hi-what ul{display:grid;gap:.4rem;justify-content:start;font:500 clamp(1.7rem,2.5vw,2.9rem)/1.08 var(--display-2);letter-spacing:.02em;text-transform:uppercase}
+  .hi-label{display:block;font:500 clamp(1rem,1.1vw,1.3rem)/1.2 var(--display-2);letter-spacing:.22em;text-transform:uppercase;color:var(--mute)}
+  .hi-what ul{display:grid;gap:.5rem;justify-content:start;font:500 clamp(2.4rem,3.9vw,5.2rem)/.98 var(--display-2);letter-spacing:.01em;text-transform:uppercase}
   .hi-what li:not(:last-child)::after{content:none}
   .hi-what,.hi-where{text-shadow:0 1px 14px var(--logo-ground),0 0 3px var(--logo-ground)}
-  .hi-place{display:grid;gap:.6rem;justify-items:end;font:400 clamp(1.05rem,1.3vw,1.35rem)/1.4 var(--display-2);letter-spacing:.02em}
+  .hi-place{display:grid;gap:.8rem;justify-items:end;font:400 clamp(1.4rem,2.1vw,2.5rem)/1.25 var(--display-2);letter-spacing:.01em}
   .hi-place>*+*::before,.hi-place>.hi-route::before{content:none}
   .hi-addr{max-width:20ch}
-  .hi-hours{font:500 clamp(1.7rem,2.5vw,2.9rem)/1 var(--display-2);color:var(--fg)}
+  .hi-hours{font:500 clamp(2rem,3vw,4.4rem)/1 var(--display-2);color:var(--fg);white-space:nowrap}
   .hi-route{font-family:var(--display-2);font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:.9em}
 }
 .hero-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--g);align-items:end;padding-block:clamp(1.5rem,4vh,2.5rem) clamp(1rem,3vh,2rem)}
@@ -476,12 +476,12 @@ button{font:inherit;color:inherit}
 @keyframes kurtar-intro{to{opacity:0;visibility:hidden}}
 @media (scripting:enabled) and (prefers-reduced-motion:no-preference){
   .intro{display:block;animation:kurtar-intro 0s 4s forwards}
-  .bar,.hero-sub,.hero-act,.facts .fact,#heroLogo,.hero-copy .lbl,[data-rise]{opacity:0;animation:kurtar 0s 4s forwards}
+  .bar,.hero-sub,.hero-act,.facts .fact,#heroLogo,.hero-copy .lbl,.hi-what,.hi-where,[data-rise]{opacity:0;animation:kurtar 0s 4s forwards}
   .hero h1 .ln>span{transform:translateY(105%);animation:kurtar 0s 4s forwards}
   .sec-head h2 .ch{transform:translateY(110%);animation:kurtar 0s 4s forwards}
   .wipe{clip-path:inset(100% 0% 0% 0%);animation:kurtar 0s 4s forwards}
   .foot-big{clip-path:inset(100% 0% 0% 0%);animation:kurtar 0s 4s forwards}
-  .m .intro,.m .bar,.m .hero-sub,.m .hero-act,.m .facts .fact,.m #heroLogo,.m .hero-copy .lbl,.m [data-rise],
+  .m .intro,.m .bar,.m .hero-sub,.m .hero-act,.m .facts .fact,.m #heroLogo,.m .hero-copy .lbl,.m .hi-what,.m .hi-where,.m [data-rise],
   .m .hero h1 .ln>span,.m .sec-head h2 .ch,.m .wipe,.m .foot-big{animation:none}
   .still .intro{display:none}
   .still .bar,.still .hero-sub,.still .hero-act,.still .facts .fact,.still #heroLogo,.still .hero-copy .lbl,.still [data-rise],
