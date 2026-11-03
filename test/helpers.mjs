@@ -2,6 +2,7 @@
 //
 // - makeEnv() builds a Cloudflare-style `env` (DB, IMAGES, ASSETS and the secrets) over temp folders.
 // - call() runs a Pages Function handler directly, with the context object Pages would give it.
+// - loginCookie() logs in to the admin API and gives the session cookie for the next calls.
 // - tempTree() writes a throwaway folder of files, for tests that need their own functions/ or public/.
 import { mkdtempSync, rmSync } from 'node:fs';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
@@ -77,6 +78,27 @@ export async function call(handler, { method = 'GET', url = 'https://cinar.test/
     }
   }
   return response;
+}
+
+// Logs in through POST /api/admin/login as the panel does, from https://cinar.test with that Origin,
+// and returns the session cookie as a Cookie header value: 'cinar_admin=<token>'. The password
+// defaults to makeEnv's ADMIN_PASSWORD. A login that does not answer 200 throws, so a test fails
+// where it logs in. A good login clears the failures recorded for its IP ('unknown').
+//
+// The admin API is imported on first use, so the suites that never log in do not load it.
+export async function loginCookie(env, password = 'test-sifre-123') {
+  const { onRequest } = await import('../functions/api/admin/[[path]].js');
+  const response = await call(onRequest, {
+    method: 'POST',
+    url: 'https://cinar.test/api/admin/login',
+    headers: { Origin: 'https://cinar.test', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+    env,
+  });
+  if (response.status !== 200) throw new Error(`loginCookie: the login answered ${response.status} ${await response.text()}`);
+  const cookie = response.headers.getSetCookie().find((header) => header.startsWith('cinar_admin='));
+  if (cookie === undefined) throw new Error('loginCookie: the login set no cinar_admin cookie');
+  return cookie.split(';')[0];
 }
 
 // A temp folder holding `files` (relative path -> text or bytes). Unless `files` has its own, it gets
