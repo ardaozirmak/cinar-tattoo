@@ -10,10 +10,10 @@ test('BRAND_NAME', () => {
 
 test('DEFAULT_SETTINGS holds the texts the site opens with', () => {
   assert.deepEqual(DEFAULT_SETTINGS, {
-    seo_title: 'Esenler Dövmeci | Çınar Tattoo Piercing',
-    seo_description: "Esenler'de dövmeci ve piercing hizmeti mi arıyorsunuz? Kalıcı dövme, geçici dövme, profesyonel piercing uygulamaları ve kaliteli dövme malzemeleri.",
-    hero_title: 'Esenler’de 2005’ten beri dövme ve piercing',
-    hero_text: 'Onur Aydoğan’ın stüdyosu. Randevu için ara ya da uğra.',
+    seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
+    seo_description: 'Esenler’de 2005’ten beri dövme ve piercing: Onur Aydoğan’ın stüdyosu. Kişiye özel çizim, steril ortam, Google yorumlarının hepsi 5 yıldız. WhatsApp’tan randevu al.',
+    hero_title: 'Bir ömür taşıyacağın\ndövme.',
+    hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
     about_title: 'Onur Aydoğan',
     about_text: 'Onur Aydoğan 20 yılı aşkın süredir dövme yapıyor. Esenler’deki stüdyosunda dövme, piercing ve malzeme için seni bekliyor.',
     hours: '10.00–23.00',
@@ -35,9 +35,13 @@ test('DEFAULT_SETTINGS holds the texts the site opens with', () => {
   });
 });
 
-test('the page title is the Instagram name with a plain pipe (the plan table’s backslash is Markdown escaping)', () => {
-  assert.equal(DEFAULT_SETTINGS.seo_title, 'Esenler Dövmeci | Çınar Tattoo Piercing');
+test('the page title leads with “Esenler Dövme” for local search and has a plain pipe (Task 6 brief, superseding P8)', () => {
+  assert.equal(DEFAULT_SETTINGS.seo_title, 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri');
   assert.ok(!DEFAULT_SETTINGS.seo_title.includes('\\'));
+});
+
+test('the hero title is two lines: its \\n is the line break the page draws', () => {
+  assert.deepEqual(DEFAULT_SETTINGS.hero_title.split('\n'), ['Bir ömür taşıyacağın', 'dövme.']);
 });
 
 test('every default setting is a string, and the lists are stored as JSON strings', () => {
@@ -73,20 +77,41 @@ test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
   assert.deepEqual(result.services, DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
 });
 
-test('SEED_PHOTOS: the owner’s five Instagram photos, in position order', () => {
-  assert.deepEqual(SEED_PHOTOS, [
+// The Dergi prototype's WORKS: [id, caption], in its order (Task 6 brief).
+const WORKS = [
+  ['w03', 'Üçgen içinde gül, el üstü'], ['k01', 'Renkli omuz, saat ve yazı'], ['w01', 'Hançer ve gül'],
+  ['w04', 'Orman ve kurt'], ['w05', 'Portre ve güller'], ['w07', 'Renkli güller'],
+  ['w06', 'Boğa'], ['w09', 'Siyah-gri tam kol'], ['w13', 'Defne ve Roma rakamı'],
+  ['w10', 'Çift kurt'], ['k02', 'Renkli kol, güller'], ['w02', 'Yılan'],
+  ['w08', 'Kırlangıç, boyun'], ['w11', 'Renkli tam kol'], ['w12', 'Ornamental ön kol'],
+  ['w14', 'Pusula ve ok'], ['w15', 'Çiçekli figür'], ['w16', 'Jilet ve şapka'],
+  ['w17', 'Yaprak dalı'], ['w18', 'Zambak'], ['w19', 'Kuşlar, köprücük'],
+  ['w20', 'Kafatası ve çiçek'], ['w21', 'Göğüs yazısı'], ['w22', 'Siyah-gri kol'],
+  ['w23', 'Tek gül'], ['w24', 'Kalp ritmi'], ['w25', 'Dalga'],
+  ['w26', 'Tüy'], ['w27', 'Ay yıldız'], ['w28', 'Zeytin dalı'],
+  ['w29', 'Çift kalp'], ['w30', 'Gül, bel'],
+];
+
+test('SEED_PHOTOS: the prototype’s 32 works in its order, then the five earlier crops (37 in all)', () => {
+  assert.equal(SEED_PHOTOS.length, 37);
+  assert.deepEqual(
+    SEED_PHOTOS.slice(0, 32),
+    WORKS.map(([id, caption]) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 })),
+  );
+  assert.deepEqual(SEED_PHOTOS.slice(32), [
     { id: 'seed-chicano-kol', caption: 'Chicano kol', category: 'dovme', seed_path: 'chicano-kol', width: 475, height: 797 },
     { id: 'seed-renkli-gul', caption: 'Renkli güller', category: 'dovme', seed_path: 'renkli-gul', width: 463, height: 800 },
     { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', seed_path: 'kurt', width: 487, height: 790 },
     { id: 'seed-yazi-gogus', caption: 'Chicano yazı', category: 'dovme', seed_path: 'yazi-gogus', width: 502, height: 641 },
     { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
   ]);
+  assert.ok(!SEED_PHOTOS.some((photo) => ['seed-k03', 'seed-k04'].includes(photo.id)), 'k03 and k04 are not seeded');
 });
 
 test('SEED_PHOTOS are consistent: ids, paths, categories, captions and sizes', () => {
   assert.equal(new Set(SEED_PHOTOS.map((photo) => photo.id)).size, SEED_PHOTOS.length);
   for (const photo of SEED_PHOTOS) {
-    assert.match(photo.id, /^seed-[a-z]+(?:-[a-z]+)*$/);
+    assert.match(photo.id, /^seed-[a-z0-9]+(?:-[a-z0-9]+)*$/);
     assert.equal(photo.seed_path, photo.id.slice('seed-'.length));
     assert.ok(CATEGORIES.includes(photo.category), photo.id);
     assert.deepEqual(validateCaption(photo.caption), { ok: true, value: photo.caption }, photo.id);
@@ -94,8 +119,8 @@ test('SEED_PHOTOS are consistent: ids, paths, categories, captions and sizes', (
   }
 });
 
-test('DEFAULT_HERO is the shop sign', () => {
-  assert.deepEqual(DEFAULT_HERO, { source: 'seed', seed_path: 'tabela', width: 880, height: 932 });
+test('DEFAULT_HERO is the shop’s logo (the old AI sign with its “Tatoo” typo is retired)', () => {
+  assert.deepEqual(DEFAULT_HERO, { source: 'seed', seed_path: 'logo', width: 1254, height: 1254 });
 });
 
 // The owner's real Google reviews, word for word. The spelling is theirs: do not correct it.

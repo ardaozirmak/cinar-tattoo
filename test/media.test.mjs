@@ -26,16 +26,18 @@ test('IMAGE_LIMITS: the numbers of the spec, and the caption limit has one sourc
 // Ids and keys
 // ---------------------------------------------------------------------------------------------
 
-test('PHOTO_ID_RE accepts every seed photo id (the plan’s pattern rejected four of the five) and 20 hex characters', () => {
+test('PHOTO_ID_RE accepts every seed photo id (P14’s pattern rejected seed-w01) and 20 hex characters', () => {
   for (const { id } of SEED_PHOTOS) assert.match(id, PHOTO_ID_RE, id);
   assert.match('seed-kol', PHOTO_ID_RE);
+  assert.match('seed-w01', PHOTO_ID_RE);
+  assert.match('seed-kol2', PHOTO_ID_RE);
   assert.match(KEY, PHOTO_ID_RE);
   assert.match('ffffffffffffffffffff', PHOTO_ID_RE);
 });
 
 test('PHOTO_ID_RE rejects everything else', () => {
   const bad = [
-    '', 'seed', 'seed-', 'seed--kol', 'seed-kol-', '-seed-kol', 'Seed-kol', 'seed-Kol', 'seed-kol2', 'seed-kol_x', 'seed-ko l',
+    '', 'seed', 'seed-', 'seed--kol', 'seed-kol-', '-seed-kol', 'Seed-kol', 'seed-Kol', 'seed-kol_x', 'seed-ko l',
     'seed-kol\n', ' seed-kol', 'seed-kol/../x', '../seed-kol',
     '0123456789abcdef012', '0123456789abcdef01234', '0123456789ABCDEF0123', '0123456789abcdef012g', `${KEY}\n`, ` ${KEY}`,
   ];
@@ -84,7 +86,7 @@ test('imageUrls: a stored photo is served by /img from KV', () => {
 test('imageUrls takes a whole photo row, a seed photo of the defaults and a hero alike', () => {
   const row = { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', position: 2, source: 'seed', seed_path: 'kurt', image_key: null, width: 487, height: 790, created_at: 0 };
   assert.deepEqual(imageUrls(row), { full: '/seed/kurt-full.jpg', thumb: '/seed/kurt-thumb.jpg' });
-  assert.deepEqual(imageUrls(DEFAULT_HERO), { full: '/seed/tabela-full.jpg', thumb: '/seed/tabela-thumb.jpg' });
+  assert.deepEqual(imageUrls(DEFAULT_HERO), { full: '/seed/logo-full.jpg', thumb: '/seed/logo-thumb.jpg' });
   assert.deepEqual(imageUrls({ source: 'kv', image_key: KEY, width: 800, height: 600 }), { full: `/img/${KEY}/full`, thumb: `/img/${KEY}/thumb` });
 });
 

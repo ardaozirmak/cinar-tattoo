@@ -45,6 +45,11 @@ const countRows = (db, table) => db.prepare(`SELECT COUNT(*) AS n FROM ${table}`
 const photoIds = async (db) => (await getContent(db)).photos.map((photo) => photo.id);
 
 const SEED_IDS = SEED_PHOTOS.map((photo) => photo.id);
+// The stored row of a seed photo, as a new database holds it.
+const seedRow = (id) => {
+  const position = SEED_IDS.indexOf(id);
+  return { ...SEED_PHOTOS[position], position, source: 'seed', image_key: null, created_at: 0 };
+};
 const SETTINGS_ROWS = Object.keys(DEFAULT_SETTINGS).length + 1; // the defaults, and hero_image
 const SEEDED_SETTINGS = { ...DEFAULT_SETTINGS, hero_image: JSON.stringify(DEFAULT_HERO) };
 
@@ -113,7 +118,7 @@ const SEEDED_COUNTS = {
   meta: 2,
   settings: SETTINGS_ROWS,
   services: 4,
-  photos: 5,
+  photos: 37,
   admin_auth: 1,
   login_attempts: 0,
   price_groups: 0,
@@ -140,7 +145,7 @@ test('schema v1: the tables, columns, defaults and keys of the plan', async (t) 
   await assert.rejects(db.prepare('INSERT INTO admin_auth (id) VALUES (2)').run(), /CHECK constraint failed/, 'there is one admin row');
 });
 
-test('ensureSchema seeds the site: settings, 4 services, the 5 seed photos, 13 reviews, the admin row, no prices', async (t) => {
+test('ensureSchema seeds the site: settings, 4 services, the 37 seed photos, 13 reviews, the admin row, no prices', async (t) => {
   const db = await seededDb(t);
   assert.deepEqual(await tableCounts(db), SEEDED_COUNTS);
   assert.deepEqual(await rows(db, 'SELECT key, value FROM meta ORDER BY key'), [
@@ -233,13 +238,15 @@ test('seeding is INSERT OR IGNORE: even if the seeded flag is lost, nothing the 
 // Reading the content
 // ---------------------------------------------------------------------------------------------
 
-test('getContent on a new database: the default texts, 4 services, the 5 seed photos in order, 13 reviews and no prices', async (t) => {
+test('getContent on a new database: the default texts, 4 services, the 37 seed photos in order, 13 reviews and no prices', async (t) => {
   const db = await seededDb(t);
   const content = await getContent(db);
   assert.deepEqual(content.settings, SEEDED_SETTINGS);
   assert.deepEqual(content.hero, DEFAULT_HERO);
   assert.deepEqual(content.services, DEFAULT_SERVICES);
-  assert.deepEqual(content.photos.map((photo) => photo.id), ['seed-chicano-kol', 'seed-renkli-gul', 'seed-kurt', 'seed-yazi-gogus', 'seed-gobek-piercing']);
+  assert.equal(content.photos.length, 37);
+  assert.deepEqual(content.photos.slice(0, 3).map((photo) => photo.id), ['seed-w03', 'seed-k01', 'seed-w01']);
+  assert.deepEqual(content.photos.slice(-5).map((photo) => photo.id), ['seed-chicano-kol', 'seed-renkli-gul', 'seed-kurt', 'seed-yazi-gogus', 'seed-gobek-piercing']);
   for (const [index, photo] of content.photos.entries()) {
     assert.deepEqual(photo, { ...SEED_PHOTOS[index], position: index, source: 'seed', image_key: null, created_at: 0 });
   }
@@ -266,9 +273,9 @@ test('defaultContent hands out fresh copies: changing one never changes the defa
 
   assert.deepEqual(defaultContent(), pristine);
   assert.notEqual(DEFAULT_SETTINGS.hero_title, 'değişti');
-  assert.equal(DEFAULT_HERO.width, 880);
+  assert.equal(DEFAULT_HERO.width, 1254);
   assert.notEqual(DEFAULT_SERVICES[0].name, 'değişti');
-  assert.equal(SEED_PHOTOS.length, 5);
+  assert.equal(SEED_PHOTOS.length, 37);
   assert.notEqual(SEED_PHOTOS[0].caption, 'değişti');
   assert.notEqual(SEED_REVIEWS[0].text, 'değişti');
 });
@@ -350,11 +357,11 @@ test('hero falls back to DEFAULT_HERO on bad JSON, a wrong shape or a missing ro
     JSON.stringify({ ...KV_HERO, image_key: keyOf(1).toUpperCase() }),
     '{"source":"seed","width":10,"height":10}',
     '{"source":"seed","seed_path":"","width":10,"height":10}',
-    '{"source":"seed","seed_path":"tabela","width":0,"height":10}',
-    '{"source":"seed","seed_path":"tabela","width":10,"height":4001}',
-    '{"source":"seed","seed_path":"tabela","width":"10","height":10}',
-    '{"source":"seed","seed_path":"tabela","width":1.5,"height":10}',
-    '{"source":"other","seed_path":"tabela","width":10,"height":10}',
+    '{"source":"seed","seed_path":"logo","width":0,"height":10}',
+    '{"source":"seed","seed_path":"logo","width":10,"height":4001}',
+    '{"source":"seed","seed_path":"logo","width":"10","height":10}',
+    '{"source":"seed","seed_path":"logo","width":1.5,"height":10}',
+    '{"source":"other","seed_path":"logo","width":10,"height":10}',
     JSON.stringify({ ...KV_HERO, source: 'other' }), // a good key does not make a hero
     JSON.stringify({ ...KV_HERO, source: 'seed' }), // a seed hero needs a seed_path
   ];
@@ -377,7 +384,7 @@ test('hero falls back to DEFAULT_HERO on bad JSON, a wrong shape or a missing ro
 
 test('a stored hero keeps only the four fields of a hero', async (t) => {
   const db = await seededDb(t);
-  const stored = JSON.stringify({ ...KV_HERO, evil: '<script>', seed_path: 'tabela' });
+  const stored = JSON.stringify({ ...KV_HERO, evil: '<script>', seed_path: 'logo' });
   await db.prepare("UPDATE settings SET value = ? WHERE key = 'hero_image'").bind(stored).run();
   assert.deepEqual(await getHero(db), KV_HERO);
 });
@@ -395,14 +402,14 @@ test('setHero stores the new hero and hands back the one it replaced', async (t)
   assert.deepEqual(await getHero(db), next);
   assert.equal(await countRows(db, 'settings'), SETTINGS_ROWS, 'one row, saved over');
 
-  const seed = { source: 'seed', seed_path: 'tabela', width: 880, height: 932 };
+  const seed = { ...DEFAULT_HERO };
   assert.deepEqual(await setHero(db, seed), next);
   assert.deepEqual(await getHero(db), seed);
 });
 
 test('setHero drops fields that are not part of a hero and refuses a malformed one', async (t) => {
   const db = await seededDb(t);
-  await setHero(db, { ...KV_HERO, type: 'image/jpeg', seed_path: 'tabela' });
+  await setHero(db, { ...KV_HERO, type: 'image/jpeg', seed_path: 'logo' });
   assert.deepEqual(JSON.parse((await getContent(db)).settings.hero_image), KV_HERO);
   for (const bad of [null, undefined, 'kv', [], {}, { ...KV_HERO, image_key: 'zzz' }, { ...KV_HERO, width: 0 }, { source: 'seed', width: 1, height: 1 }]) {
     await assert.rejects(setHero(db, bad), TypeError, JSON.stringify(bad));
@@ -604,9 +611,9 @@ test('getClickStats totals the days from sinceDay on, and gives 0 for a kind wit
 
 test('countPhotos', async (t) => {
   const db = await seededDb(t);
-  assert.equal(await countPhotos(db), 5);
+  assert.equal(await countPhotos(db), 37);
   await insertPhoto(db, newPhoto(1));
-  assert.equal(await countPhotos(db), 6);
+  assert.equal(await countPhotos(db), 38);
   await db.prepare('DELETE FROM photos').run();
   assert.equal(await countPhotos(db), 0);
 });
@@ -650,7 +657,7 @@ test('insertPhoto without a caption or a type uses the defaults of the table', a
 
 test('getPhoto gives the row, or null', async (t) => {
   const db = await seededDb(t);
-  assert.deepEqual(await getPhoto(db, 'seed-kurt'), { ...SEED_PHOTOS[2], position: 2, source: 'seed', image_key: null, created_at: 0 });
+  assert.deepEqual(await getPhoto(db, 'seed-kurt'), seedRow('seed-kurt'));
   assert.equal(await getPhoto(db, 'seed-yok'), null);
   assert.equal(await getPhoto(db, idOf(9)), null);
 });
@@ -664,7 +671,7 @@ test('updatePhotoMeta changes only what it is given and returns the new row', as
   assert.deepEqual(await updatePhotoMeta(db, 'seed-kurt', { caption: '' }), { ...before, caption: '', category: 'diger' }, 'an empty caption is a caption');
   assert.deepEqual(await updatePhotoMeta(db, 'seed-kurt', {}), { ...before, caption: '', category: 'diger' }, 'nothing to change');
   assert.deepEqual(await getPhoto(db, 'seed-kurt'), { ...before, caption: '', category: 'diger' });
-  assert.deepEqual(await getPhoto(db, 'seed-renkli-gul'), { ...SEED_PHOTOS[1], position: 1, source: 'seed', image_key: null, created_at: 0 }, 'the others are untouched');
+  assert.deepEqual(await getPhoto(db, 'seed-renkli-gul'), seedRow('seed-renkli-gul'), 'the others are untouched');
 });
 
 test('updatePhotoMeta on an unknown id is null and writes nothing', async (t) => {
@@ -708,13 +715,13 @@ test('setPhotoOrder takes exactly the current ids, renumbers them from 0 and say
   const db = await seededDb(t);
   await insertPhoto(db, newPhoto(1));
   const ids = (await photoIds(db)).reverse();
-  assert.equal(ids.length, 6);
+  assert.equal(ids.length, 38);
   assert.equal(await setPhotoOrder(db, ids), true);
   const { photos } = await getContent(db);
   assert.deepEqual(photos.map((photo) => photo.id), ids);
-  assert.deepEqual(photos.map((photo) => photo.position), [0, 1, 2, 3, 4, 5]);
+  assert.deepEqual(photos.map((photo) => photo.position), ids.map((_, index) => index));
 
-  const shuffled = [ids[3], ids[0], ids[5], ids[1], ids[4], ids[2]];
+  const shuffled = [ids[3], ids[0], ids[5], ids[1], ids[4], ids[2], ...ids.slice(6)];
   assert.equal(await setPhotoOrder(db, shuffled), true);
   assert.deepEqual(await photoIds(db), shuffled);
 });
@@ -783,9 +790,9 @@ test('deletePhoto returns the row it removed, and only that row goes', async (t)
 test('deletePhoto of an unknown id, or one that was deleted already, is null', async (t) => {
   const db = await seededDb(t);
   assert.equal(await deletePhoto(db, idOf(1)), null);
-  assert.deepEqual(await deletePhoto(db, 'seed-kurt'), { ...SEED_PHOTOS[2], position: 2, source: 'seed', image_key: null, created_at: 0 });
+  assert.deepEqual(await deletePhoto(db, 'seed-kurt'), seedRow('seed-kurt'));
   assert.equal(await deletePhoto(db, 'seed-kurt'), null);
-  assert.equal(await countPhotos(db), 4);
+  assert.equal(await countPhotos(db), 36);
 });
 
 // ---------------------------------------------------------------------------------------------

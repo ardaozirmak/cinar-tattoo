@@ -174,7 +174,7 @@ test('the new photo is the first of the state, before the seed photos, and the n
   assert.deepEqual([first.position, second.position], [-1, -2]);
   assert.deepEqual(await orderOf(env, cookie), [second.id, first.id, ...SEED_IDS]);
   const state = await stateOf(env, cookie);
-  assert.equal(state.photos.length, 7);
+  assert.equal(state.photos.length, SEED_IDS.length + 2);
   assert.equal(state.photos[0].full, second.full);
 });
 
@@ -232,7 +232,7 @@ test('an upload that is too big, unreadable, incomplete or without a size is ref
   ];
   for (const [label, response, status, message] of refused) await assertError(response, status, message, label);
   assert.deepEqual(await keysOf(env), []);
-  assert.equal((await stateOf(env, cookie)).photos.length, 5);
+  assert.equal((await stateOf(env, cookie)).photos.length, SEED_IDS.length);
 });
 
 test('a caption over 120 characters or an unknown type is 400 before anything is stored', async (t) => {
@@ -242,12 +242,12 @@ test('a caption over 120 characters or an unknown type is 400 before anything is
   await assertError(await upload(env, cookie, { category: '' }), 400, BAD_CATEGORY);
   await assertError(await upload(env, cookie, { category: 'DOVME' }), 400, BAD_CATEGORY);
   assert.deepEqual(await keysOf(env), []);
-  assert.equal((await stateOf(env, cookie)).photos.length, 5);
+  assert.equal((await stateOf(env, cookie)).photos.length, SEED_IDS.length);
 });
 
 test('with 400 photos stored an upload is 409 "Fotoğraf sınırına ulaşıldı (400)…"; with 399 one more still goes in', async (t) => {
   const { env, cookie } = await signedIn(t);
-  for (let index = 0; index < 394; index += 1) {
+  for (let index = 0; index < 399 - SEED_IDS.length; index += 1) {
     const id = String(index).padStart(20, '0');
     await insertPhoto(env.DB, { id, image_key: id, width: 1, height: 1, created_at: 1 });
   }
@@ -279,7 +279,7 @@ test('Review Focus 4: when the D1 write fails after the KV writes, the new image
   assert.equal(logged.mock.callCount(), 1);
   assert.match(loggedText(logged)[0], /D1 yazamadı/);
 
-  assert.equal((await stateOf(env, cookie)).photos.length, 5, 'the gallery is as it was');
+  assert.equal((await stateOf(env, cookie)).photos.length, SEED_IDS.length, 'the gallery is as it was');
 });
 
 test('when the KV write of the thumb fails, the full image that was already stored is deleted again', async (t) => {
@@ -289,7 +289,7 @@ test('when the KV write of the thumb fails, the full image that was already stor
   await assertError(await upload(env, cookie, {}), 500, UNEXPECTED);
   assert.deepEqual((await env.IMAGES.list()).keys, []);
   assert.match(loggedText(logged)[0], /KV yazamadı/);
-  assert.equal((await stateOf(env, cookie)).photos.length, 5);
+  assert.equal((await stateOf(env, cookie)).photos.length, SEED_IDS.length);
 });
 
 test('when the cleanup fails too, the answer is still the error that started it, and the cleanup failure is logged', async (t) => {
@@ -379,7 +379,7 @@ test('PUT photos/order puts the photos in the order of the list and numbers them
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { ok: true });
   assert.deepEqual(await orderOf(env, cookie), reversed);
-  assert.deepEqual((await getContent(env.DB)).photos.map(({ position }) => position), [0, 1, 2, 3, 4, 5]);
+  assert.deepEqual((await getContent(env.DB)).photos.map(({ position }) => position), reversed.map((_, index) => index));
   assert.equal((await stateOf(env, cookie)).photos.at(-1).id, mine.id);
 
   const toFront = [mine.id, ...reversed.filter((id) => id !== mine.id)];
@@ -539,7 +539,7 @@ test('deleting a seed photo removes the row only; KV is not touched', async (t) 
   assert.deepEqual(await response.json(), { ok: true });
   assert.deepEqual(await orderOf(env, cookie), SEED_IDS.filter((id) => id !== 'seed-renkli-gul'));
   assert.deepEqual(await stored(env), before, 'row removed, IMAGES untouched');
-  assert.equal((await getContent(env.DB)).photos.length, 4, 'and it does not come back with the next request');
+  assert.equal((await getContent(env.DB)).photos.length, SEED_IDS.length - 1, 'and it does not come back with the next request');
 });
 
 test('a photo can be deleted once: the second time it is 404', async (t) => {
@@ -591,7 +591,7 @@ test('POST hero-image makes the uploaded image the hero: getContent().hero is a 
   assert.deepEqual(Object.keys(kv).sort(), [...imageKeys(hero.image_key), ...imageKeys(DECOY)].sort(), 'the seed hero has no KV keys to delete, and nothing else was touched');
   assert.deepEqual(kv[kvKeys(hero.image_key).full], { bytes: TINY_PNG, metadata: { type: 'image/png', width: 800, height: 600 } });
   assert.deepEqual(kv[kvKeys(hero.image_key).thumb].metadata, { type: 'image/jpeg', width: 640, height: 480 });
-  assert.equal((await getContent(env.DB)).photos.length, 5, 'it is not a photo of the gallery');
+  assert.equal((await getContent(env.DB)).photos.length, SEED_IDS.length, 'it is not a photo of the gallery');
 });
 
 test('a second hero image deletes the KV keys of the first', async (t) => {

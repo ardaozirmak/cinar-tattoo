@@ -57,7 +57,7 @@ const EXPECTED_FIELDS = [
   // key, label, kind, max, required
   ['seo_title', 'Sayfa başlığı', 'text', 70, true],
   ['seo_description', 'Google açıklaması', 'text', 170, true],
-  ['hero_title', 'Giriş başlığı', 'text', 80, true],
+  ['hero_title', 'Giriş başlığı', 'multiline', 80, true], // multiline since Task 6: its line breaks are the H1's lines
   ['hero_text', 'Giriş metni', 'text', 160, false],
   ['about_title', 'Hakkında başlığı', 'text', 40, true],
   ['about_text', 'Hakkında metni', 'multiline', 600, false],
@@ -236,9 +236,11 @@ test('validateSettingsPatch: values are trimmed and lose \\r and control charact
 });
 
 test('validateSettingsPatch: a text field turns newlines into single spaces, a multiline field keeps them', () => {
-  assert.equal(accepted(patchOf({ hero_title: 'a\nb' })).values.hero_title, 'a b');
-  assert.equal(accepted(patchOf({ hero_title: 'a\r\nb' })).values.hero_title, 'a b');
-  assert.equal(accepted(patchOf({ hero_title: 'a \n\n  b\n' })).values.hero_title, 'a b');
+  assert.equal(accepted(patchOf({ seo_title: 'a\nb' })).values.seo_title, 'a b');
+  assert.equal(accepted(patchOf({ seo_title: 'a\r\nb' })).values.seo_title, 'a b');
+  assert.equal(accepted(patchOf({ seo_title: 'a \n\n  b\n' })).values.seo_title, 'a b');
+  // Since Task 6 the hero title is multiline: its line breaks are the lines of the H1.
+  assert.equal(accepted(patchOf({ hero_title: ' Bir ömür\r\ndövme. ' })).values.hero_title, 'Bir ömür\ndövme.');
   assert.equal(accepted(patchOf({ about_text: '  a\r\nb\n\nc \u0007 \n' })).values.about_text, 'a\nb\n\nc');
   assert.equal(accepted(patchOf({ address: 'Nine Hatun Mah.\nİnönü Cd. No:11' })).values.address, 'Nine Hatun Mah.\nİnönü Cd. No:11');
 });

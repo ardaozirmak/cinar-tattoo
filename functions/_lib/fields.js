@@ -54,7 +54,8 @@ const field = (key, label, kind, max, { required = false, maxItems } = {}) => ({
 export const SETTINGS_FIELDS = [
   field('seo_title', 'Sayfa başlığı', 'text', 70, { required: true }),
   field('seo_description', 'Google açıklaması', 'text', 170, { required: true }),
-  field('hero_title', 'Giriş başlığı', 'text', 80, { required: true }),
+  // Multiline: each line of the hero title is one line of the H1 (the page uses up to three).
+  field('hero_title', 'Giriş başlığı', 'multiline', 80, { required: true }),
   field('hero_text', 'Giriş metni', 'text', 160),
   field('about_title', 'Hakkında başlığı', 'text', 40, { required: true }),
   field('about_text', 'Hakkında metni', 'multiline', 600),

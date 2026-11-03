@@ -239,8 +239,8 @@ test('state holds everything the panel shows and edits, every photo and the hero
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   const state = await response.json();
   assert.deepEqual(Object.keys(state).sort(), ['categories', 'fields', 'groups', 'hero', 'limits', 'photos', 'prices', 'reviewSources', 'reviews', 'services', 'settings']);
-  assert.deepEqual(state.hero, { source: 'seed', seed_path: 'tabela', width: 880, height: 932, full: '/seed/tabela-full.jpg', thumb: '/seed/tabela-thumb.jpg' });
-  assert.equal(state.photos.length, 6);
+  assert.deepEqual(state.hero, { source: 'seed', seed_path: 'logo', width: 1254, height: 1254, full: '/seed/logo-full.jpg', thumb: '/seed/logo-thumb.jpg' });
+  assert.equal(state.photos.length, 38);
   assert.deepEqual(state.photos[0], {
     id: 'a'.repeat(20),
     caption: 'Yeni iş',
@@ -256,18 +256,18 @@ test('state holds everything the panel shows and edits, every photo and the hero
     thumb: `/img/${key}/thumb`,
   });
   assert.deepEqual(state.photos[1], {
-    id: 'seed-chicano-kol',
-    caption: 'Chicano kol',
+    id: 'seed-w03',
+    caption: 'Üçgen içinde gül, el üstü',
     category: 'dovme',
     position: 0,
     source: 'seed',
-    seed_path: 'chicano-kol',
+    seed_path: 'w03',
     image_key: null,
-    width: 475,
-    height: 797,
+    width: 400,
+    height: 711,
     created_at: 0,
-    full: '/seed/chicano-kol-full.jpg',
-    thumb: '/seed/chicano-kol-thumb.jpg',
+    full: '/seed/w03-full.jpg',
+    thumb: '/seed/w03-thumb.jpg',
   });
   assert.deepEqual(state.services, DEFAULT_SERVICES);
   assert.deepEqual(state.prices, [{ id: 1, title: 'Dövme', items: [{ id: 1, name: 'Minimal yazı', detail: '', price: 'Teklif al' }] }]);

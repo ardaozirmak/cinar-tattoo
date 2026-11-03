@@ -9,10 +9,11 @@
 export const BRAND_NAME = 'Çınar Tattoo';
 
 export const DEFAULT_SETTINGS = {
-  seo_title: 'Esenler Dövmeci | Çınar Tattoo Piercing',
-  seo_description: "Esenler'de dövmeci ve piercing hizmeti mi arıyorsunuz? Kalıcı dövme, geçici dövme, profesyonel piercing uygulamaları ve kaliteli dövme malzemeleri.",
-  hero_title: 'Esenler’de 2005’ten beri dövme ve piercing',
-  hero_text: 'Onur Aydoğan’ın stüdyosu. Randevu için ara ya da uğra.',
+  seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
+  seo_description: 'Esenler’de 2005’ten beri dövme ve piercing: Onur Aydoğan’ın stüdyosu. Kişiye özel çizim, steril ortam, Google yorumlarının hepsi 5 yıldız. WhatsApp’tan randevu al.',
+  // Each line of the hero title is one line of the H1; the last of two or three is set in italics.
+  hero_title: 'Bir ömür taşıyacağın\ndövme.',
+  hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
   about_title: 'Onur Aydoğan',
   about_text: 'Onur Aydoğan 20 yılı aşkın süredir dövme yapıyor. Esenler’deki stüdyosunda dövme, piercing ve malzeme için seni bekliyor.',
   hours: '10.00–23.00',
@@ -41,9 +42,45 @@ export const DEFAULT_SERVICES = [
   { id: 4, name: 'Dövme malzemeleri', description: 'Boya, iğne ve bakım ürünleri.' },
 ];
 
-// The owner's own Instagram photos, in position order. The sizes are those of the files in
-// public/seed/<seed_path>-full.jpg.
+// The gallery a new site opens with, in position order: the Dergi prototype's 32 works (photos of
+// Onur Bey's work from his friend's site, ruling T6-R12; k03 and k04 are close-ups and not seeded),
+// then the five earlier crops. The sizes are those of public/seed/<seed_path>-full.jpg, which
+// dev/seed-images.py makes.
+const work = (id, caption) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 });
+
 export const SEED_PHOTOS = [
+  work('w03', 'Üçgen içinde gül, el üstü'),
+  work('k01', 'Renkli omuz, saat ve yazı'),
+  work('w01', 'Hançer ve gül'),
+  work('w04', 'Orman ve kurt'),
+  work('w05', 'Portre ve güller'),
+  work('w07', 'Renkli güller'),
+  work('w06', 'Boğa'),
+  work('w09', 'Siyah-gri tam kol'),
+  work('w13', 'Defne ve Roma rakamı'),
+  work('w10', 'Çift kurt'),
+  work('k02', 'Renkli kol, güller'),
+  work('w02', 'Yılan'),
+  work('w08', 'Kırlangıç, boyun'),
+  work('w11', 'Renkli tam kol'),
+  work('w12', 'Ornamental ön kol'),
+  work('w14', 'Pusula ve ok'),
+  work('w15', 'Çiçekli figür'),
+  work('w16', 'Jilet ve şapka'),
+  work('w17', 'Yaprak dalı'),
+  work('w18', 'Zambak'),
+  work('w19', 'Kuşlar, köprücük'),
+  work('w20', 'Kafatası ve çiçek'),
+  work('w21', 'Göğüs yazısı'),
+  work('w22', 'Siyah-gri kol'),
+  work('w23', 'Tek gül'),
+  work('w24', 'Kalp ritmi'),
+  work('w25', 'Dalga'),
+  work('w26', 'Tüy'),
+  work('w27', 'Ay yıldız'),
+  work('w28', 'Zeytin dalı'),
+  work('w29', 'Çift kalp'),
+  work('w30', 'Gül, bel'),
   { id: 'seed-chicano-kol', caption: 'Chicano kol', category: 'dovme', seed_path: 'chicano-kol', width: 475, height: 797 },
   { id: 'seed-renkli-gul', caption: 'Renkli güller', category: 'dovme', seed_path: 'renkli-gul', width: 463, height: 800 },
   { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', seed_path: 'kurt', width: 487, height: 790 },
@@ -51,8 +88,9 @@ export const SEED_PHOTOS = [
   { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
 ];
 
-// The shop sign shown in the hero until the owner uploads another picture.
-export const DEFAULT_HERO = { source: 'seed', seed_path: 'tabela', width: 880, height: 932 };
+// The shop's logo, shown whole and sharp as the hero until the owner uploads another picture. (The
+// earlier AI-drawn sign is retired: it spelled "Tatoo".)
+export const DEFAULT_HERO = { source: 'seed', seed_path: 'logo', width: 1254, height: 1254 };
 
 const googleReview = (name, text) => ({ name, rating: 5, text, source: 'google', date_text: '' });
 

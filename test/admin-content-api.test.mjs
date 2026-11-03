@@ -88,17 +88,17 @@ test('PUT settings: only the keys of the settings form may be sent; the hero ima
   await assertError(await put(env, cookie, 'settings', { hero_title: 'Yeni', zzz: 'x' }), 400, 'Bilinmeyen alan: zzz');
   await assertError(await put(env, cookie, 'settings', { constructor: 'x' }), 400, 'Bilinmeyen alan: constructor');
   assert.equal((await getContent(env.DB)).settings.hero_title, DEFAULT_SETTINGS.hero_title);
-  assert.deepEqual((await getContent(env.DB)).hero, { source: 'seed', seed_path: 'tabela', width: 880, height: 932 });
+  assert.deepEqual((await getContent(env.DB)).hero, { source: 'seed', seed_path: 'logo', width: 1254, height: 1254 });
 });
 
 test('PUT settings: a text is trimmed and cleaned like the validators do; an empty patch changes nothing', async (t) => {
   const { env, cookie } = await signedIn(t);
-  const response = await put(env, cookie, 'settings', { hero_title: '  Esenler’de\n  dövme  ' });
-  assert.equal((await response.json()).settings.hero_title, 'Esenler’de dövme');
+  const response = await put(env, cookie, 'settings', { seo_title: '  Esenler’de\n  dövme  ' });
+  assert.equal((await response.json()).settings.seo_title, 'Esenler’de dövme');
 
   const nothing = await put(env, cookie, 'settings', {});
   assert.equal(nothing.status, 200);
-  assert.equal((await nothing.json()).settings.hero_title, 'Esenler’de dövme');
+  assert.equal((await nothing.json()).settings.seo_title, 'Esenler’de dövme');
 });
 
 test('PUT settings: a body that is not an object, not JSON or empty is 400 "İstek okunamadı."', async (t) => {

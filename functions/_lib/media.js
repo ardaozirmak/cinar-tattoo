@@ -1,8 +1,8 @@
 // Photo rules shared by the upload API, the image route and the stored rows: the limits, the shape
 // of ids and keys, where each image is served from, and a check of what a file really is.
 //
-// An image lives in one of two places. A seed photo (the owner's first Instagram pictures and the
-// shop sign) is a static file under public/seed/. Every picture uploaded from the panel is in KV,
+// An image lives in one of two places. A seed photo (the first gallery pictures and the shop.s
+// logo) is a static file under public/seed/. Every picture uploaded from the panel is in KV,
 // under a random key, in two sizes: `full` for the viewer and `thumb` for the gallery.
 import { CAPTION_MAX } from './fields.js';
 
@@ -15,9 +15,10 @@ export const IMAGE_LIMITS = Object.freeze({
   captionMax: CAPTION_MAX,
 });
 
-// A seed photo's id is "seed-" and its name: words of lower-case letters joined by dashes. Any other
-// photo's id is 20 hex characters. Nothing else is a photo id, so an id from a URL is safe to look up.
-export const PHOTO_ID_RE = /^(seed-[a-z]+(?:-[a-z]+)*|[0-9a-f]{20})$/;
+// A seed photo's id is "seed-" and its name: words of lower-case letters and digits joined by dashes
+// (seed-w01, seed-chicano-kol). Any other photo's id is 20 hex characters. Nothing else is a photo
+// id, so an id from a URL is safe to look up.
+export const PHOTO_ID_RE = /^(seed-[a-z0-9]+(?:-[a-z0-9]+)*|[0-9a-f]{20})$/;
 // The random part of a KV key.
 export const IMAGE_KEY_RE = /^[0-9a-f]{20}$/;
 
