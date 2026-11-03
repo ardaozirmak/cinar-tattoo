@@ -366,7 +366,7 @@ function hero(ctx) {
 }
 
 function facts(ctx) {
-  const items = [`<div class="fact"><b class="num" id="years">${ctx.year - FOUNDED}</b><span>yıldır aynı mahallede</span></div>`];
+  const items = ['<div class="fact"><b class="num">+20</b><span>yıllık tecrübe</span></div>'];
   if (!blank(ctx.settings.instagram_followers)) items.push(`<div class="fact"><b>${text(String(ctx.settings.instagram_followers).trim())}</b><span>Instagram takipçisi</span></div>`);
   if (ctx.reviews.length > 0) {
     const fives = ctx.reviews.filter((review) => review.rating === 5).length;

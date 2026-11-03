@@ -103,7 +103,8 @@ test('defaults: 28 work cards, the first is seed-gecici-06, 24 shown and 4 behin
 test('defaults: 13 reviews, the facts 26 years and 13 / 13, and never ÇINAR or the old lacivert', () => {
   const html = page();
   assert.equal(count(html, '<li class="q">'), 13);
-  assert.ok(html.includes('<b class="num" id="years">26</b><span>yıldır aynı mahallede</span>'));
+  assert.ok(html.includes('<div class="fact"><b class="num">+20</b><span>yıllık tecrübe</span></div>'));
+  assert.ok(!html.includes('aynı mahallede</span></div>'));
   assert.ok(html.includes('<b class="num">13 / 13</b><span>Google yorumu, hepsi 5 yıldız</span>'));
   assert.ok(html.includes('<b>18 bin+</b><span>Instagram takipçisi</span>'));
   assert.ok(html.includes('<b>Steril</b><span>iğne göz önünde açılır</span>'));
