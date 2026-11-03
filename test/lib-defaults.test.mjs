@@ -1,0 +1,170 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { BRAND_NAME, DEFAULT_HERO, DEFAULT_SERVICES, DEFAULT_SETTINGS, SEED_PHOTOS, SEED_REVIEWS } from '../functions/_lib/defaults.js';
+import { CATEGORIES, SETTINGS_FIELDS, validateCaption, validateReviews, validateServices, validateSettingsPatch } from '../functions/_lib/fields.js';
+import { telHref, waHref } from '../functions/_lib/links.js';
+
+test('BRAND_NAME', () => {
+  assert.equal(BRAND_NAME, 'Çınar Tattoo');
+});
+
+test('DEFAULT_SETTINGS holds the texts the site opens with', () => {
+  assert.deepEqual(DEFAULT_SETTINGS, {
+    seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
+    seo_description: 'Esenler’de 2005’ten beri dövme ve piercing: Onur Aydoğan’ın stüdyosu. Kişiye özel çizim, steril ortam, Google yorumlarının hepsi 5 yıldız. WhatsApp’tan randevu al.',
+    hero_title: 'Bir ömür taşıyacağın\ndövme.',
+    hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
+    about_title: 'Onur Aydoğan',
+    about_text: 'Onur Aydoğan 20 yılı aşkın süredir dövme yapıyor. Esenler’deki stüdyosunda dövme, piercing ve malzeme için seni bekliyor.',
+    hours: '10.00–23.00',
+    hours_note: 'Duruma göre esneyebilir.',
+    address: 'Nine Hatun Mah. İnönü Cd. No:11, Akman Ticaret Merkezi, 34220 Esenler / İstanbul',
+    phone: '0537 263 15 46',
+    whatsapp: '0537 263 15 46',
+    instagram_url: 'https://www.instagram.com/cinartattooesenler',
+    maps_url: '',
+    announcement_text: '',
+    announcement_on: '0',
+    highlights: '["20 yılı aşkın tecrübe","2005’ten beri Esenler’de","Kişiye özel çizim","Kalıcı ve geçici dövme","Profesyonel piercing"]',
+    hero_points: '["Kişiye özel dövme tasarımı","Profesyonel piercing uygulamaları","Kaliteli dövme malzemeleri"]',
+    payment_text: '',
+    instagram_followers: '18 bin+',
+    google_reviews_url: 'https://www.google.com/maps/search/?api=1&query=%C3%87%C4%B1nar%20Tattoo%20esenler%20d%C3%B6vme%20piercing%20studiosu',
+    tiktok_url: '',
+    email: '',
+  });
+});
+
+test('the page title leads with “Esenler Dövme” for local search and has a plain pipe (Task 6 brief, superseding P8)', () => {
+  assert.equal(DEFAULT_SETTINGS.seo_title, 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri');
+  assert.ok(!DEFAULT_SETTINGS.seo_title.includes('\\'));
+});
+
+test('the hero title is two lines: its \\n is the line break the page draws', () => {
+  assert.deepEqual(DEFAULT_SETTINGS.hero_title.split('\n'), ['Bir ömür taşıyacağın', 'dövme.']);
+});
+
+test('every default setting is a string, and the lists are stored as JSON strings', () => {
+  for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) assert.equal(typeof value, 'string', key);
+  assert.equal(JSON.parse(DEFAULT_SETTINGS.highlights).length, 5);
+  assert.equal(JSON.parse(DEFAULT_SETTINGS.hero_points).length, 3);
+});
+
+test('the default phone numbers make working links', () => {
+  assert.equal(telHref(DEFAULT_SETTINGS.phone), 'tel:+905372631546');
+  assert.equal(telHref(DEFAULT_SETTINGS.whatsapp), 'tel:+905372631546');
+  assert.equal(waHref(DEFAULT_SETTINGS.whatsapp, ''), 'https://wa.me/905372631546');
+});
+
+test('every default passes the rule of its own field', () => {
+  const patch = Object.fromEntries(
+    Object.entries(DEFAULT_SETTINGS).map(([key, value]) => [key, SETTINGS_FIELDS.find((field) => field.key === key).kind === 'list' ? JSON.parse(value) : value]),
+  );
+  const result = validateSettingsPatch(patch);
+  assert.equal(result.ok, true, result.message);
+  assert.deepEqual(result.values, DEFAULT_SETTINGS); // nothing about a default changes when it is saved as it is
+});
+
+test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
+  assert.deepEqual(DEFAULT_SERVICES, [
+    { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan büyük parçalara, sana göre çizilen dövmeler.' },
+    { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenler için.' },
+    { id: 3, name: 'Piercing', description: 'Kulak, burun, göbek ve daha fazlası.' },
+    { id: 4, name: 'Dövme malzemeleri', description: 'Boya, iğne ve bakım ürünleri.' },
+  ]);
+  const result = validateServices(DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
+  assert.equal(result.ok, true, result.message);
+  assert.deepEqual(result.services, DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
+});
+
+// The Dergi prototype's WORKS: [id, caption], in its order (Task 6 brief).
+const WORKS = [
+  ['w03', 'Üçgen içinde gül, el üstü'], ['k01', 'Renkli omuz, saat ve yazı'], ['w01', 'Hançer ve gül'],
+  ['w04', 'Orman ve kurt'], ['w05', 'Portre ve güller'], ['w07', 'Renkli güller'],
+  ['w06', 'Boğa'], ['w09', 'Siyah-gri tam kol'], ['w13', 'Defne ve Roma rakamı'],
+  ['w10', 'Çift kurt'], ['k02', 'Renkli kol, güller'], ['w02', 'Yılan'],
+  ['w08', 'Kırlangıç, boyun'], ['w11', 'Renkli tam kol'], ['w12', 'Ornamental ön kol'],
+  ['w14', 'Pusula ve ok'], ['w15', 'Çiçekli figür'], ['w16', 'Jilet ve şapka'],
+  ['w17', 'Yaprak dalı'], ['w18', 'Zambak'], ['w19', 'Kuşlar, köprücük'],
+  ['w20', 'Kafatası ve çiçek'], ['w21', 'Göğüs yazısı'], ['w22', 'Siyah-gri kol'],
+  ['w23', 'Tek gül'], ['w24', 'Kalp ritmi'], ['w25', 'Dalga'],
+  ['w26', 'Tüy'], ['w27', 'Ay yıldız'], ['w28', 'Zeytin dalı'],
+  ['w29', 'Çift kalp'], ['w30', 'Gül, bel'],
+];
+
+test('SEED_PHOTOS: the prototype’s 32 works in its order, then the five earlier crops (37 in all)', () => {
+  assert.equal(SEED_PHOTOS.length, 37);
+  assert.deepEqual(
+    SEED_PHOTOS.slice(0, 32),
+    WORKS.map(([id, caption]) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 })),
+  );
+  assert.deepEqual(SEED_PHOTOS.slice(32), [
+    { id: 'seed-chicano-kol', caption: 'Chicano kol', category: 'dovme', seed_path: 'chicano-kol', width: 475, height: 797 },
+    { id: 'seed-renkli-gul', caption: 'Renkli güller', category: 'dovme', seed_path: 'renkli-gul', width: 463, height: 800 },
+    { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', seed_path: 'kurt', width: 487, height: 790 },
+    { id: 'seed-yazi-gogus', caption: 'Chicano yazı', category: 'dovme', seed_path: 'yazi-gogus', width: 502, height: 641 },
+    { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
+  ]);
+  assert.ok(!SEED_PHOTOS.some((photo) => ['seed-k03', 'seed-k04'].includes(photo.id)), 'k03 and k04 are not seeded');
+});
+
+test('SEED_PHOTOS are consistent: ids, paths, categories, captions and sizes', () => {
+  assert.equal(new Set(SEED_PHOTOS.map((photo) => photo.id)).size, SEED_PHOTOS.length);
+  for (const photo of SEED_PHOTOS) {
+    assert.match(photo.id, /^seed-[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    assert.equal(photo.seed_path, photo.id.slice('seed-'.length));
+    assert.ok(CATEGORIES.includes(photo.category), photo.id);
+    assert.deepEqual(validateCaption(photo.caption), { ok: true, value: photo.caption }, photo.id);
+    for (const size of [photo.width, photo.height]) assert.ok(Number.isInteger(size) && size >= 1 && size <= 4000, photo.id);
+  }
+});
+
+test('DEFAULT_HERO is the shop’s logo (the old AI sign with its “Tatoo” typo is retired)', () => {
+  assert.deepEqual(DEFAULT_HERO, { source: 'seed', seed_path: 'logo', width: 1254, height: 1254 });
+});
+
+// The owner's real Google reviews, word for word. The spelling is theirs: do not correct it.
+const REVIEWS = [
+  ['Humeyra K.', 'Çok memnun kaldım fiyatlarda gayet uygun el işçiliği desen harika dövmemi yaparken çok özenerek yaptılar en ince detayına kadar ilgilendiler sorduğum sorularda cevapsız kalmadı çok sakin çok profosyonelceydi burdan tekrardan teşekkürlerimi iletmek istiyorum başarılarınızın devamını dilerim çınar tattoo'],
+  ['Hulya A.', 'İlk dövme deneyimimdi. Hijyenik konusunda kaygılıydım..Ortamı gördükten sonra yaptırmaya karar verdim. Onur bey işinin ehli, sabırla istediğim şekilde özenle yapıldı. Çok beğendim ellerine emeğine sağlık.'],
+  ['Yunus A.', 'Esenlerin en iyi dövmesini ben çok beğendim muhakkak gelin her çeşit dövme yapıyorlar fiyatlarıda çok uygun iyi karşılıyorlar güler yüzlüler'],
+  ['Ömer D.', 'Profesyonel ve hijyenik bakımından mükemmel ve çok mütevazi insanlar gönül rahatlığıyla gidebilirsiniz fiyat konusunda yardımcı oluyorlar kullanılan malzemeler en üst seviyede olup profosyonel makinaları kullanılıyo Mükemmel tesekkurler çınar tatto…'],
+  ['Google kullanıcısı', 'Güler yüzü samimi sohbeti ile gidebileceğiniz en güzel yerlerden diyebilirim işine özen göstermesi ve el işçiliği mükemmel 3 dövme yaptırdım üçüde aşırı içime sindi ve mükemmel oldu teşekkür ederim çınartattooesenler 🙏'],
+  ['Sila', 'İlk dövmem için geldim gerçekten çok iyi bir dükkan temiz hijyenik malzemelerini yeni ve göz önümüzde açtı çok tatlı ve şirin bir dükkan gerçekten çok harikaydı'],
+  ['Kader D.', 'Burun piercingi için gittim gerçekten güler yüzlü insanlardı, çok temiz ve titizlik ile işi yaptı, çok memnun kaldım, tavsiye ederimm'],
+  ['Buse P.', 'Çok iyi bir dövme güler yüz ve ilgi çok iyi gayet mutlu girdim gayet mutlu çıktım dövmenin içildiğini beğendim ve atrı göbek piercing kuzenimle beraber yaptık acı yok çok hafif eli var teşekkürler çınar tattoo'],
+  ['Güneş', 'İşini bilen biri olduğu kesin, hijyen konusunda çok iyi, kulak piercing yaptırdım çok memnun kaldım, çevreme tavsiye edeceğim kesin.…'],
+  ['Defne G.', 'Göbek piercing’i yaptırmak için gittim çok güzel bir yer tavsiye ederim korktuğum için onları çok beklettim ama beni çok anlayışla karşıladılar teşekkür ederim sevgi ve saygı dolu bir insan başarılarının devamını dilerim…'],
+  ['Efee', 'Gayet kaliteli bir işletme dövme piercing vesaire tüm imkanlar mevcut onur beyde gayet kibar memnun kaldık'],
+  ['Sude Ü.', 'Burnuma nostril piercing yaptırdım hijyen konusunda çok dikkatli güler yüzlü ve ilgiliydi çok memnun kaldım😊…'],
+  ['Oyku', 'Çok güzel bir dövmeci herkese öneririm\nPiercingi steril 🫶🏻 😍…'],
+];
+
+test('SEED_REVIEWS: thirteen real reviews, verbatim and in order', () => {
+  assert.deepEqual(SEED_REVIEWS.map((review) => [review.name, review.text]), REVIEWS);
+});
+
+test('every seeded review is 5 stars from Google, with no date', () => {
+  for (const review of SEED_REVIEWS) {
+    assert.deepEqual(Object.keys(review).sort(), ['date_text', 'name', 'rating', 'source', 'text']);
+    assert.equal(review.rating, 5, review.name);
+    assert.equal(review.source, 'google', review.name);
+    assert.equal(review.date_text, '', review.name);
+  }
+});
+
+test('the review that praises a woman artist stays out: the shop has none', () => {
+  assert.ok(!SEED_REVIEWS.some((review) => review.name.startsWith('Gülçek')));
+  assert.ok(!SEED_REVIEWS.some((review) => /kadın sanatçı/i.test(review.text)));
+});
+
+test('the last review keeps its single line break, which the page shows as <br>', () => {
+  assert.equal(SEED_REVIEWS[12].text.split('\n').length, 2);
+  assert.ok(SEED_REVIEWS.slice(0, 12).every((review) => !review.text.includes('\n')));
+});
+
+test('the seeded reviews pass the review rules unchanged, so saving the list in the panel alters none of them', () => {
+  const result = validateReviews(SEED_REVIEWS);
+  assert.equal(result.ok, true, result.message);
+  assert.deepEqual(result.reviews, SEED_REVIEWS);
+});
