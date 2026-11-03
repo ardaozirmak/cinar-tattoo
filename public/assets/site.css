@@ -447,7 +447,7 @@ button{font:inherit;color:inherit}
 .foot-cols a{text-decoration:none}
 .foot-cols a:hover{color:var(--fg)}
 @media (max-width:760px){.foot-cols>div{grid-column:span 6}}
-.foot-big{font:400 clamp(3rem,13.4vw,13.5rem)/.85 var(--serif);letter-spacing:-.03em;text-align:center;white-space:nowrap;padding-bottom:.16em}
+.foot-big{font:400 clamp(3rem,13.4vw,13.5rem)/.85 var(--serif);letter-spacing:-.03em;text-align:center;white-space:nowrap;padding-bottom:.3em}
 .foot-bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;padding:1.2rem 0 2rem;border-top:1px solid var(--line);font-size:.8rem;color:var(--mute)}
 
 /* mobile dock */
