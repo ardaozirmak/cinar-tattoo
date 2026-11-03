@@ -73,7 +73,7 @@ test('defaults: the WhatsApp number on <html>, the two-line H1, the logo, the li
   assert.ok(html.includes('src="/seed/logo-full.jpg"'));
   assert.ok(html.includes('srcset="/seed/logo-thumb.jpg 640w, /seed/logo-full.jpg 1254w"'));
   assert.ok(html.includes('sizes="(max-width: 900px) 100vw, min(100vw, 120svh)"'));
-  assert.ok(html.includes('alt="Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa"'));
+  assert.ok(html.includes('alt="Çınar Tattoo logosu: Çınar İnk, Tattoo, 2005 ve çapa; dövme, piercing, kalıcı makyaj"'));
   assert.ok(html.includes('href="tel:+905372631546"'));
   assert.ok(html.includes(`href="${WA_GENERIC}"`));
   assert.ok(html.includes('© 2031 Çınar Tattoo'));

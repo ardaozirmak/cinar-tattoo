@@ -135,9 +135,12 @@ button{font:inherit;color:inherit}
 .hero-sign.stage .hero-bg picture{display:contents}
 .hero-sign.stage .hero-bg img{display:block;margin:0;width:100%;height:100%;object-fit:cover;object-position:40% 42%;filter:brightness(.5) saturate(.75)}
 .hero-sign.stage .hero-bg::after{content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse 72% 78% at 50% 50%,transparent 30%,color-mix(in oklch,var(--logo-ground) 92%,transparent) 100%),
+  /* darker right behind the logo, so the photo does not show through its open parts */
+  background:radial-gradient(circle closest-side at 50% 52%,color-mix(in oklch,var(--logo-ground) 82%,transparent),color-mix(in oklch,var(--logo-ground) 68%,transparent) 70%,transparent),
+             radial-gradient(ellipse 72% 78% at 50% 50%,transparent 30%,color-mix(in oklch,var(--logo-ground) 92%,transparent) 100%),
              linear-gradient(to bottom,color-mix(in oklch,var(--logo-ground) 70%,transparent),transparent 22%,transparent 70%,var(--logo-ground))}
-.hero-sign.stage #heroLogo{width:min(100%,calc(100svh - 6rem));height:auto;
+/* the logo's black ground drops out against the photo (lighten keeps the brighter of the two), so only the mark shows */
+.hero-sign.stage #heroLogo{width:min(100%,calc(100svh - 6rem));height:auto;mix-blend-mode:lighten;
   -webkit-mask-image:linear-gradient(to right,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent),linear-gradient(to bottom,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent);
   -webkit-mask-composite:source-in;
   mask-image:linear-gradient(to right,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent),linear-gradient(to bottom,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent);
