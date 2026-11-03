@@ -282,20 +282,24 @@ function heroLines(title) {
   return parts;
 }
 
-// The small card under the logo, seen on arrival: what the shop does (the service names), the address,
-// the hours and the directions link. Each line is left out when it has nothing to show, and the card
-// when both are empty.
+// What the visitor reads on arrival: the services (the service names) and where the shop is (address,
+// hours, directions). Desktops show them left and right of the logo, over the photo; phones in a small
+// card under it. Each part is left out when it has nothing to show, and the whole when both are empty.
 function heroInfo(ctx) {
   const { settings, services } = ctx;
   const names = services.map((service) => String(service.name ?? '').trim()).filter(Boolean);
-  const what = names.length ? `<p class="hi-what">${names.map((name) => text(name)).join(' · ')}</p>` : '';
-  const where = [
-    blank(settings.address) ? '' : text(String(settings.address).trim()),
-    blank(settings.hours) ? '' : text(String(settings.hours).trim()),
-  ].filter(Boolean).join(' · ');
-  const route = dirLink(ctx, 'hi-route', `Yol tarifi${arrow}`);
-  const place = where || route ? `<p class="hi-where"><span class="dot" aria-hidden="true"></span>${where}${where && route ? ' ' : ''}${route}</p>` : '';
-  return what || place ? `<div class="hero-info">${what}${place}</div>` : '';
+  const what = names.length
+    ? `<div class="hi-what"><p class="hi-label">Hizmetler</p><ul>${names.map((name) => `<li>${text(name)}</li>`).join('')}</ul></div>`
+    : '';
+  const parts = [
+    blank(settings.address) ? '' : `<span class="hi-addr">${text(String(settings.address).trim())}</span>`,
+    blank(settings.hours) ? '' : `<span class="hi-hours">${text(String(settings.hours).trim())}</span>`,
+    dirLink(ctx, 'hi-route', `Yol tarifi${arrow}`),
+  ].filter(Boolean).join('');
+  const where = parts
+    ? `<div class="hi-where"><p class="hi-label"><span class="dot" aria-hidden="true"></span>Adres</p><p class="hi-place">${parts}</p></div>`
+    : '';
+  return what || where ? `<div class="hero-info">${what}${where}</div>` : '';
 }
 
 function hero(ctx) {

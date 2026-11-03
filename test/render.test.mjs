@@ -754,10 +754,11 @@ test('the hero backdrop crops exist at their pinned sizes and within 150 KB', ()
 
 test('the hero card under the logo names the services, the address, the hours and the route', () => {
   const html = page();
-  assert.ok(html.includes('<div class="hero-info"><p class="hi-what">Kalıcı dövme · Geçici dövme · Titanyum piercing · Kalıcı makyaj</p><p class="hi-where"><span class="dot" aria-hidden="true"></span>Nine Hatun Mah. İnönü Cd. No:11, Akman Ticaret Merkezi, 34220 Esenler / İstanbul · 10.00–23.00 <a class="hi-route" href='));
-  assert.ok(/<a class="hi-route" href="[^"]+" target="_blank" rel="noopener" data-track="directions">Yol tarifi <span class="ar">→<\/span><\/a><\/p><\/div>/.test(html));
+  assert.ok(html.includes('<div class="hero-info"><div class="hi-what"><p class="hi-label">Hizmetler</p><ul><li>Kalıcı dövme</li><li>Geçici dövme</li><li>Titanyum piercing</li><li>Kalıcı makyaj</li></ul></div>'));
+  assert.ok(html.includes('<div class="hi-where"><p class="hi-label"><span class="dot" aria-hidden="true"></span>Adres</p><p class="hi-place"><span class="hi-addr">Nine Hatun Mah. İnönü Cd. No:11, Akman Ticaret Merkezi, 34220 Esenler / İstanbul</span><span class="hi-hours">10.00–23.00</span><a class="hi-route" href='));
+  assert.ok(/<a class="hi-route" href="[^"]+" target="_blank" rel="noopener" data-track="directions">Yol tarifi <span class="ar">→<\/span><\/a><\/p><\/div><\/div>/.test(html));
   // Owner text is escaped; empty parts drop out, and with nothing at all there is no card.
-  assert.ok(page({}, { services: [{ id: 1, name: '<b>x</b>', description: '' }] }).includes('<p class="hi-what">&lt;b&gt;x&lt;/b&gt;</p>'));
+  assert.ok(page({}, { services: [{ id: 1, name: '<b>x</b>', description: '' }] }).includes('<ul><li>&lt;b&gt;x&lt;/b&gt;</li></ul>'));
   assert.ok(!page({}, { services: [] }).includes('class="hi-what"'));
   const bare = page({ address: '', hours: '', maps_url: '' }, { services: [] });
   assert.ok(!bare.includes('class="hero-info"'));
