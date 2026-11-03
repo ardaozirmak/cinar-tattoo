@@ -507,12 +507,12 @@ function playIntro() {
     .add('#introLine', { scaleX: [1, 0], duration: 600, ease: 'inOutQuart', transformOrigin: 'right' }, 2350)
     .add('.intro-half.t', { y: ['0%', '-101%'], duration: 1000, ease: 'inOutQuart', onBegin: heroIn }, 2700)
     .add('.intro-half.b', { y: ['0%', '101%'], duration: 1000, ease: 'inOutQuart' }, 2700);
-  // the service names flash past under the line, one every 360 ms; the last one stays until the fade
+  // the service names flash past under the line, one every 300 ms; the last one stays until the fade
   const names = [...document.querySelectorAll('#introSvc span')];
   names.forEach((name, index) => {
-    const at = 900 + index * 360;
+    const at = 900 + index * 300;
     timeline.add(name, { opacity: [0, 1], y: ['100%', '0%'], duration: 280, ease: 'outQuart' }, at);
-    if (index < names.length - 1) timeline.add(name, { opacity: [1, 0], y: ['0%', '-100%'], duration: 220, ease: 'inQuad' }, at + 300);
+    if (index < names.length - 1) timeline.add(name, { opacity: [1, 0], y: ['0%', '-100%'], duration: 200, ease: 'inQuad' }, at + 250);
     else timeline.add(name, { opacity: [1, 0], duration: 450, ease: 'inQuad' }, 2350);
   });
   $('#introSkip')?.addEventListener('click', () => {

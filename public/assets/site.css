@@ -169,7 +169,7 @@ button{font:inherit;color:inherit}
   .hi-what{left:var(--g);justify-items:start;text-align:left}
   .hi-where{right:var(--g);justify-items:end;text-align:right}
   .hi-label{display:block;font:500 clamp(1rem,1.1vw,1.3rem)/1.2 var(--display-2);letter-spacing:.22em;text-transform:uppercase;color:var(--mute)}
-  .hi-what ul{display:grid;gap:.5rem;justify-content:start;font:500 clamp(2.4rem,3.9vw,5.2rem)/.98 var(--display-2);letter-spacing:.01em;text-transform:uppercase}
+  .hi-what ul{display:grid;gap:.8rem;justify-content:start;font:500 clamp(2rem,2.6vw,3.6rem)/.98 var(--display-2);letter-spacing:.01em;text-transform:uppercase}
   .hi-what li:not(:last-child)::after{content:none}
   .hi-what,.hi-where{text-shadow:0 1px 14px var(--logo-ground),0 0 3px var(--logo-ground)}
   .hi-place{display:grid;gap:.8rem;justify-items:end;font:400 clamp(1.4rem,2.1vw,2.5rem)/1.25 var(--display-2);letter-spacing:.01em}

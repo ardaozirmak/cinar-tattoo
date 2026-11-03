@@ -11,7 +11,7 @@ test('BRAND_NAME', () => {
 test('DEFAULT_SETTINGS holds the texts the site opens with', () => {
   assert.deepEqual(DEFAULT_SETTINGS, {
     seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
-    seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum piercing ve kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, hijyen ve güler yüz. WhatsApp’tan randevu al.',
+    seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme, kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz.',
     hero_title: 'Bir ömür taşıyacağın\ndövme.',
     hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
     about_title: 'Onur Aydoğan',
@@ -74,12 +74,13 @@ test('every default passes the rule of its own field', () => {
   assert.deepEqual(result.values, DEFAULT_SETTINGS); // nothing about a default changes when it is saved as it is
 });
 
-test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
+test('DEFAULT_SERVICES: ids 1 to 5, in order', () => {
   assert.deepEqual(DEFAULT_SERVICES, [
     { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan tam kola, sana göre çizilen dövmeler.' },
     { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenlere.' },
-    { id: 3, name: 'Titanyum piercing', description: 'Kulak, burun, göbek; titanyum takıyla.' },
-    { id: 4, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
+    { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek; titanyum ya da çelik takıyla.' },
+    { id: 4, name: 'Ağrısız kulak delme', description: 'Ağrısız, acısız kulak delme; steril ortamda.' },
+    { id: 5, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
   ]);
   const result = validateServices(DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
   assert.equal(result.ok, true, result.message);

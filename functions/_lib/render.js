@@ -756,7 +756,7 @@ function faq(ctx, no) {
     ['Fiyat ne kadar?', `Boyuta, detaya ve bölgeye göre değişir. Fikrini ve yaklaşık boyutu ${via} gönder, net fiyatı birlikte konuşalım.`],
     ['Yaş sınırı var mı?', 'Evet. 18 yaşından küçüklere dövme yapılmaz; seans günü kimliğini yanında getir.'],
     ['Seanstan önce ne yapmalıyım?', 'İyi uyu, doyurucu bir öğün ye, bol su iç. Seanstan önceki 24 saat alkol alma. Dövülecek bölgeye rahat erişilen kıyafetler giy.'],
-    ['Piercing de yapıyor musunuz?', `Evet, titanyum takıyla. Hangi bölge için düşündüğünü ${via} yaz, uygun takı ve randevu için bilgi verelim.`],
+    ['Piercing de yapıyor musunuz?', `Evet, titanyum ya da çelik takıyla; kulak delme de ağrısız yapılır. Hangi bölge için düşündüğünü ${via} yaz, uygun takı ve randevu için bilgi verelim.`],
     ['Kalıcı makyaj ve geçici dövme var mı?', `Evet, ikisi de var. Ne istediğini ${via} yaz, ayrıntıları ve randevuyu birlikte konuşalım.`],
   ];
   return section(

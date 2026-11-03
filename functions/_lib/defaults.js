@@ -11,7 +11,7 @@ export const BRAND_NAME = 'Çınar Tattoo';
 export const DEFAULT_SETTINGS = {
   seo_title: 'Esenler Dövme ve Piercing | Çınar Tattoo · 2005’ten beri',
   // No review claim here: the reviews can change, a fixed claim in Google's snippet cannot.
-  seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum piercing ve kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, hijyen ve güler yüz. WhatsApp’tan randevu al.',
+  seo_description: 'Esenler’de 2005’ten beri kalıcı ve geçici dövme, titanyum ve çelik piercing, ağrısız kulak delme, kalıcı makyaj: Onur Aydoğan’ın stüdyosu. Steril ortam, güler yüz.',
   // Each line of the hero title is one line of the H1; the last of two or three is set in italics.
   hero_title: 'Bir ömür taşıyacağın\ndövme.',
   hero_text: 'Esenler’de Onur Aydoğan’ın dövme ve piercing stüdyosu. Kişiye özel çizim, steril ortam; temiz çizgi, net gölge, kalıcı iş.',
@@ -45,8 +45,9 @@ export const DEFAULT_SETTINGS = {
 export const DEFAULT_SERVICES = [
   { id: 1, name: 'Kalıcı dövme', description: 'Yazıdan tam kola, sana göre çizilen dövmeler.' },
   { id: 2, name: 'Geçici dövme', description: 'Kalıcıya karar vermeden önce denemek isteyenlere.' },
-  { id: 3, name: 'Titanyum piercing', description: 'Kulak, burun, göbek; titanyum takıyla.' },
-  { id: 4, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
+  { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek; titanyum ya da çelik takıyla.' },
+  { id: 4, name: 'Ağrısız kulak delme', description: 'Ağrısız, acısız kulak delme; steril ortamda.' },
+  { id: 5, name: 'Kalıcı makyaj', description: 'Kalıcı makyaj uygulamaları; ayrıntı için yaz.' },
 ];
 
 // The gallery a new site opens with, in position order: the Dergi prototype's 32 works (photos of
