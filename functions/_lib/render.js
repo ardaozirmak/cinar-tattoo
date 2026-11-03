@@ -26,7 +26,7 @@ const THUMB_MAX = 640; // the long side of a thumb (T7's resize and dev/seed-ima
 // The seed hero stands in front of a studio photo (Onur Bey drawing a design), dimmed and with dark edges as on
 // nikkohurtado.com: a wide crop for desktops, a tall one for phones. Decorative, so its alt is empty.
 export const HERO_BACKDROP = { wide: { src: '/media/hero-arka-genis.jpg', width: 1440, height: 1648 }, tall: { src: '/media/hero-arka-dik.jpg', width: 720, height: 900 } };
-const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar İnk, Tattoo, 2005 ve çapa';
+const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa';
 const ARTIST_NAME = 'Onur Aydoğan';
 // public/media/sanatci.jpg: Onur Bey's portrait (2026-11-03, the user's pick), cropped to 4:5.
 const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
