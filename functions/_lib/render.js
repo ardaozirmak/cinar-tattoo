@@ -559,7 +559,7 @@ function prices(ctx, no) {
           if (!blank(item.price)) price = `<b class="num">${text(item.price)}</b>`;
           else if (ctx.waGeneric !== null) price = waLink(ctx, 'link', 'Fiyat için yaz', ctx.wa(`${smartApostrophes(group.title)}, ${smartApostrophes(item.name)} için fiyat öğrenebilir miyim?`));
           else if (ctx.tel !== null) price = telLink(ctx, 'link', 'Fiyat için ara');
-          else price = '<span>Sorun</span>';
+          else price = '<span>Dükkânda sor</span>';
           return `<li><span class="pr-name">${text(item.name)}${detail}</span><span class="pr-price">${price}</span></li>`;
         })
         .join('');
