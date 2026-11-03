@@ -353,6 +353,13 @@ test('reviews: every one is in the HTML with its stars, source and date; a 4-sta
   assert.ok(html.includes('<b class="num">1 / 2</b><span>yorum 5 yıldız</span>'));
   assert.ok(html.includes('Google’da gör ↗'));
   assert.ok(!page({ google_reviews_url: '' }).includes('Google’da gör'));
+  // The Google summary counts only the Google reviews and links to them when there is a link.
+  assert.ok(html.includes('<b class="g-score num">5,0</b>'));
+  assert.ok(html.includes('1 Google yorumu'));
+  assert.ok(html.includes('<a class="g-badge" href='));
+  assert.equal(count(html, 'class="g-logo"'), 2);
+  assert.ok(page({ google_reviews_url: '' }, { reviews }).includes('<p class="g-badge">'));
+  assert.ok(!page({}, { reviews: [reviews[1]] }).includes('g-badge'));
 });
 
 test('prices: none by default; a group with an empty price asks on WhatsApp, a set price is shown', () => {
@@ -691,11 +698,11 @@ test('every font the stylesheets name exists, and all eight are there', () => {
   }
 });
 
-test('site.css uses the palette tokens: no prototype paths and no hex colour but the logo black', () => {
+test('site.css uses the palette tokens: no prototype paths and no hex colour but the logo black and Google’s star yellow', () => {
   const css = readFileSync(join(PUBLIC, 'assets/site.css'), 'utf8');
   assert.ok(!css.includes('/files/'));
   const hexes = new Set(css.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []);
-  assert.deepEqual([...hexes], ['#070604']);
+  assert.deepEqual([...hexes].sort(), ['#070604', '#FBBC04']);
 });
 
 test('site.js: no prototype paths, no innerHTML, no phone number, no style attribute, no console; it beacons clicks', () => {

@@ -347,22 +347,37 @@ button{font:inherit;color:inherit}
 
 /* reviews: one big quote at a time */
 .quote{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--g)}
-.quote-body{grid-column:3/span 9;min-height:clamp(16rem,30vw,22rem);min-width:0}
+/* Google's own colours (the G and the yellow stars) are the one exception to the palette: they are
+   what tells a visitor at a glance that these are real Google reviews. */
+.quote{--g-star:#FBBC04}
+.quote-head{grid-column:3/span 9;min-width:0;margin-bottom:1.2rem}
+.g-badge{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem;padding:.8rem 1.1rem;background:var(--bg-3);border:1px solid var(--line-2);
+  text-decoration:none;color:var(--fg);transition:border-color .2s}
+a.g-badge:hover{border-color:var(--fg)}
+.g-logo{width:1.5rem;height:1.5rem;flex:none}
+.g-name{font-weight:600}
+.g-score{font:600 1.35rem/1 var(--sans)}
+.g-count{color:var(--fg-2);font-size:.88rem}
+.quote .stars{color:var(--g-star);letter-spacing:.12em}
+.g-badge .stars{font-size:1.05rem}
+.quote-body{grid-column:3/span 9;min-height:clamp(16rem,30vw,22rem);min-width:0;background:var(--bg-2);border:1px solid var(--line);padding:clamp(1.4rem,3.5vw,2.8rem)}
 .quotes{display:grid;gap:3rem}
-.q{display:grid;align-content:start;gap:2rem}
+.q{display:grid;align-content:start;gap:1.6rem}
+.q>.stars{font-size:1.25rem}
 .quote blockquote{font:400 clamp(1.6rem,3.1vw,2.8rem)/1.18 var(--serif);letter-spacing:-.005em;overflow-wrap:anywhere}
 .quote blockquote::before{content:"“";color:var(--mute)}
 .quote blockquote::after{content:"”";color:var(--mute)}
-.quote-by{display:flex;gap:1.2rem;align-items:baseline;flex-wrap:wrap}
+.quote-by{display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap}
 .quote-by b{font-weight:600}
-.quote-by>span{color:var(--mute);font-size:.85rem}
+.q-src{display:inline-flex;align-items:center;gap:.45rem;color:var(--fg-2);font-size:.85rem}
+.q-src .g-logo{width:1.05rem;height:1.05rem}
 .quote-nav{grid-column:3/span 9;display:flex;flex-wrap:wrap;align-items:center;gap:1.2rem;margin-top:2.5rem}
 .quote-nav button{width:3rem;height:3rem;border:1px solid var(--line-2);background:none;cursor:pointer;font-size:1rem}
 .quote-nav button:hover{border-color:var(--fg)}
 .quote-prog{flex:1;min-width:4rem;height:1px;background:var(--line);position:relative;overflow:hidden}
 .quote-prog i{position:absolute;inset:0;background:var(--fg);transform-origin:left;transform:scaleX(0)}
 .quote-count{font-size:.85rem;color:var(--mute)}
-@media (max-width:900px){.quote-body,.quote-nav{grid-column:1/-1}}
+@media (max-width:900px){.quote-head,.quote-body,.quote-nav{grid-column:1/-1}}
 
 /* care and prices: a ledger in columns */
 .ledger{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
