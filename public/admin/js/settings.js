@@ -1,8 +1,8 @@
 // The Ayarlar tab (spec §6.2): the picture of the shop sign, the password, the link to the site and
 // logging out.
-import { api, imageForm } from './api.js';
+import { api } from './api.js';
 import { messageOf, toast } from './dom.js';
-import { resizeImage } from './resize.js';
+import { uploadImage } from './upload.js';
 
 /** The settings tab. `onLogout` runs for "Çıkış yap". Returns { render(state), clear() }. */
 export function setupSettings({ onLogout }) {
@@ -30,24 +30,14 @@ export function setupSettings({ onLogout }) {
     if (file === undefined) return;
     heroInput.disabled = true;
     heroError.textContent = '';
-    heroProgress.hidden = false;
-    heroStatus.textContent = 'Hazırlanıyor…';
-    heroBar.removeAttribute('value');
     try {
-      const prepared = await resizeImage(file);
-      const progress = (percent) => {
-        heroStatus.textContent = `Yükleniyor %${percent}`;
-        heroBar.value = percent;
-      };
-      progress(0);
-      const { hero } = await api('hero-image', { method: 'POST', form: imageForm(prepared), onProgress: progress });
+      const { hero } = await uploadImage('hero-image', file, { status: heroStatus, bar: heroBar, line: heroProgress });
       showHero(hero);
       toast('Fotoğraf değiştirildi');
     } catch (error) {
       heroError.textContent = messageOf(error);
     } finally {
       heroInput.disabled = false;
-      heroProgress.hidden = true;
     }
   });
 

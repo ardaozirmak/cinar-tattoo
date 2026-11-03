@@ -1,20 +1,58 @@
 // The Fotoğraflar tab (spec §6.2, §6.3): what the site sent the owner in the last 30 days, adding
 // photos, the grid in the order the site shows them, and the sheet that edits one photo.
 //
-// Photos are prepared (resize.js) and uploaded one at a time, in the order they were chosen, so a
+// Photos are prepared and uploaded one at a time (upload.js), in the order they were chosen, so a
 // phone never holds more than one decoded photo. A session that ends during the uploads pauses
 // them: what is left goes on after the next login.
-import { api, imageForm } from './api.js';
+//
+// Saving a new photo and saving the order take turns. The server takes an order only when it names
+// every photo there is, and it puts a new photo first. So a reorder waits while a new photo is being
+// saved, then is worked out from the grid with that photo in it; the next upload waits for the order.
+//
+// Nothing here touches the DOM until setupPhotos runs, so the module also loads in Node (the tests).
+import { api } from './api.js';
 import { confirmDialog, el, messageOf, textField, toast } from './dom.js';
-import { resizeImage } from './resize.js';
+import { PREPARING, uploadImage } from './upload.js';
 
-const PREPARING = 'Hazırlanıyor…';
 const UPLOADED = 'Yüklendi';
 const GUARD = 'Kaydedilmemiş değişiklikler var. Yine de çıkılsın mı?';
 const LEAVE = 'Evet, çık';
 
-const uploadingText = (percent) => `Yükleniyor %${percent}`;
 const NUMBER = new Intl.NumberFormat('tr-TR');
+
+/**
+ * `ids` with `id` moved `where`: 'first', 'earlier' (one place) or 'later' (one place). Null when `id`
+ * is not there or cannot go further that way. `ids` itself stays as it is.
+ */
+export function moveId(ids, id, where) {
+  const from = ids.indexOf(id);
+  const to = where === 'first' ? 0 : where === 'earlier' ? from - 1 : from + 1;
+  if (from < 0 || to < 0 || to >= ids.length || to === from) return null;
+  const moved = ids.filter((other) => other !== id);
+  moved.splice(to, 0, id);
+  return moved;
+}
+
+/**
+ * `photos` once the server has saved the order `ids`. A photo that is not in `ids` came while the
+ * order was on its way, and the server puts a new photo first, so it stays in front. An id whose photo
+ * is gone is skipped.
+ */
+export function applyOrder(photos, ids) {
+  const named = new Set(ids);
+  const byId = new Map(photos.map((photo) => [photo.id, photo]));
+  return [...photos.filter((photo) => !named.has(photo.id)), ...ids.map((id) => byId.get(id)).filter(Boolean)];
+}
+
+/** A function that runs the tasks it is given one after the other: each starts once the one before has settled. */
+export function oneAtATime() {
+  let last = Promise.resolve();
+  return (task) => {
+    const result = last.then(() => task());
+    last = result.catch(() => {}); // a failure is for the task's own caller; the next task runs anyway
+    return result;
+  };
+}
 
 /** The photos tab. Returns { render(state), loadStats() }. */
 export function setupPhotos() {
@@ -22,10 +60,14 @@ export function setupPhotos() {
   const grid = document.getElementById('photo-grid');
   const empty = document.getElementById('photo-empty');
   const uploads = document.getElementById('upload-list');
+  const sheet = document.getElementById('photo-dialog');
 
   let photos = [];
   let categories = [];
   let limits = {};
+
+  // Saving a new photo and saving the order take turns (see the top of this file).
+  const inTurn = oneAtATime();
 
   // ---------------------------------------------------------------------------------------------
   // Uploads
@@ -72,16 +114,14 @@ export function setupPhotos() {
 
   async function upload(job) {
     try {
-      const prepared = await resizeImage(job.file);
-      showThumb(job, prepared.thumb);
-      const progress = (percent) => {
-        job.status.textContent = uploadingText(percent);
-        job.progress.value = percent;
-      };
-      progress(0);
-      const { photo } = await api('photos', { method: 'POST', form: imageForm(prepared), onProgress: progress });
-      photos = [photo, ...photos]; // a new photo goes first, as on the site
-      renderGrid();
+      await inTurn(async () => {
+        const { photo } = await uploadImage('photos', job.file, {
+          status: job.status,
+          bar: job.progress,
+          onPrepared: (prepared) => showThumb(job, prepared.thumb),
+        });
+        addPhoto(photo);
+      });
       job.item.classList.add('is-done');
       job.status.textContent = UPLOADED;
       job.progress.hidden = true;
@@ -118,7 +158,8 @@ export function setupPhotos() {
 
   const labelOf = (category) => categories.find((option) => option.value === category)?.label ?? category;
 
-  // Up to 400 tiles: the thumbs load lazily, as they come near the screen.
+  // Up to 400 tiles: the thumbs load lazily, as they come near the screen. A photo added or moved
+  // changes the place of the one whose sheet is open, so the sheet's n/N and move buttons follow.
   function renderGrid() {
     grid.replaceChildren(
       ...photos.map((photo, index) =>
@@ -129,6 +170,7 @@ export function setupPhotos() {
       ),
     );
     empty.hidden = photos.length > 0;
+    if (sheet.open) showPosition();
   }
 
   // A picture that does not load (a dropped connection, say) leaves its caption on the tile, so that
@@ -137,6 +179,13 @@ export function setupPhotos() {
     const image = event.currentTarget;
     image.closest('.photo-tile')?.append(el('span', { class: 'tile-missing', 'aria-hidden': 'true', text: image.alt }));
     image.classList.add('is-broken');
+  }
+
+  // A new photo goes first, as on the site. It is there already when the list was loaded again (after
+  // a login) while the photo was on its way.
+  function addPhoto(photo) {
+    photos = [photo, ...photos.filter((item) => item.id !== photo.id)];
+    renderGrid();
   }
 
   function putPhoto(photo) {
@@ -148,7 +197,6 @@ export function setupPhotos() {
   // The sheet of one photo
   // ---------------------------------------------------------------------------------------------
 
-  const sheet = document.getElementById('photo-dialog');
   const form = sheet.querySelector('[data-photo-form]');
   const preview = sheet.querySelector('[data-photo-preview]');
   const captionHost = sheet.querySelector('[data-photo-caption]');
@@ -201,6 +249,7 @@ export function setupPhotos() {
 
   function showPosition() {
     const index = photos.findIndex((photo) => photo.id === currentId);
+    if (index < 0) return; // the photo has just been deleted, and its sheet is closing
     position.textContent = `${index + 1}/${photos.length}`;
     for (const button of moves) {
       const where = button.dataset.photoMove;
@@ -240,26 +289,24 @@ export function setupPhotos() {
     });
   });
 
+  // A move is worked out when its turn comes, from the grid as it is then: a new photo that was being
+  // saved when the button was pressed is in it by then, so the order names every photo there is.
   for (const button of moves) {
     button.addEventListener('click', () => {
       const id = currentId;
-      const ids = photos.map((photo) => photo.id);
-      const from = ids.indexOf(id);
       const where = button.dataset.photoMove;
-      const to = where === 'first' ? 0 : where === 'earlier' ? from - 1 : from + 1;
-      if (from < 0 || to < 0 || to >= ids.length || to === from) return;
-      ids.splice(from, 1);
-      ids.splice(to, 0, id);
-      run(async () => {
-        await api('photos/order', { method: 'PUT', json: { ids } });
-        const byId = new Map(photos.map((photo) => [photo.id, photo]));
-        photos = ids.map((photoId) => byId.get(photoId));
-        renderGrid();
-        showPosition();
-        // At the end of the line the pressed button is disabled: keep the focus on one that is not.
-        if (button.disabled) moves.find((other) => !other.disabled)?.focus();
-        toast('Sıralama kaydedildi');
-      });
+      run(() =>
+        inTurn(async () => {
+          const ids = moveId(photos.map((photo) => photo.id), id, where);
+          if (ids === null) return;
+          await api('photos/order', { method: 'PUT', json: { ids } });
+          photos = applyOrder(photos, ids);
+          renderGrid();
+          // At the end of the line the pressed button is disabled: keep the focus on one that is not.
+          if (sheet.open && currentId === id && button.disabled) moves.find((other) => !other.disabled)?.focus();
+          toast('Sıralama kaydedildi');
+        }),
+      );
     });
   }
 
@@ -269,23 +316,14 @@ export function setupPhotos() {
     if (file === undefined) return;
     const id = currentId;
     run(async () => {
-      progressLine.hidden = false;
-      progressStatus.textContent = PREPARING;
-      progressBar.removeAttribute('value');
-      try {
-        const prepared = await resizeImage(file);
-        const progress = (percent) => {
-          progressStatus.textContent = uploadingText(percent);
-          progressBar.value = percent;
-        };
-        progress(0);
-        const { photo } = await api(`photos/${encodeURIComponent(id)}/replace`, { method: 'POST', form: imageForm(prepared), onProgress: progress });
-        putPhoto(photo);
-        if (currentId === id) preview.src = photo.thumb;
-        toast('Fotoğraf değiştirildi');
-      } finally {
-        progressLine.hidden = true;
-      }
+      const { photo } = await uploadImage(`photos/${encodeURIComponent(id)}/replace`, file, {
+        status: progressStatus,
+        bar: progressBar,
+        line: progressLine,
+      });
+      putPhoto(photo);
+      if (currentId === id) preview.src = photo.thumb;
+      toast('Fotoğraf değiştirildi');
     });
   });
 
