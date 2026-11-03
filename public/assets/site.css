@@ -133,6 +133,16 @@ button{font:inherit;color:inherit}
   mask-image:linear-gradient(to right,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent),linear-gradient(to bottom,transparent,var(--logo-ground) 5%,var(--logo-ground) 95%,transparent);
   mask-composite:intersect}
 .has-duyuru .hero-sign.stage #heroLogo{width:min(100%,calc(100svh - 9rem))}
+/* the small card under the logo: what the shop does and where it is, readable on arrival */
+.hero-sign:has(.hero-info){display:grid;justify-items:center;align-content:center;gap:1rem}
+.hero-sign:has(.hero-info) #heroLogo{width:min(100%,calc(100svh - 12rem))}
+.has-duyuru .hero-sign:has(.hero-info) #heroLogo{width:min(100%,calc(100svh - 15rem))}
+.hero-info{display:grid;gap:.3rem;justify-items:center;text-align:center;max-width:min(100%,46rem);padding:.7rem 1.1rem;
+  background:color-mix(in oklch,var(--logo-ground) 72%,transparent);border:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hi-what{font:700 .7rem/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg);overflow-wrap:anywhere}
+.hi-where{font-size:.82rem;line-height:1.45;color:var(--fg-2);overflow-wrap:anywhere}
+.hi-route{color:var(--fg);font-weight:600;white-space:nowrap;text-decoration:none;border-bottom:1px solid var(--line-2)}
+.hi-route:hover{border-bottom-color:var(--fg)}
 .hero-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--g);align-items:end;padding-block:clamp(1.5rem,4vh,2.5rem) clamp(1rem,3vh,2rem)}
 .hero-copy{grid-column:1/span 8;display:grid;gap:1rem;min-width:0}
 .hero h1{font:400 clamp(2.6rem,5.4vw,5.6rem)/.9 var(--serif);letter-spacing:-.02em}
@@ -154,7 +164,8 @@ button{font:inherit;color:inherit}
   .hero-sign img{height:auto;width:100%}
   .hero-copy,.hero-side{grid-column:1/-1}
   .hero-sign.stage{padding-bottom:1.5rem}
-  .hero-sign.stage #heroLogo,.has-duyuru .hero-sign.stage #heroLogo{width:min(84%,28rem)}
+  .hero-sign.stage #heroLogo,.has-duyuru .hero-sign.stage #heroLogo,.hero-sign:has(.hero-info) #heroLogo{width:min(84%,28rem)}
+  .hero-info{margin-inline:var(--g)}
 }
 .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);margin-top:clamp(2.5rem,6vw,4.5rem)}
 .facts.f3{grid-template-columns:repeat(3,minmax(0,1fr))}

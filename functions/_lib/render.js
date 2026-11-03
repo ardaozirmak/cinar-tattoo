@@ -282,6 +282,22 @@ function heroLines(title) {
   return parts;
 }
 
+// The small card under the logo, seen on arrival: what the shop does (the service names), the address,
+// the hours and the directions link. Each line is left out when it has nothing to show, and the card
+// when both are empty.
+function heroInfo(ctx) {
+  const { settings, services } = ctx;
+  const names = services.map((service) => String(service.name ?? '').trim()).filter(Boolean);
+  const what = names.length ? `<p class="hi-what">${names.map((name) => text(name)).join(' · ')}</p>` : '';
+  const where = [
+    blank(settings.address) ? '' : text(String(settings.address).trim()),
+    blank(settings.hours) ? '' : text(String(settings.hours).trim()),
+  ].filter(Boolean).join(' · ');
+  const route = dirLink(ctx, 'hi-route', `Yol tarifi${arrow}`);
+  const place = where || route ? `<p class="hi-where"><span class="dot" aria-hidden="true"></span>${where}${where && route ? ' ' : ''}${route}</p>` : '';
+  return what || place ? `<div class="hero-info">${what}${place}</div>` : '';
+}
+
 function hero(ctx) {
   const { settings } = ctx;
   const image = ctx.hero;
@@ -303,9 +319,10 @@ function hero(ctx) {
   // uploaded in the panel is shown as it is.
   const { wide, tall } = HERO_BACKDROP;
   const backdrop = `<div class="hero-bg" aria-hidden="true"><picture><source media="(min-width: 901px)" srcset="${wide.src}" width="${wide.width}" height="${wide.height}"><img src="${tall.src}" width="${tall.width}" height="${tall.height}" alt="" decoding="async"></picture></div>`;
+  const info = heroInfo(ctx);
   const sign = image.source === 'seed'
-    ? `<div class="hero-sign stage">${backdrop}${img}</div>`
-    : `<div class="hero-sign">${img}</div>`;
+    ? `<div class="hero-sign stage">${backdrop}${img}${info}</div>`
+    : `<div class="hero-sign">${img}${info}</div>`;
 
   return `<section class="hero" aria-labelledby="heroTitle">
   <div class="hero-top">
