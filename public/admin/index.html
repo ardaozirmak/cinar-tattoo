@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#15110d">
+  <meta name="apple-mobile-web-app-title" content="Çınar Panel">
+  <title>Çınar Tattoo Panel</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/admin/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <script type="module" src="/admin/js/main.js"></script>
+</head>
+<body>
+  <p id="boot" class="boot">Çınar Tattoo</p>
+
+  <main id="login-view" class="login" hidden>
+    <form id="login-form" class="login-plate" novalidate>
+      <h1 class="login-title"><span class="login-brand">Çınar Tattoo</span> <span class="login-sub">yönetim paneli</span></h1>
+      <div class="field">
+        <label for="login-password" class="label">Şifre</label>
+        <input id="login-password" name="password" type="password" class="input" autocomplete="current-password" enterkeyhint="go">
+      </div>
+      <p id="login-error" class="form-error" role="alert"></p>
+      <button type="submit" class="button button-primary button-block">Giriş yap</button>
+    </form>
+  </main>
+
+  <div id="app" hidden>
+    <header class="topbar">
+      <p class="topbar-brand">Çınar Tattoo</p>
+    </header>
+
+    <main class="main">
+      <section class="panel" data-panel="photos" aria-labelledby="title-photos">
+        <h1 id="title-photos" class="panel-title" tabindex="-1">Fotoğraflar</h1>
+
+        <section id="stats-card" class="stats" aria-label="Siteden gelenler" hidden>
+          <p class="stats-line" data-stats-main></p>
+          <p class="stats-sub" data-stats-sub></p>
+        </section>
+
+        <div class="add-photos">
+          <input id="photo-input" class="visually-hidden" type="file" accept="image/*" multiple>
+          <label for="photo-input" class="button button-primary button-block button-large">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>
+            Fotoğraf ekle
+          </label>
+        </div>
+        <ul id="upload-list" class="upload-list" aria-label="Yüklenen fotoğraflar"></ul>
+
+        <p id="photo-empty" class="empty" hidden>Henüz fotoğraf yok. "Fotoğraf ekle" ile ilk işini yükle.</p>
+        <div id="photo-grid" class="photo-grid"></div>
+      </section>
+
+      <section class="panel" data-panel="prices" aria-labelledby="title-prices" hidden>
+        <h1 id="title-prices" class="panel-title" tabindex="-1">Fiyatlar</h1>
+        <div id="prices-host"></div>
+      </section>
+
+      <section class="panel" data-panel="reviews" aria-labelledby="title-reviews" hidden>
+        <h1 id="title-reviews" class="panel-title" tabindex="-1">Yorumlar</h1>
+        <div id="reviews-host"></div>
+      </section>
+
+      <section class="panel" data-panel="texts" aria-labelledby="title-texts" hidden>
+        <h1 id="title-texts" class="panel-title" tabindex="-1">Yazılar</h1>
+        <nav id="texts-nav" class="jump" aria-label="Yazı grupları"></nav>
+        <div id="texts-host"></div>
+      </section>
+
+      <section class="panel" data-panel="settings" aria-labelledby="title-settings" hidden>
+        <h1 id="title-settings" class="panel-title" tabindex="-1">Ayarlar</h1>
+
+        <section class="plate" aria-labelledby="hero-title">
+          <h2 id="hero-title" class="plate-title">Tabela görseli</h2>
+          <p class="hint">Bu görsel sitenin girişinde ve paylaşım önizlemesinde kullanılır.</p>
+          <div class="hero-frame">
+            <img id="hero-preview" class="hero-preview" alt="Şu anki tabela görseli">
+            <p class="hero-missing">Görsel şu an açılamadı.</p>
+          </div>
+          <input id="hero-input" class="visually-hidden" type="file" accept="image/*">
+          <label for="hero-input" class="button button-block">Görseli değiştir</label>
+          <div class="progress-line" data-hero-progress hidden>
+            <p class="status" data-hero-status></p>
+            <progress max="100"></progress>
+          </div>
+          <p class="form-error" role="alert" data-hero-error></p>
+        </section>
+
+        <form id="password-form" class="plate" novalidate aria-labelledby="password-title">
+          <h2 id="password-title" class="plate-title">Şifreyi değiştir</h2>
+          <div class="field">
+            <label for="password-current" class="label">Mevcut şifre</label>
+            <input id="password-current" name="current" type="password" class="input" autocomplete="current-password">
+          </div>
+          <div class="field">
+            <label for="password-next" class="label">Yeni şifre</label>
+            <input id="password-next" name="next" type="password" class="input" autocomplete="new-password" aria-describedby="password-rule">
+            <p id="password-rule" class="hint">En az 8 karakter.</p>
+          </div>
+          <div class="field">
+            <label for="password-repeat" class="label">Yeni şifre (tekrar)</label>
+            <input id="password-repeat" name="repeat" type="password" class="input" autocomplete="new-password">
+          </div>
+          <p class="form-error" role="alert" data-password-error></p>
+          <button type="submit" class="button button-primary button-block">Şifreyi değiştir</button>
+        </form>
+
+        <section class="plate" aria-label="Site ve oturum">
+          <div class="button-row">
+            <a class="button" href="/" target="_blank" rel="noopener">Siteyi aç</a>
+            <button type="button" id="logout-button" class="button">Çıkış yap</button>
+          </div>
+          <p class="hint">Paneli telefonunun ana ekranına eklemek için tarayıcı menüsünden "Ana ekrana ekle"yi seç.</p>
+        </section>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Bölümler">
+      <div class="tabbar-inner">
+        <button type="button" class="tab" data-tab="photos" aria-current="page">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16.5-5.5-5.5L5 19.5"/></svg>
+          <span>Fotoğraflar</span><span class="visually-hidden" data-tab-dirty hidden>, kaydedilmemiş değişiklik var</span>
+        </button>
+        <button type="button" class="tab" data-tab="prices">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.4 1.4 0 0 1 0 2l-7.1 7.1a1.4 1.4 0 0 1-2 0z"/><circle cx="8.5" cy="8.5" r="1.6"/></svg>
+          <span>Fiyatlar</span><span class="visually-hidden" data-tab-dirty hidden>, kaydedilmemiş değişiklik var</span>
+        </button>
+        <button type="button" class="tab" data-tab="reviews">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>
+          <span>Yorumlar</span><span class="visually-hidden" data-tab-dirty hidden>, kaydedilmemiş değişiklik var</span>
+        </button>
+        <button type="button" class="tab" data-tab="texts">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 6h15M4.5 10.5h15M4.5 15h15M4.5 19.5h9"/></svg>
+          <span>Yazılar</span><span class="visually-hidden" data-tab-dirty hidden>, kaydedilmemiş değişiklik var</span>
+        </button>
+        <button type="button" class="tab" data-tab="settings">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h9M17 7.5h3M4 16.5h3M11 16.5h9"/><circle cx="15" cy="7.5" r="2"/><circle cx="9" cy="16.5" r="2"/></svg>
+          <span>Ayarlar</span><span class="visually-hidden" data-tab-dirty hidden>, kaydedilmemiş değişiklik var</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <dialog id="photo-dialog" class="sheet" aria-labelledby="photo-dialog-title">
+    <form class="sheet-body" novalidate data-photo-form>
+      <div class="sheet-head">
+        <h2 id="photo-dialog-title" class="sheet-title">Fotoğrafı düzenle</h2>
+        <button type="button" class="icon-button" data-photo-close aria-label="Kapat">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="sheet-preview-frame">
+        <img class="sheet-preview" alt="" data-photo-preview>
+      </div>
+      <div data-photo-caption></div>
+      <fieldset class="field segmented" data-photo-category>
+        <legend class="label">Tür</legend>
+        <div class="segments" data-photo-segments></div>
+      </fieldset>
+      <p class="form-error" role="alert" data-photo-error></p>
+      <button type="submit" class="button button-primary button-block">Kaydet</button>
+
+      <div class="sheet-section" role="group" aria-labelledby="photo-order-title">
+        <p id="photo-order-title" class="sheet-label">Sıra <span class="sheet-meta" data-photo-position></span></p>
+        <div class="button-row button-row-3">
+          <button type="button" class="button button-small" data-photo-move="first">Başa al</button>
+          <button type="button" class="button button-small" data-photo-move="earlier">Bir öne</button>
+          <button type="button" class="button button-small" data-photo-move="later">Bir arkaya</button>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="button-row">
+          <input id="replace-input" class="visually-hidden" type="file" accept="image/*">
+          <label for="replace-input" class="button">Fotoğrafı değiştir</label>
+          <button type="button" class="button button-danger" data-photo-delete>Sil</button>
+        </div>
+        <div class="progress-line" data-photo-progress hidden>
+          <p class="status" data-photo-status></p>
+          <progress max="100"></progress>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" class="sheet sheet-confirm" aria-labelledby="confirm-message">
+    <form method="dialog" class="sheet-body">
+      <p id="confirm-message" class="confirm-message" data-confirm-message></p>
+      <div class="button-row">
+        <button type="submit" value="cancel" class="button" data-confirm-cancel autofocus>Vazgeç</button>
+        <button type="submit" value="ok" class="button button-primary" data-confirm-ok>Tamam</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
