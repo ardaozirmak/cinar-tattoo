@@ -87,35 +87,35 @@ test('DEFAULT_SERVICES: ids 1 to 5, in order', () => {
   assert.deepEqual(result.services, DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
 });
 
-// The Dergi prototype's WORKS: [id, caption], in its order (Task 6 brief).
+// The Dergi prototype's works that stay in the gallery: [id, caption], in its order. The weak or
+// repeated ones (w06, w07, w10, w11, w16, w21-w30) left on 2026-11-03.
 const WORKS = [
   ['w03', 'Üçgen içinde gül, el üstü'], ['k01', 'Renkli omuz, saat ve yazı'], ['w01', 'Hançer ve gül'],
-  ['w04', 'Orman ve kurt'], ['w05', 'Portre ve güller'], ['w07', 'Renkli güller'],
-  ['w06', 'Boğa'], ['w09', 'Siyah-gri tam kol'], ['w13', 'Defne ve Roma rakamı'],
-  ['w10', 'Çift kurt'], ['k02', 'Renkli kol, güller'], ['w02', 'Yılan'],
-  ['w08', 'Kırlangıç, boyun'], ['w11', 'Renkli tam kol'], ['w12', 'Ornamental ön kol'],
-  ['w14', 'Pusula ve ok'], ['w15', 'Çiçekli figür'], ['w16', 'Jilet ve şapka'],
-  ['w17', 'Yaprak dalı'], ['w18', 'Zambak'], ['w19', 'Kuşlar, köprücük'],
-  ['w20', 'Kafatası ve çiçek'], ['w21', 'Göğüs yazısı'], ['w22', 'Siyah-gri kol'],
-  ['w23', 'Tek gül'], ['w24', 'Kalp ritmi'], ['w25', 'Dalga'],
-  ['w26', 'Tüy'], ['w27', 'Ay yıldız'], ['w28', 'Zeytin dalı'],
-  ['w29', 'Çift kalp'], ['w30', 'Gül, bel'],
+  ['w04', 'Orman ve kurt'], ['w05', 'Portre ve güller'], ['w09', 'Siyah-gri tam kol'],
+  ['w13', 'Defne ve Roma rakamı'], ['k02', 'Renkli kol, güller'], ['w02', 'Yılan'],
+  ['w08', 'Kırlangıç, boyun'], ['w12', 'Ornamental ön kol'], ['w14', 'Pusula ve ok'],
+  ['w15', 'Çiçekli figür'], ['w17', 'Yaprak dalı'], ['w18', 'Zambak'],
+  ['w19', 'Kuşlar, köprücük'], ['w20', 'Kafatası ve çiçek'],
 ];
 
-test('SEED_PHOTOS: the prototype’s 32 works in its order, then the five earlier crops (37 in all)', () => {
-  assert.equal(SEED_PHOTOS.length, 37);
+test('SEED_PHOTOS: 17 prototype works, the five earlier crops, then 24 CC0 samples by category (46 in all)', () => {
+  assert.equal(SEED_PHOTOS.length, 46);
   assert.deepEqual(
-    SEED_PHOTOS.slice(0, 32),
+    SEED_PHOTOS.slice(0, 17),
     WORKS.map(([id, caption]) => ({ id: `seed-${id}`, caption, category: 'dovme', seed_path: id, width: 400, height: 711 })),
   );
-  assert.deepEqual(SEED_PHOTOS.slice(32), [
+  assert.deepEqual(SEED_PHOTOS.slice(17, 22), [
     { id: 'seed-chicano-kol', caption: 'Chicano kol', category: 'dovme', seed_path: 'chicano-kol', width: 475, height: 797 },
     { id: 'seed-renkli-gul', caption: 'Renkli güller', category: 'dovme', seed_path: 'renkli-gul', width: 463, height: 800 },
     { id: 'seed-kurt', caption: 'Kurt ve orman', category: 'dovme', seed_path: 'kurt', width: 487, height: 790 },
     { id: 'seed-yazi-gogus', caption: 'Chicano yazı', category: 'dovme', seed_path: 'yazi-gogus', width: 502, height: 641 },
     { id: 'seed-gobek-piercing', caption: 'Göbek piercing', category: 'piercing', seed_path: 'gobek-piercing', width: 477, height: 811 },
   ]);
-  assert.ok(!SEED_PHOTOS.some((photo) => ['seed-k03', 'seed-k04'].includes(photo.id)), 'k03 and k04 are not seeded');
+  const samples = SEED_PHOTOS.slice(22);
+  assert.ok(samples.every((photo) => photo.seed_path === `temsili-${photo.category}-${photo.seed_path.split('-').pop()}`));
+  const per = (category) => samples.filter((photo) => photo.category === category).length;
+  assert.deepEqual([per('gecici'), per('piercing'), per('kulak'), per('makyaj'), per('dovme')], [7, 5, 5, 7, 0]);
+  assert.ok(!SEED_PHOTOS.some((photo) => ['seed-k03', 'seed-k04', 'seed-w06', 'seed-w30'].includes(photo.id)));
 });
 
 test('SEED_PHOTOS are consistent: ids, paths, categories, captions and sizes', () => {

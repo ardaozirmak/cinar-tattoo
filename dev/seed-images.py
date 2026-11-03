@@ -32,9 +32,8 @@ LOGO_MAX_BYTES = 330 * 1024
 THUMB_QUALITY = 80
 
 # The work photos, in the order of SEED_PHOTOS. Each is s-<id>.jpg in srcDir, 400 x 711.
-WORKS = ['w03', 'k01', 'w01', 'w04', 'w05', 'w07', 'w06', 'w09', 'w13', 'w10', 'k02', 'w02', 'w08', 'w11', 'w12'] + [
-    f'w{n:02d}' for n in range(14, 31)
-]
+# The weak or repeated ones (w06, w07, w10, w11, w16, w21-w30) left the gallery on 2026-11-03.
+WORKS = ['w03', 'k01', 'w01', 'w04', 'w05', 'w09', 'w13', 'k02', 'w02', 'w08', 'w12', 'w14', 'w15', 'w17', 'w18', 'w19', 'w20']
 
 # The five earlier crops: seed_path -> (width, height). Each is is-<seed_path>.jpg in cropDir.
 CROPS = {

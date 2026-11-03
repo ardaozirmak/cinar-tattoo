@@ -240,7 +240,7 @@ test('state holds everything the panel shows and edits, every photo and the hero
   const state = await response.json();
   assert.deepEqual(Object.keys(state).sort(), ['categories', 'fields', 'groups', 'hero', 'limits', 'photos', 'prices', 'reviewSources', 'reviews', 'services', 'settings']);
   assert.deepEqual(state.hero, { source: 'seed', seed_path: 'logo', width: 1254, height: 1254, full: '/seed/logo-full.jpg', thumb: '/seed/logo-thumb.jpg' });
-  assert.equal(state.photos.length, 38);
+  assert.equal(state.photos.length, 47);
   assert.deepEqual(state.photos[0], {
     id: 'a'.repeat(20),
     caption: 'Yeni iş',

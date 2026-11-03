@@ -118,7 +118,7 @@ const SEEDED_COUNTS = {
   meta: 2,
   settings: SETTINGS_ROWS,
   services: 5,
-  photos: 37,
+  photos: 46,
   admin_auth: 1,
   login_attempts: 0,
   price_groups: 0,
@@ -145,7 +145,7 @@ test('schema v1: the tables, columns, defaults and keys of the plan', async (t) 
   await assert.rejects(db.prepare('INSERT INTO admin_auth (id) VALUES (2)').run(), /CHECK constraint failed/, 'there is one admin row');
 });
 
-test('ensureSchema seeds the site: settings, 5 services, the 37 seed photos, 13 reviews, the admin row, no prices', async (t) => {
+test('ensureSchema seeds the site: settings, 5 services, the 46 seed photos, 13 reviews, the admin row, no prices', async (t) => {
   const db = await seededDb(t);
   assert.deepEqual(await tableCounts(db), SEEDED_COUNTS);
   assert.deepEqual(await rows(db, 'SELECT key, value FROM meta ORDER BY key'), [
@@ -238,15 +238,15 @@ test('seeding is INSERT OR IGNORE: even if the seeded flag is lost, nothing the 
 // Reading the content
 // ---------------------------------------------------------------------------------------------
 
-test('getContent on a new database: the default texts, 5 services, the 37 seed photos in order, 13 reviews and no prices', async (t) => {
+test('getContent on a new database: the default texts, 5 services, the 46 seed photos in order, 13 reviews and no prices', async (t) => {
   const db = await seededDb(t);
   const content = await getContent(db);
   assert.deepEqual(content.settings, SEEDED_SETTINGS);
   assert.deepEqual(content.hero, DEFAULT_HERO);
   assert.deepEqual(content.services, DEFAULT_SERVICES);
-  assert.equal(content.photos.length, 37);
+  assert.equal(content.photos.length, 46);
   assert.deepEqual(content.photos.slice(0, 3).map((photo) => photo.id), ['seed-w03', 'seed-k01', 'seed-w01']);
-  assert.deepEqual(content.photos.slice(-5).map((photo) => photo.id), ['seed-chicano-kol', 'seed-renkli-gul', 'seed-kurt', 'seed-yazi-gogus', 'seed-gobek-piercing']);
+  assert.deepEqual(content.photos.slice(17, 22).map((photo) => photo.id), ['seed-chicano-kol', 'seed-renkli-gul', 'seed-kurt', 'seed-yazi-gogus', 'seed-gobek-piercing']);
   for (const [index, photo] of content.photos.entries()) {
     assert.deepEqual(photo, { ...SEED_PHOTOS[index], position: index, source: 'seed', image_key: null, created_at: 0 });
   }
@@ -275,7 +275,7 @@ test('defaultContent hands out fresh copies: changing one never changes the defa
   assert.notEqual(DEFAULT_SETTINGS.hero_title, 'değişti');
   assert.equal(DEFAULT_HERO.width, 1254);
   assert.notEqual(DEFAULT_SERVICES[0].name, 'değişti');
-  assert.equal(SEED_PHOTOS.length, 37);
+  assert.equal(SEED_PHOTOS.length, 46);
   assert.notEqual(SEED_PHOTOS[0].caption, 'değişti');
   assert.notEqual(SEED_REVIEWS[0].text, 'değişti');
 });
@@ -611,9 +611,9 @@ test('getClickStats totals the days from sinceDay on, and gives 0 for a kind wit
 
 test('countPhotos', async (t) => {
   const db = await seededDb(t);
-  assert.equal(await countPhotos(db), 37);
+  assert.equal(await countPhotos(db), 46);
   await insertPhoto(db, newPhoto(1));
-  assert.equal(await countPhotos(db), 38);
+  assert.equal(await countPhotos(db), 47);
   await db.prepare('DELETE FROM photos').run();
   assert.equal(await countPhotos(db), 0);
 });
@@ -715,7 +715,7 @@ test('setPhotoOrder takes exactly the current ids, renumbers them from 0 and say
   const db = await seededDb(t);
   await insertPhoto(db, newPhoto(1));
   const ids = (await photoIds(db)).reverse();
-  assert.equal(ids.length, 38);
+  assert.equal(ids.length, 47);
   assert.equal(await setPhotoOrder(db, ids), true);
   const { photos } = await getContent(db);
   assert.deepEqual(photos.map((photo) => photo.id), ids);
@@ -792,7 +792,7 @@ test('deletePhoto of an unknown id, or one that was deleted already, is null', a
   assert.equal(await deletePhoto(db, idOf(1)), null);
   assert.deepEqual(await deletePhoto(db, 'seed-kurt'), seedRow('seed-kurt'));
   assert.equal(await deletePhoto(db, 'seed-kurt'), null);
-  assert.equal(await countPhotos(db), 36);
+  assert.equal(await countPhotos(db), 45);
 });
 
 // ---------------------------------------------------------------------------------------------

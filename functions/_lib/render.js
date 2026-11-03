@@ -381,7 +381,9 @@ function facts(ctx) {
 }
 
 const caption = (photo) => (blank(photo.caption) ? '' : text(String(photo.caption).trim()));
-const altOf = (photo) => caption(photo) || UNTITLED_WORK;
+// A seeded CC0 stock photo (defaults.js, "sample"), not the studio's own work: marked "Temsili".
+const isSample = (photo) => String(photo.seed_path ?? '').startsWith('temsili-');
+const altOf = (photo) => `${caption(photo) || UNTITLED_WORK}${isSample(photo) ? ' (temsili görsel)' : ''}`;
 
 function strip(ctx) {
   const photos = ctx.photos.slice(0, STRIP_MAX);
@@ -430,8 +432,9 @@ function works(ctx, no) {
   const counts = new Map(CATEGORIES.map((category) => [category, ctx.photos.filter((photo) => photo.category === category).length]));
   const used = CATEGORIES.filter((category) => counts.get(category) > 0);
   const hasTabs = used.length >= 2;
-  const side = `Esenler’deki stüdyoda yapılan dövmeler: siyah-gri, ince çizgi, renkli ve yazı. ${hasTabs ? 'Türe göre süz, büyütmek için dokun.' : 'Büyütmek için dokun.'}`;
-  const top = sectionTop('calismalar', no, 'Çalışmalar', 'Stüdyodan, gerçek işler.', side);
+  const samples = ctx.photos.some(isSample);
+  const side = `Esenler’deki stüdyoda yapılan dövmeler: siyah-gri, ince çizgi, renkli ve yazı.${samples ? ' “Temsili” yazanlar hizmeti tanıtan örnek görsellerdir.' : ''} ${hasTabs ? 'Türe göre süz, büyütmek için dokun.' : 'Büyütmek için dokun.'}`;
+  const top = sectionTop('calismalar', no, 'Çalışmalar', samples ? 'Stüdyodan işler, hizmetlerden örnekler.' : 'Stüdyodan, gerçek işler.', side);
 
   if (photos.length === 0) {
     const more = instaLink(ctx, 'link', 'Instagram’da işlere bak ↗');
@@ -453,7 +456,7 @@ function works(ctx, no) {
       const label = altOf(photo);
       return `<figure class="work" id="is-${escapeHtml(photo.id)}" data-i="${index}" data-no="${index + 1}" data-style="${escapeHtml(photo.category)}"${index >= WORKS_SHOWN ? ' hidden' : ''}>
         <button type="button" class="wipe" aria-label="${label}, büyüt"><img src="${escapeHtml(thumb)}" data-full="${escapeHtml(full)}" alt="${label}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></button>
-        <figcaption><b>${caption(photo)}</b><span class="num">No. ${pad(index + 1)}</span></figcaption>
+        <figcaption><b>${caption(photo)}${isSample(photo) ? ' <i class="sample">Temsili</i>' : ''}</b><span class="num">No. ${pad(index + 1)}</span></figcaption>
       </figure>`;
     })
     .join('\n      ');

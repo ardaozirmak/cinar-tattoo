@@ -82,12 +82,12 @@ test('defaults: the WhatsApp number on <html>, the two-line H1, the logo, the li
   assert.ok(html.includes('Esenler dövme &amp; piercing</b> · 2005’ten beri'));
 });
 
-test('defaults: 37 work cards, the first is seed-w03, 24 shown and 13 behind “Daha fazla göster”', () => {
+test('defaults: 46 work cards, the first is seed-w03, 24 shown and 22 behind “Daha fazla göster”', () => {
   const html = page();
-  assert.equal(count(html, '<figure class="work"'), 37);
+  assert.equal(count(html, '<figure class="work"'), 46);
   assert.ok(html.includes('<figure class="work" id="is-seed-w03" data-i="0" data-no="1" data-style="dovme">'));
   const cards = html.match(/<figure class="work"[^>]*>/g);
-  assert.equal(cards.filter((card) => card.endsWith(' hidden>')).length, 13);
+  assert.equal(cards.filter((card) => card.endsWith(' hidden>')).length, 22);
   assert.ok(cards.slice(0, 24).every((card) => !card.includes('hidden')));
   assert.equal(count(html, 'Daha fazla göster'), 1);
   const first = between(html, '<figure class="work" id="is-seed-w03"', '</figure>');
@@ -95,7 +95,17 @@ test('defaults: 37 work cards, the first is seed-w03, 24 shown and 13 behind “
   assert.ok(first.includes('width="400" height="711" loading="lazy"'));
   assert.ok(first.includes('alt="Üçgen içinde gül, el üstü"'));
   assert.ok(first.includes('<figcaption><b>Üçgen içinde gül, el üstü</b><span class="num">No. 01</span></figcaption>'));
-  assert.ok(html.includes('<figure class="work" id="is-seed-gobek-piercing" data-i="36" data-no="37" data-style="piercing" hidden>'));
+  assert.ok(html.includes('<figure class="work" id="is-seed-gobek-piercing" data-i="21" data-no="22" data-style="piercing">'));
+  // the CC0 samples come after the studio's own work, each marked "Temsili"
+  const sample = between(html, '<figure class="work" id="is-seed-temsili-gecici-1"', '</figure>');
+  assert.ok(sample.includes('alt="Kınayla çiçek deseni (temsili görsel)"'));
+  assert.ok(sample.includes('<figcaption><b>Kınayla çiçek deseni <i class="sample">Temsili</i></b><span class="num">No. 23</span></figcaption>'));
+  assert.equal(count(html, '<i class="sample">Temsili</i>'), 24);
+  assert.ok(html.includes('Stüdyodan işler, hizmetlerden örnekler.'));
+  assert.ok(html.includes('“Temsili” yazanlar hizmeti tanıtan örnek görsellerdir.'));
+  const own = page({}, { photos: [photo(1), photo(2)] });
+  assert.ok(own.includes('Stüdyodan, gerçek işler.'));
+  assert.ok(!own.includes('class="sample"') && !own.includes('“Temsili” yazanlar'));
 });
 
 test('defaults: 13 reviews, the facts 26 years and 13 / 13, and never ÇINAR or the old lacivert', () => {
@@ -509,9 +519,12 @@ test('tabs: none with one category; the defaults count every category that has p
   const one = page({}, { photos: [photo(1), photo(2)] });
   assert.ok(!one.includes('class="tabs"'));
   const html = page();
-  assert.ok(html.includes('Tümü <sup>37</sup>'));
-  assert.ok(html.includes('Kalıcı dövme <sup>36</sup>'));
-  assert.ok(html.includes('Piercing <sup>1</sup>'));
+  assert.ok(html.includes('Tümü <sup>46</sup>'));
+  assert.ok(html.includes('Kalıcı dövme <sup>21</sup>'));
+  assert.ok(html.includes('Geçici dövme <sup>7</sup>'));
+  assert.ok(html.includes('Kulak delme <sup>5</sup>'));
+  assert.ok(html.includes('Kalıcı makyaj <sup>7</sup>'));
+  assert.ok(html.includes('Piercing <sup>6</sup>'));
   assert.ok(!html.includes('data-f="diger"'));
 });
 
