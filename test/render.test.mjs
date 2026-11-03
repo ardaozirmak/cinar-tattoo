@@ -664,6 +664,8 @@ test('the vendored anime.js is v4.5.0', () => {
 });
 
 const FONTS = [
+  'oswald-var-latin.woff2',
+  'oswald-var-latin-ext.woff2',
   'instrument-serif-400-latin.woff2',
   'instrument-serif-400-latin-ext.woff2',
   'instrument-serif-400-italic-latin.woff2',
@@ -672,7 +674,7 @@ const FONTS = [
   'manrope-var-latin-ext.woff2',
 ];
 
-test('every font the stylesheets name exists, and all six are there', () => {
+test('every font the stylesheets name exists, and all eight are there', () => {
   for (const font of FONTS) assert.ok(existsSync(join(PUBLIC, 'assets/fonts', font)), font);
   for (const css of ['assets/site.css', 'admin/admin.css', '404.css']) {
     const text = readFileSync(join(PUBLIC, css), 'utf8');
@@ -727,7 +729,7 @@ test('budget: the first load is at most 350 KiB (without the hero image, the gal
 
 test('the seed hero stands the square logo in front of the dimmed studio photo', () => {
   const html = page();
-  assert.ok(html.includes('<div class="hero-sign stage"><div class="hero-bg" aria-hidden="true"><picture><source media="(min-width: 901px)" srcset="/media/hero-arka-genis.jpg" width="1600" height="727"><img src="/media/hero-arka-dik.jpg" width="720" height="900" alt="" decoding="async"></picture></div><img id="heroLogo" src="/seed/logo-full.jpg"'));
+  assert.ok(html.includes('<div class="hero-sign stage"><div class="hero-bg" aria-hidden="true"><picture><source media="(min-width: 901px)" srcset="/media/hero-arka-genis.jpg" width="1440" height="1648"><img src="/media/hero-arka-dik.jpg" width="720" height="900" alt="" decoding="async"></picture></div><img id="heroLogo" src="/seed/logo-full.jpg"'));
   // A hero the owner uploaded is shown as it is, on every screen.
   const own = page({}, { hero: { source: 'kv', image_key: 'f'.repeat(20), width: 1600, height: 1200 } });
   assert.ok(!own.includes('hero-arka'));
@@ -744,7 +746,7 @@ test('the hero backdrop crops exist at their pinned sizes and within 150 KB', ()
     }
     return null;
   };
-  for (const [name, size] of [['hero-arka-genis.jpg', { width: 1600, height: 727 }], ['hero-arka-dik.jpg', { width: 720, height: 900 }]]) {
+  for (const [name, size] of [['hero-arka-genis.jpg', { width: 1440, height: 1648 }], ['hero-arka-dik.jpg', { width: 720, height: 900 }]]) {
     const file = join(PUBLIC, 'media', name);
     assert.ok(existsSync(file), name);
     assert.ok(statSync(file).size <= 153600, `${name} is ${statSync(file).size} bytes`);
