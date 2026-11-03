@@ -28,7 +28,7 @@ const THUMB_MAX = 640; // the long side of a thumb (T7's resize and dev/seed-ima
 export const HERO_BACKDROP = { wide: { src: '/media/hero-arka-genis.jpg', width: 1600, height: 727 }, tall: { src: '/media/hero-arka-dik.jpg', width: 720, height: 900 } };
 const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio, 2005 ve çapa';
 const ARTIST_NAME = 'Onur Aydoğan';
-// public/media/sanatci.jpg: the owner's solo studio photo (2026-11-03), cropped to 4:5.
+// public/media/sanatci.jpg: Onur Bey's portrait (2026-11-03, the user's pick), cropped to 4:5.
 const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
 const HIGHLIGHT_DASH = ' — '; // a highlight is "title — detail"
 const UNTITLED_WORK = 'Çınar Tattoo çalışması';
