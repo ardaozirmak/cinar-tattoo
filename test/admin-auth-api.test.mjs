@@ -276,8 +276,11 @@ test('state holds everything the panel shows and edits, every photo and the hero
   assert.deepEqual(state.fields, SETTINGS_FIELDS);
   assert.deepEqual(state.groups, SETTINGS_GROUPS);
   assert.deepEqual(state.categories, [
-    { value: 'dovme', label: 'Dövme' },
+    { value: 'dovme', label: 'Kalıcı dövme' },
+    { value: 'gecici', label: 'Geçici dövme' },
     { value: 'piercing', label: 'Piercing' },
+    { value: 'kulak', label: 'Kulak delme' },
+    { value: 'makyaj', label: 'Kalıcı makyaj' },
     { value: 'diger', label: 'Diğer' },
   ]);
   assert.deepEqual(state.reviewSources, [

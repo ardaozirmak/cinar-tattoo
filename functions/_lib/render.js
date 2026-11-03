@@ -30,6 +30,17 @@ const SEED_LOGO_ALT ='Çınar Tattoo logosu: Çınar Ink, Tattoo Piercing Studio
 const ARTIST_NAME = 'Onur Aydoğan';
 // public/media/sanatci.jpg: Onur Bey's portrait (2026-11-03, the user's pick), cropped to 4:5.
 const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt: 'Çınar Tattoo’nun sanatçısı Onur Aydoğan, Esenler’deki stüdyosunda' };
+// One picture per kind of service, matched on the service's name (the owner can rename and reorder
+// them). These are CC0 stock photos, not the studio's work, so each card says "Temsili görsel";
+// the sources are listed in docs/GORSELLER.md. Order matters: "kulak" before "piercing".
+const SERVICE_PHOTOS = [
+  { key: 'kulak', words: ['kulak'], alt: 'Küpe takılı bir kulak memesi' },
+  { key: 'piercing', words: ['piercing'], alt: 'Kaşta titanyum piercing' },
+  { key: 'makyaj', words: ['makyaj', 'kaş', 'microblading'], alt: 'Belirgin, dolgun bir kaş' },
+  { key: 'gecici', words: ['geçici', 'kına'], alt: 'Ele kınayla çiçek deseni çizilirken' },
+  { key: 'kalici', words: ['dövme'], alt: 'Eldivenli ellerle dövme yapılırken' },
+];
+const SERVICE_PHOTO_SIZE = { width: 560, height: 700 };
 const HIGHLIGHT_DASH = ' — '; // a highlight is "title — detail"
 const UNTITLED_WORK = 'Çınar Tattoo çalışması';
 const AREA_SERVED = ['Esenler', 'Bağcılar', 'Güngören', 'Bayrampaşa', 'Gaziosmanpaşa', 'İstanbul'];
@@ -571,10 +582,16 @@ function artist(ctx, no) {
 
 function services(ctx) {
   if (ctx.services.length === 0) return '';
+  const used = new Set();
   const items = ctx.services
     .map((service, index) => {
+      const name = String(service.name ?? '').trim();
       const description = blank(service.description) ? '' : `<p>${text(String(service.description).trim())}</p>`;
-      return `<li><i class="num">${pad(index + 1)}</i><h3>${text(String(service.name ?? '').trim())}</h3>${description}</li>`;
+      const photo = servicePhoto(name, used);
+      const figure = photo === null
+        ? ''
+        : `<figure class="svc-ph"><img src="/media/hizmet-${photo.key}.jpg" alt="${escapeHtml(photo.alt)}" width="${SERVICE_PHOTO_SIZE.width}" height="${SERVICE_PHOTO_SIZE.height}" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure>`;
+      return `<li>${figure}<i class="num">${pad(index + 1)}</i><h3>${text(name)}</h3>${description}</li>`;
     })
     .join('\n        ');
   return `
@@ -584,6 +601,15 @@ function services(ctx) {
         ${items}
       </ul>
     </div>`;
+}
+
+// The first unused picture whose words appear in the name, or null.
+function servicePhoto(name, used) {
+  const lower = name.toLocaleLowerCase('tr-TR');
+  const photo = SERVICE_PHOTOS.find((candidate) => !used.has(candidate.key) && candidate.words.some((word) => lower.includes(word)));
+  if (photo === undefined) return null;
+  used.add(photo.key);
+  return photo;
 }
 
 function reviews(ctx, no) {

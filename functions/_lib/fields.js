@@ -11,8 +11,8 @@
 import { DEFAULT_SETTINGS } from './defaults.js';
 import { telHref } from './links.js';
 
-export const CATEGORIES = ['dovme', 'piercing', 'diger'];
-export const CATEGORY_LABELS = { dovme: 'Dövme', piercing: 'Piercing', diger: 'Diğer' };
+export const CATEGORIES = ['dovme', 'gecici', 'piercing', 'kulak', 'makyaj', 'diger'];
+export const CATEGORY_LABELS = { dovme: 'Kalıcı dövme', gecici: 'Geçici dövme', piercing: 'Piercing', kulak: 'Kulak delme', makyaj: 'Kalıcı makyaj', diger: 'Diğer' };
 export const REVIEW_SOURCES = ['google', 'instagram', 'diger'];
 export const REVIEW_SOURCE_LABELS = { google: 'Google', instagram: 'Instagram', diger: 'Diğer' };
 // What the site counts when a visitor taps a button (POST /api/track).

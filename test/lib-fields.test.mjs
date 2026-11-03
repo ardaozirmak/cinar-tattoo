@@ -130,8 +130,8 @@ test('the panel does not offer hero_points: the Dergi hero shows no points, so e
 });
 
 test('categories, review sources and click kinds', () => {
-  assert.deepEqual(CATEGORIES, ['dovme', 'piercing', 'diger']);
-  assert.deepEqual(CATEGORY_LABELS, { dovme: 'Dövme', piercing: 'Piercing', diger: 'Diğer' });
+  assert.deepEqual(CATEGORIES, ['dovme', 'gecici', 'piercing', 'kulak', 'makyaj', 'diger']);
+  assert.deepEqual(CATEGORY_LABELS, { dovme: 'Kalıcı dövme', gecici: 'Geçici dövme', piercing: 'Piercing', kulak: 'Kulak delme', makyaj: 'Kalıcı makyaj', diger: 'Diğer' });
   assert.deepEqual(REVIEW_SOURCES, ['google', 'instagram', 'diger']);
   assert.deepEqual(REVIEW_SOURCE_LABELS, { google: 'Google', instagram: 'Instagram', diger: 'Diğer' });
   assert.deepEqual(CLICK_KINDS, ['whatsapp', 'call', 'directions', 'form', 'instagram']);

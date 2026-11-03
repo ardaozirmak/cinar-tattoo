@@ -430,11 +430,11 @@ test('hizmetler: one item per service under the artist, the empty description le
   const block = between(section, '<div class="services" data-rise>', '</ul>');
   assert.ok(block.includes('<p class="lbl">Hizmetler</p>'));
   assert.equal(count(block, '<li>'), 5);
-  assert.ok(block.includes('<li><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
-  assert.ok(block.includes('<li><i class="num">02</i><h3>Geçici dövme</h3><p>Kalıcıya karar vermeden önce denemek isteyenlere.</p></li>'));
-  assert.ok(block.includes('<li><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek; titanyum ya da çelik takıyla.</p></li>'));
-  assert.ok(block.includes('<li><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Ağrısız, acısız kulak delme; steril ortamda.</p></li>'));
-  assert.ok(block.includes('<li><i class="num">05</i><h3>Kalıcı makyaj</h3><p>Kalıcı makyaj uygulamaları; ayrıntı için yaz.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kalici.jpg" alt="Eldivenli ellerle dövme yapılırken" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">01</i><h3>Kalıcı dövme</h3><p>Yazıdan tam kola, sana göre çizilen dövmeler.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-gecici.jpg" alt="Ele kınayla çiçek deseni çizilirken" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Kalıcıya karar vermeden önce denemek isteyenlere.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Kaşta titanyum piercing" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">03</i><h3>Titanyum &amp; çelik piercing</h3><p>Kulak, burun, göbek; titanyum ya da çelik takıyla.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kulak.jpg" alt="Küpe takılı bir kulak memesi" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">04</i><h3>Ağrısız kulak delme</h3><p>Ağrısız, acısız kulak delme; steril ortamda.</p></li>'));
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-makyaj.jpg" alt="Belirgin, dolgun bir kaş" width="560" height="700" loading="lazy" decoding="async"><figcaption>Temsili görsel</figcaption></figure><i class="num">05</i><h3>Kalıcı makyaj</h3><p>Kalıcı makyaj uygulamaları; ayrıntı için yaz.</p></li>'));
   const one = page({}, { services: [{ id: 9, name: "Onur'un <i>", description: '' }] });
   assert.ok(one.includes('<li><i class="num">01</i><h3>Onur’un &lt;i&gt;</h3></li>'));
   const none = page({}, { services: [] });
@@ -510,7 +510,7 @@ test('tabs: none with one category; the defaults count every category that has p
   assert.ok(!one.includes('class="tabs"'));
   const html = page();
   assert.ok(html.includes('Tümü <sup>37</sup>'));
-  assert.ok(html.includes('Dövme <sup>36</sup>'));
+  assert.ok(html.includes('Kalıcı dövme <sup>36</sup>'));
   assert.ok(html.includes('Piercing <sup>1</sup>'));
   assert.ok(!html.includes('data-f="diger"'));
 });
@@ -739,15 +739,17 @@ test('the seed hero stands the square logo in front of the dimmed studio photo',
   assert.ok(own.includes(`<div class="hero-sign"><img id="heroLogo" src="/img/${'f'.repeat(20)}/full"`));
 });
 
+// The width and height in a JPEG's start-of-frame segment.
+const sof = (file) => {
+  const bytes = readFileSync(file);
+  for (let i = 2; i < bytes.length; i += 2 + bytes.readUInt16BE(i + 2)) {
+    const marker = bytes[i + 1];
+    if (marker === 0xc0 || marker === 0xc2) return { width: bytes.readUInt16BE(i + 7), height: bytes.readUInt16BE(i + 5) };
+  }
+  return null;
+};
+
 test('the hero backdrop crops exist at their pinned sizes and within 150 KB', () => {
-  const sof = (file) => {
-    const bytes = readFileSync(file);
-    for (let i = 2; i < bytes.length; i += 2 + bytes.readUInt16BE(i + 2)) {
-      const marker = bytes[i + 1];
-      if (marker === 0xc0 || marker === 0xc2) return { width: bytes.readUInt16BE(i + 7), height: bytes.readUInt16BE(i + 5) };
-    }
-    return null;
-  };
   for (const [name, size] of [['hero-arka-genis.jpg', { width: 1440, height: 1648 }], ['hero-arka-dik.jpg', { width: 720, height: 900 }]]) {
     const file = join(PUBLIC, 'media', name);
     assert.ok(existsSync(file), name);
@@ -776,4 +778,31 @@ test('the opening shows Çınar Tattoo over ESENLER · 2005 and flashes the serv
   assert.ok(!html.includes('id="introSub"'));
   assert.ok(page({}, { services: [{ id: 1, name: '<i>x</i>', description: '' }] }).includes('<span>&lt;i&gt;x&lt;/i&gt;</span></p>'));
   assert.ok(!page({}, { services: [] }).includes('id="introSvc"'));
+});
+
+test('service cards: a CC0 picture by the name, each used once, marked as illustrative; none for an unknown name', () => {
+  const services = [
+    { id: 1, name: 'Kulak piercing', description: '' },
+    { id: 2, name: 'Burun piercing', description: '' },
+    { id: 3, name: 'Kapatma dövme', description: '' },
+    { id: 4, name: 'İkinci dövme', description: '' },
+    { id: 5, name: 'Lazer', description: '' },
+  ];
+  const block = between(page({}, { services }), '<ul class="svc-list">', '</ul>');
+  assert.equal(count(block, '<figure class="svc-ph">'), 3);
+  assert.equal(count(block, 'Temsili görsel'), 3);
+  assert.ok(block.includes('<li><i class="num">04</i><h3>İkinci dövme</h3></li>'));
+  assert.ok(block.includes('hizmet-kulak.jpg" alt="Küpe takılı bir kulak memesi"'));
+  assert.ok(block.includes('hizmet-piercing.jpg'));
+  assert.equal(count(block, 'hizmet-kalici.jpg'), 1);
+  assert.ok(block.includes('<li><i class="num">05</i><h3>Lazer</h3></li>'));
+});
+
+test('the five service pictures are 560 by 700 JPEGs of at most 120 KB', () => {
+  for (const key of ['kalici', 'gecici', 'piercing', 'kulak', 'makyaj']) {
+    const file = join(PUBLIC, 'media', `hizmet-${key}.jpg`);
+    assert.ok(existsSync(file), key);
+    assert.ok(statSync(file).size <= 122880, `${key} is ${statSync(file).size} bytes`);
+    assert.deepEqual(sof(file), { width: 560, height: 700 }, key);
+  }
 });
