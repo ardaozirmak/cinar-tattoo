@@ -271,17 +271,6 @@ button{font:inherit;color:inherit}
 .lb-wa{padding:.8em 1.1em;font-size:.82rem}
 @media (max-width:600px){.lb-in{grid-template-columns:minmax(0,1fr);padding:1rem}.lb-prev,.lb-next{position:fixed;bottom:1.25rem}.lb-prev{left:1.25rem}.lb-next{right:1.25rem}.lb img{max-height:calc(100svh - 13rem)}}
 
-/* reels: sticky note left, staggered clips right */
-.reels{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--g)}
-.reels-note{grid-column:1/span 3;align-self:start;position:sticky;top:6rem;display:grid;gap:1.2rem;color:var(--fg-2);justify-items:start}
-.clips{grid-column:5/span 8;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(.6rem,1.4vw,1.2rem)}
-.clip{display:grid;gap:.5rem}
-.clip:nth-child(even){margin-top:clamp(2rem,8vw,7rem)}
-.clip .vid{aspect-ratio:9/16;overflow:hidden;background:var(--bg-2)}
-.clip video{width:100%;height:100%;object-fit:cover}
-.clip figcaption{display:flex;justify-content:space-between;font-size:.76rem;color:var(--mute)}
-.clip figcaption b{color:var(--fg-2);font-weight:600}
-@media (max-width:900px){.reels-note{grid-column:1/-1;position:static}.clips{grid-column:1/-1}}
 
 /* banner over a wall of real work */
 .banner{position:relative;min-height:clamp(440px,66vh,640px);display:grid;place-items:center;text-align:center;overflow:hidden;isolation:isolate;border-top:1px solid var(--line)}
@@ -345,12 +334,11 @@ button{font:inherit;color:inherit}
 @media (max-width:640px){.svc-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:2rem .9rem}.svc-list h3{font-size:1.45rem}}
 @media (prefers-reduced-motion:reduce){.svc-ph img{transition:none}.svc-list li:hover .svc-ph img{transform:none}}
 
-/* reviews: one big quote at a time */
-.quote{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--g)}
+/* reviews: every review on show at once, a wall of Google-style cards */
 /* Google's own colours (the G and the yellow stars) are the one exception to the palette: they are
    what tells a visitor at a glance that these are real Google reviews. */
-.quote{--g-star:#FBBC04}
-.quote-head{grid-column:3/span 9;min-width:0;margin-bottom:1.2rem}
+.quote{--g-star:#FBBC04;display:grid;gap:clamp(1.4rem,3vw,2.2rem)}
+.quote-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem 2rem;min-width:0}
 .g-badge{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem;padding:.8rem 1.1rem;background:var(--bg-3);border:1px solid var(--line-2);
   text-decoration:none;color:var(--fg);transition:border-color .2s}
 a.g-badge:hover{border-color:var(--fg)}
@@ -360,24 +348,17 @@ a.g-badge:hover{border-color:var(--fg)}
 .g-count{color:var(--fg-2);font-size:.88rem}
 .quote .stars{color:var(--g-star);letter-spacing:.12em}
 .g-badge .stars{font-size:1.05rem}
-.quote-body{grid-column:3/span 9;min-height:clamp(16rem,30vw,22rem);min-width:0;background:var(--bg-2);border:1px solid var(--line);padding:clamp(1.4rem,3.5vw,2.8rem)}
-.quotes{display:grid;gap:3rem}
-.q{display:grid;align-content:start;gap:1.6rem}
-.q>.stars{font-size:1.25rem}
-.quote blockquote{font:400 clamp(1.6rem,3.1vw,2.8rem)/1.18 var(--serif);letter-spacing:-.005em;overflow-wrap:anywhere}
-.quote blockquote::before{content:"“";color:var(--mute)}
-.quote blockquote::after{content:"”";color:var(--mute)}
-.quote-by{display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap}
-.quote-by b{font-weight:600}
-.q-src{display:inline-flex;align-items:center;gap:.45rem;color:var(--fg-2);font-size:.85rem}
-.q-src .g-logo{width:1.05rem;height:1.05rem}
-.quote-nav{grid-column:3/span 9;display:flex;flex-wrap:wrap;align-items:center;gap:1.2rem;margin-top:2.5rem}
-.quote-nav button{width:3rem;height:3rem;border:1px solid var(--line-2);background:none;cursor:pointer;font-size:1rem}
-.quote-nav button:hover{border-color:var(--fg)}
-.quote-prog{flex:1;min-width:4rem;height:1px;background:var(--line);position:relative;overflow:hidden}
-.quote-prog i{position:absolute;inset:0;background:var(--fg);transform-origin:left;transform:scaleX(0)}
-.quote-count{font-size:.85rem;color:var(--mute)}
-@media (max-width:900px){.quote-head,.quote-body,.quote-nav{grid-column:1/-1}}
+.rv-wall{list-style:none;padding:0;columns:3 18rem;column-gap:clamp(.8rem,1.6vw,1.2rem)}
+.rv{break-inside:avoid;display:grid;gap:.9rem;margin-bottom:clamp(.8rem,1.6vw,1.2rem);padding:clamp(1.1rem,2vw,1.5rem);background:var(--bg-2);border:1px solid var(--line);transition:border-color .2s}
+.rv:hover{border-color:var(--line-2)}
+.rv-by{display:flex;align-items:center;gap:.8rem;min-width:0}
+.rv-av{flex:none;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:var(--bg-3);border:1px solid var(--line-2);font-weight:600;color:var(--fg)}
+.rv-who{display:grid;gap:.15rem;min-width:0}
+.rv-who b{font-weight:600;overflow-wrap:anywhere}
+.q-src{display:inline-flex;align-items:center;gap:.4rem;color:var(--mute);font-size:.8rem}
+.q-src .g-logo{width:.95rem;height:.95rem}
+.rv>.stars{font-size:1.05rem;line-height:1}
+.rv blockquote{color:var(--fg-2);font-size:.98rem;line-height:1.6;overflow-wrap:anywhere}
 
 /* care and prices: a ledger in columns */
 .ledger{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
@@ -477,32 +458,26 @@ a.g-badge:hover{border-color:var(--fg)}
 /* ============ without JavaScript: everything is there and nothing waits for a script ============ */
 @media (scripting:none){
   .bar{background:var(--bg)}
-  .menu-btn,.tabs,.daha,.quote-nav button,.quote-prog,.quote-count{display:none}
+  .menu-btn,.tabs,.daha{display:none}
   .works .work[hidden]{display:grid}
   .dock{transform:none}
 }
 
-/* with JavaScript the reviews show one at a time; site.js takes over with .go */
-@media (scripting:enabled){
-  .quotes>.q:not(:first-child){display:none}
-}
-.quotes.go>.q{display:grid}
-.quotes.go>.q[hidden]{display:none}
 
 /* ============ motion: where things start before anime moves them ============ */
 @keyframes kurtar{to{opacity:1;transform:none;clip-path:none;visibility:visible}}
 @keyframes kurtar-intro{to{opacity:0;visibility:hidden}}
 @media (scripting:enabled) and (prefers-reduced-motion:no-preference){
   .intro{display:block;animation:kurtar-intro 0s 4s forwards}
-  .bar,.hero-sub,.hero-act,.facts .fact,#heroLogo,.hero-copy .lbl,.hi-what,.hi-where,[data-rise]{opacity:0;animation:kurtar 0s 4s forwards}
+  .bar,.hero-sub,.hero-act,.facts .fact,#heroLogo,.hero-copy .lbl,.hi-what,.hi-where,[data-rise],.rv{opacity:0;animation:kurtar 0s 4s forwards}
   .hero h1 .ln>span{transform:translateY(105%);animation:kurtar 0s 4s forwards}
   .sec-head h2 .ch{transform:translateY(110%);animation:kurtar 0s 4s forwards}
   .wipe{clip-path:inset(100% 0% 0% 0%);animation:kurtar 0s 4s forwards}
   .foot-big{clip-path:inset(100% 0% 0% 0%);animation:kurtar 0s 4s forwards}
-  .m .intro,.m .bar,.m .hero-sub,.m .hero-act,.m .facts .fact,.m #heroLogo,.m .hero-copy .lbl,.m .hi-what,.m .hi-where,.m [data-rise],
+  .m .intro,.m .bar,.m .hero-sub,.m .hero-act,.m .facts .fact,.m #heroLogo,.m .hero-copy .lbl,.m .hi-what,.m .hi-where,.m [data-rise],.m .rv,
   .m .hero h1 .ln>span,.m .sec-head h2 .ch,.m .wipe,.m .foot-big{animation:none}
   .still .intro{display:none}
-  .still .bar,.still .hero-sub,.still .hero-act,.still .facts .fact,.still #heroLogo,.still .hero-copy .lbl,.still [data-rise],
+  .still .bar,.still .hero-sub,.still .hero-act,.still .facts .fact,.still #heroLogo,.still .hero-copy .lbl,.still [data-rise],.still .rv,
   .still .hero h1 .ln>span,.still .sec-head h2 .ch,.still .wipe,.still .foot-big{animation-delay:0s}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition-duration:1ms!important}}

@@ -48,20 +48,12 @@ const AREA_SERVED = ['Esenler', 'Bağcılar', 'Güngören', 'Bayrampaşa', 'Gazi
 const SECTIONS = [
   { id: 'sanatci', label: 'Sanatçı', menu: true },
   { id: 'calismalar', label: 'Çalışmalar', menu: true },
-  { id: 'reels', label: 'Reels', menu: true },
   { id: 'surec', label: 'Süreç', menu: true },
   { id: 'yorumlar', label: 'Yorumlar', menu: true },
   { id: 'fiyatlar', label: 'Fiyatlar', menu: true },
   { id: 'bakim', label: 'Bakım', menu: false },
   { id: 'randevu', label: 'Randevu', menu: true },
   { id: 'sss', label: 'SSS', menu: true },
-];
-
-const REELS = [
-  { n: 1, title: 'Orman & kurt', label: 'Orman ve kurt dövmesi videosu' },
-  { n: 2, title: 'Çift kurt', label: 'Çift kurt dövmesi videosu' },
-  { n: 3, title: 'El üstü gül', label: 'El üstü gül dövmesi videosu' },
-  { n: 4, title: 'Renkli tam kol', label: 'Renkli tam kol dövmesi videosu' },
 ];
 
 const PLACES = ['Kol', 'Bacak', 'Sırt', 'Göğüs', 'Boyun', 'El', 'Diğer'];
@@ -98,7 +90,7 @@ export function renderPage({ content, origin, assetVersion, year }) {
   const built = SECTIONS.filter((section) => SECTION_SHOWN[section.id]?.(ctx) ?? true).map((section, index) => ({ ...section, no: pad(index + 1) }));
   const sectionsHtml = built.map((section) => {
     const body = SECTION_BUILDERS[section.id](ctx, section.no);
-    // The banner sits between Reels and Süreç, as in the prototype.
+    // The banner sits just before Süreç.
     return section.id === 'surec' ? banner(ctx) + body : body;
   });
 
@@ -419,7 +411,7 @@ const section = (id, no, inner) => `<section class="sec" id="${id}" aria-labelle
   </div>
 </section>`;
 
-const SECTION_BUILDERS = { sanatci: artist, calismalar: works, reels, surec: process, yorumlar: reviews, fiyatlar: prices, bakim: care, randevu: booking, sss: faq };
+const SECTION_BUILDERS = { sanatci: artist, calismalar: works, surec: process, yorumlar: reviews, fiyatlar: prices, bakim: care, randevu: booking, sss: faq };
 // The sections that render only with their content; the others always do.
 const SECTION_SHOWN = {
   sanatci: (ctx) => !blank(ctx.settings.about_title) || !blank(ctx.settings.about_text) || listSetting(ctx.settings, 'highlights').length > 0,
@@ -479,27 +471,6 @@ function lightbox(ctx) {
   </div>
   <button class="lb-btn lb-close" id="lbClose" type="button" aria-label="Kapat">✕</button>
 </dialog>`;
-}
-
-function reels(ctx, no) {
-  const more = instaLink(ctx, 'link', 'Instagram’da daha fazlası ↗');
-  const clips = REELS.map(
-    (reel) =>
-      `<figure class="clip"><div class="vid wipe"><video src="/media/r${reel.n}.mp4" poster="/media/r${reel.n}.jpg" muted loop playsinline controls preload="none" width="400" height="711" aria-label="${escapeHtml(reel.label)}"></video></div><figcaption><b>${escapeHtml(reel.title)}</b><span class="num">R/${pad(reel.n)}</span></figcaption></figure>`,
-  ).join('\n        ');
-  return section(
-    'reels',
-    no,
-    `${sectionTop('reels', no, 'Reels', 'Hareket halinde.')}
-    <div class="reels">
-      <div class="reels-note">
-        <p>Bir dövmenin ışıkta, açıda, deride nasıl durduğunu en iyi video gösterir.</p>${more === '' ? '' : `\n        ${more}`}
-      </div>
-      <div class="clips">
-        ${clips}
-      </div>
-    </div>`,
-  );
 }
 
 function banner(ctx) {
@@ -633,18 +604,20 @@ function googleSummary(ctx) {
 }
 
 function reviews(ctx, no) {
+  // Every review is on the page at once, as a wall of Google-style cards: no slider, nothing to click.
   const items = ctx.reviews
     .map((review) => {
       const rating = Math.max(1, Math.min(5, Number(review.rating) || 5));
       const source = REVIEW_SOURCE_LABELS[review.source] ?? REVIEW_SOURCE_LABELS.diger;
       const mark = review.source === 'google' ? GOOGLE_G : '';
       const date = blank(review.date_text) ? '' : ` · ${escapeHtml(review.date_text)}`;
-      return `<li class="q"><span class="stars" role="img" aria-label="5 üzerinden ${rating} yıldız">${'★'.repeat(rating)}</span><blockquote>${escapeHtml(review.text).replaceAll('\n', '<br>')}</blockquote><p class="quote-by"><b>${escapeHtml(review.name)}</b><span class="q-src">${mark}${source}${date}</span></p></li>`;
+      const initial = escapeHtml([...String(review.name ?? '').trim()][0]?.toLocaleUpperCase('tr') ?? '?');
+      return `<li class="rv"><p class="rv-by"><span class="rv-av" aria-hidden="true">${initial}</span><span class="rv-who"><b>${escapeHtml(review.name)}</b><span class="q-src">${mark}${source}${date}</span></span></p><span class="stars" role="img" aria-label="5 üzerinden ${rating} yıldız">${'★'.repeat(rating)}</span><blockquote>${escapeHtml(review.text).replaceAll('\n', '<br>')}</blockquote></li>`;
     })
-    .join('\n          ');
+    .join('\n        ');
   const reviewsUrl = blank(ctx.settings.google_reviews_url) ? '' : escapeHtml(String(ctx.settings.google_reviews_url).trim());
-  const google = reviewsUrl === '' ? '' : `<a class="link" href="${reviewsUrl}" ${external}>Google’da gör ↗</a>`;
-  // The summary over the quote: Google's G, the score and how many Google reviews there are.
+  const google = reviewsUrl === '' ? '' : `<a class="link" href="${reviewsUrl}" ${external}>Tüm yorumlar Google’da ↗</a>`;
+  // The summary over the wall: Google's G, the score and how many Google reviews there are.
   const summary = googleSummary(ctx);
   let badge = '';
   if (summary !== null) {
@@ -654,27 +627,15 @@ function reviews(ctx, no) {
         ? `<p class="g-badge">${inner}</p>`
         : `<a class="g-badge" href="${reviewsUrl}" ${external}>${inner}</a>`;
   }
-  const nav =
-    ctx.reviews.length > 1
-      ? `<button type="button" id="qPrev" aria-label="Önceki yorum">←</button>
-        <button type="button" id="qNext" aria-label="Sonraki yorum">→</button>
-        <div class="quote-prog" aria-hidden="true"><i id="qProg"></i></div>
-        <span class="quote-count num" id="qCount">01 / ${pad(ctx.reviews.length)}</span>
-        `
-      : '';
+  const head = badge === '' && google === '' ? '' : `\n      <div class="quote-head">${badge}${google}</div>`;
   return section(
     'yorumlar',
     no,
     `${sectionTop('yorumlar', no, 'Yorumlar', 'Gidenler anlatıyor.', 'Google’daki yorumlar, yazıldığı gibi; tek harfine dokunmadan.')}
-    <div class="quote" id="quote" aria-roledescription="yorum gösterici">${badge === '' ? '' : `\n      <div class="quote-head">${badge}</div>`}
-      <div class="quote-body" aria-live="polite">
-        <ol class="quotes" id="quotes">
-          ${items}
-        </ol>
-      </div>
-      <div class="quote-nav">
-        ${nav}${google}
-      </div>
+    <div class="quote" id="quote">${head}
+      <ul class="rv-wall">
+        ${items}
+      </ul>
     </div>`,
   );
 }

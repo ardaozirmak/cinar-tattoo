@@ -102,7 +102,7 @@ test('defaults: 31 work cards, the first is seed-gecici-06, 24 shown and 7 behin
 
 test('defaults: 13 reviews, the facts 26 years and Google’s 4,8 from 178, and never ÇINAR or the old lacivert', () => {
   const html = page();
-  assert.equal(count(html, '<li class="q">'), 13);
+  assert.equal(count(html, '<li class="rv">'), 13);
   assert.ok(html.includes('<div class="fact"><b class="num">+20</b><span>yıllık tecrübe</span></div>'));
   assert.ok(!html.includes('aynı mahallede</span></div>'));
   assert.ok(html.includes('<b class="num">4,8 ★</b><span>178 Google yorumu</span>'));
@@ -319,10 +319,11 @@ test('every booking link says what it is: wa.me whatsapp, tel: call, directions,
 
 test('sections: the defaults render all but the price list, numbered 01 … in order, and the menus follow', () => {
   const html = page();
-  assert.deepEqual(sectionIds(html), ['sanatci', 'calismalar', 'reels', 'surec', 'yorumlar', 'bakim', 'randevu', 'sss']);
-  assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07', '08']);
+  assert.deepEqual(sectionIds(html), ['sanatci', 'calismalar', 'surec', 'yorumlar', 'bakim', 'randevu', 'sss']);
+  assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07']);
   const menu = between(html, '<nav class="menu"', '</nav>');
-  assert.deepEqual([...menu.matchAll(/href="#([a-z]+)"><i>(\d+)<\/i>/g)].map((m) => `${m[1]} ${m[2]}`), ['sanatci 01', 'calismalar 02', 'reels 03', 'surec 04', 'yorumlar 05', 'randevu 07', 'sss 08']);
+  assert.deepEqual([...menu.matchAll(/href="#([a-z]+)"><i>(\d+)<\/i>/g)].map((m) => `${m[1]} ${m[2]}`), ['sanatci 01', 'calismalar 02', 'surec 03', 'yorumlar 04', 'randevu 06', 'sss 07']);
+  assert.ok(!html.includes('id="reels"') && !html.includes('.mp4'), 'the Reels section is gone');
   assert.ok(menu.includes('<a href="#sanatci"><i>01</i>Sanatçı</a>'));
   assert.ok(between(html, '<div class="sheet"', '<div class="sheet-foot">').includes('<a href="#sanatci"><i>01</i>Sanatçı</a>'));
   assert.ok(!html.includes('id="usta"') && !html.includes('usta-'), 'the old Usta section is gone');
@@ -336,10 +337,10 @@ test('without reviews: no review section, no link to it, no review fact; the num
   assert.ok(!html.includes('href="#yorumlar"'));
   assert.ok(!html.includes('/ 13'));
   assert.ok(!html.includes('Google yorumu'));
-  assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07']);
+  assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06']);
   const none = page({ about_title: '', about_text: '', highlights: '[]' }, { reviews: [] });
-  assert.deepEqual(sectionIds(none), ['calismalar', 'reels', 'surec', 'bakim', 'randevu', 'sss']);
-  assert.deepEqual(secNos(none), ['01', '02', '03', '04', '05', '06']);
+  assert.deepEqual(sectionIds(none), ['calismalar', 'surec', 'bakim', 'randevu', 'sss']);
+  assert.deepEqual(secNos(none), ['01', '02', '03', '04', '05']);
 });
 
 test('reviews: every one is in the HTML with its stars, source and date; a 4-star one changes the fact', () => {
@@ -348,13 +349,16 @@ test('reviews: every one is in the HTML with its stars, source and date; a 4-sta
     { id: 2, name: 'B', rating: 4, text: 'İyi.', source: 'instagram', date_text: 'Ekim 2026' },
   ];
   const html = page({ google_rating: '', google_review_count: '' }, { reviews });
-  assert.equal(count(html, '<li class="q">'), 2);
+  assert.equal(count(html, '<li class="rv">'), 2);
+  // All of them are on show at once: no slider, no arrows.
+  assert.ok(!html.includes('qPrev') && !html.includes('qNext') && !html.includes('quote-body'));
+  assert.ok(html.includes('<span class="rv-av" aria-hidden="true">A</span>'));
   assert.ok(html.includes('<span class="stars" role="img" aria-label="5 üzerinden 4 yıldız">★★★★</span>'));
   assert.ok(html.includes('Instagram'));
   assert.ok(html.includes('Ekim 2026'));
   assert.ok(html.includes('<b class="num">1 / 2</b><span>yorum 5 yıldız</span>'));
-  assert.ok(html.includes('Google’da gör ↗'));
-  assert.ok(!page({ google_reviews_url: '' }).includes('Google’da gör'));
+  assert.ok(html.includes('Tüm yorumlar Google’da ↗'));
+  assert.ok(!page({ google_reviews_url: '' }).includes('Tüm yorumlar Google’da'));
   // The Google summary counts only the Google reviews and links to them when there is a link.
   assert.ok(html.includes('<b class="g-score num">5,0</b>'));
   assert.ok(html.includes('1 Google yorumu'));
@@ -384,8 +388,8 @@ test('prices: none by default; a group with an empty price asks on WhatsApp, a s
   assert.ok(section.includes('1.500₺&#39;den'));
   assert.ok(section.includes('<small>tek satır</small>'));
   assert.ok(section.includes('Fiyatlar boyuta ve detaya göre değişebilir; net fiyat için yaz.'));
-  assert.deepEqual(sectionIds(html), ['sanatci', 'calismalar', 'reels', 'surec', 'yorumlar', 'fiyatlar', 'bakim', 'randevu', 'sss']);
-  assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07', '08', '09']);
+  assert.deepEqual(sectionIds(html), ['sanatci', 'calismalar', 'surec', 'yorumlar', 'fiyatlar', 'bakim', 'randevu', 'sss']);
+  assert.deepEqual(secNos(html), ['01', '02', '03', '04', '05', '06', '07', '08']);
 });
 
 test('sanatçı: the first section (01), the photo, the about title and text, and the highlights split into title and detail', () => {
@@ -506,11 +510,6 @@ test('SSS: five questions; piercing is with titanium and steel, and the sticker 
   const bare = between(page({ whatsapp: '' }), '<section class="sec" id="sss"', '</section>');
   assert.ok(!bare.includes('WhatsApp'));
   assert.ok(bare.includes('kalıcıya karar vermeden önce deneyebilirsin. Ne istediğini bize yaz.'));
-});
-
-test('the reels: four clips from /media with their posters', () => {
-  const html = page();
-  for (const n of [1, 2, 3, 4]) assert.ok(html.includes(`src="/media/r${n}.mp4" poster="/media/r${n}.jpg"`), `r${n}`);
 });
 
 // ---------------------------------------------------------------------------------------------

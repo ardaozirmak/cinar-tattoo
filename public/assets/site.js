@@ -270,26 +270,6 @@ if (worksEl && lb) {
   openFromHash();
 }
 
-/* ---------------- reels play while they are in view ---------------- */
-const videos = $$('.clip video');
-if (motionOK) {
-  const vio = new IntersectionObserver(
-    (entries) =>
-      entries.forEach((entry) => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          video.preload = 'auto';
-          video.play().catch(() => {});
-        } else video.pause();
-      }),
-    { threshold: 0.35 },
-  );
-  videos.forEach((video) => {
-    video.controls = false;
-    vio.observe(video);
-  });
-}
-
 /* ---------------- process: the step in view drives the sticky picture ---------------- */
 const steps = $$('.pstep');
 const procImgs = $$('#procStack img');
@@ -328,69 +308,6 @@ if (steps.length > 0) {
   );
   steps.forEach((step) => pio.observe(step));
   setStep(0);
-}
-
-/* ---------------- reviews: one at a time ---------------- */
-const quotes = $('#quotes');
-const quoteItems = quotes ? $$('.q', quotes) : [];
-if (quotes && quoteItems.length > 1) {
-  const count = $('#qCount');
-  const progress = $('#qProg');
-  const body = $('.quote-body');
-  const quote = $('#quote');
-  let q = 0;
-  let timer = null;
-  let paused = false;
-  const put = (index) => {
-    q = (index + quoteItems.length) % quoteItems.length;
-    quoteItems.forEach((item, k) => {
-      item.hidden = k !== q;
-    });
-    if (count) count.textContent = `${pad(q + 1)} / ${pad(quoteItems.length)}`;
-  };
-  const tick = () => {
-    clearTimeout(timer);
-    if (paused || !motionOK) return;
-    if (progress) animate(progress, { scaleX: [0, 1], duration: 8000, ease: 'linear' });
-    timer = setTimeout(() => go(1), 8000);
-  };
-  const go = (step) => {
-    const next = q + step;
-    if (!motionOK || !body) {
-      put(next);
-      return;
-    }
-    animate(body, {
-      opacity: [1, 0],
-      y: [0, -14],
-      duration: 350,
-      ease: 'inQuad',
-      onComplete: () => {
-        put(next);
-        animate(body, { opacity: [0, 1], y: [18, 0], filter: ['blur(8px)', 'blur(0px)'], duration: 900, ease: 'outExpo' });
-      },
-    });
-    tick();
-  };
-  quotes.classList.add('go');
-  put(0);
-  $('#qPrev')?.addEventListener('click', () => go(-1));
-  $('#qNext')?.addEventListener('click', () => go(1));
-  if (quote) {
-    const pause = () => {
-      paused = true;
-      clearTimeout(timer);
-    };
-    const resume = () => {
-      paused = false;
-      tick();
-    };
-    quote.addEventListener('pointerenter', pause);
-    quote.addEventListener('pointerleave', resume);
-    quote.addEventListener('focusin', pause);
-    quote.addEventListener('focusout', resume);
-    once(quote, tick, 0.3);
-  }
 }
 
 /* ---------------- the map loads when asked ---------------- */
@@ -540,12 +457,10 @@ function entrance() {
     number.textContent = '00';
     once(number, () => animate(counter, { v: [0, to], duration: 900, ease: 'outQuad', onUpdate: () => (number.textContent = pad(Math.round(counter.v))) }), 0.5);
   });
-  // works and reels open like curtains as they arrive
+  // works open like curtains as they arrive
   cards.forEach((card, index) => once(card, () => wipe($('button', card), (index % 4) * 90), 0.1, '0px 0px -8% 0px'));
-  $$('.clip').forEach((clip, index) => {
-    const vid = $('.vid', clip);
-    if (vid) once(clip, () => wipe(vid, (index % 2) * 140, 1400), 0.15);
-  });
+  // review cards rise as they arrive, a little apart across the columns
+  $$('.rv').forEach((card, index) => once(card, () => animate(card, { opacity: [0, 1], y: [28, 0], delay: (index % 3) * 110, duration: 1000, ease: 'outExpo' }), 0.15));
   // the artist's photo, watched through its figure: the frame itself is clipped shut
   const artist = $('.artist-ph');
   const frame = artist && $('.artist-frame', artist);
