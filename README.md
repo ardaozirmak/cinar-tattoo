@@ -1,13 +1,38 @@
 # Çınar Tattoo
 
-Esenler'deki Çınar Tattoo dövme ve piercing stüdyosunun web sitesi ve yönetim paneli. Site tek sayfadır ve sunucuda hazırlanır (`functions/index.js`); çalışmalar, yorumlar, fiyatlar, iletişim bilgileri ve bütün yazılar panelden (`/admin`) telefonla değiştirilir. Cloudflare Pages üzerinde ücretsiz katmanda çalışır: sayfa ve API Pages Functions'ta, içerik D1'de (`DB`), panelden yüklenen fotoğraflar KV'de (`IMAGES`). Yayına alma adımları [docs/KURULUM.md](docs/KURULUM.md) içinde; tasarım belgesi `docs/superpowers/specs/`, uygulama planı `docs/superpowers/plans/` altında.
+**Canlı site:** [cinartattooesenler.com](https://cinartattooesenler.com)
 
-Projenin hiç npm bağımlılığı ve build adımı yok: `public/` olduğu gibi yayınlanır, tek dış kütüphane siteyle birlikte sunulan anime.js'tir (`public/assets/vendor/`). Yerelde Cloudflare yerine Node'un yerleşik modülleriyle yazılmış küçük bir emülatör çalışır (`dev/`): D1 için `node:sqlite`, KV için bir klasör kullanır. Node 22.13 veya üstü gerekir. `public/assets/` altındaki her şey ziyaretçinin tarayıcısında bir yıl saklanır. `site.css` ve `site.js` sayfaya içeriklerinden türetilen bir sürümle (`?v=`) bağlandığı için yayından sonra kendiliğinden yenilenir; fontlar, `vendor/anime.esm.min.js` ve `og.jpg` ise sürümsüzdür, bu yüzden bunlardan biri değişirse dosyaya **yeni bir ad** verilmeli ve adı geçtiği yerler güncellenmelidir.
+Esenler'deki Çınar Tattoo dövme ve piercing stüdyosu için hazırladığım web sitesi ve yönetim paneli.
+
+![Çınar Tattoo ana sayfa](docs/ekran-goruntusu.jpg)
+
+## Neler var
+
+- **Tek sayfalık site:** Sanatçı, çalışmalar, süreç, Google yorumları, randevu ve sık sorulan sorular bölümleri. Telefonda ve bilgisayarda düzgün görünür, animasyonlu ve sade bir tasarımla yapıldı.
+- **Yönetim paneli (`/admin`):** Stüdyo sahibi telefonundan fotoğraf, hizmet, fiyat, yorum ve sitedeki bütün yazıları kendisi değiştirir. Panel telefonun ana ekranına uygulama gibi eklenebilir ve her açılışta şifre ister.
+- **Tıklama sayacı:** Ziyaretçilerin WhatsApp, arama ve yol tarifi düğmelerine kaç kez bastığını panelde gösterir.
+- **Yerel SEO:** Google'ın işletmeyi tanıması için yapılandırılmış veri (TattooParlor), site haritası ve arama motoru ayarları.
+
+## Teknik
+
+- Saf JavaScript, HTML ve CSS; npm bağımlılığı ve build adımı yok. Animasyonlar için anime.js.
+- Cloudflare Pages + Pages Functions; içerik D1'de, panelden yüklenen fotoğraflar KV'de.
+- Yerelde Cloudflare yerine Node'un yerleşik modülleriyle yazılmış küçük bir emülatör çalışır (`dev/`).
+- ~600 birim testi ve başsız tarayıcıyla uçtan uca deneme.
 
 ```bash
-cp .dev.vars.example .dev.vars   # bir kez; içindeki şifreyi ve APP_SECRET'i değiştir
+cp .dev.vars.example .dev.vars   # bir kez; şifreyi ve APP_SECRET'i değiştir
 npm run dev       # http://127.0.0.1:8788  (panel: /admin/)
-npm run dev:lan   # aynı Wi-Fi'deki telefondan denemek için; adresi ekrana yazar
-npm test          # birim testleri (node --test)
-npm run e2e       # başsız Edge ile uçtan uca deneme; ekran görüntüleri .dev/shots/ içine
+npm test          # birim testleri
+npm run e2e       # uçtan uca deneme
 ```
+
+Yayına alma adımları: [docs/KURULUM.md](docs/KURULUM.md)
+
+Claude Code yardımıyla geliştirildi.
+
+## Lisans
+
+Tüm hakları saklıdır. Kod yalnızca incelemek için yayımlanmıştır; izinsiz kopyalanamaz, kullanılamaz ya da dağıtılamaz. Ayrıntı: [LICENSE](LICENSE)
+
+Fotoğraflar, logo ve işletme bilgileri Çınar Tattoo'ya aittir.
