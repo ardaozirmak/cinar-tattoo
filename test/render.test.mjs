@@ -452,8 +452,8 @@ test('hizmetler: one item per service under the artist, the empty description le
   assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-gecici.jpg" alt="Çınar Tattoo’da yapılan renkli güller, ön kol" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">02</i><h3>Geçici dövme</h3><p>Deseni önce yapıştırma dövmeyle birkaç gün taşı. İçine sinerse kalıcısını yapalım.</p></li>'));
   assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-piercing.jpg" alt="Çınar Tattoo’da yapılan göbek piercing, sallantılı taşlı uç" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">03</i><h3>Titanyum piercing</h3><p>Kulak, burun, göbek. Hassas cilde ve ilk delime uygun, alerji yapmayan titanyum takı.</p></li>'));
   assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-kulak.jpg" alt="Çınar Tattoo’da delinen kulak: çiçek ve yıldız küpeler" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">05</i><h3>Ağrısız kulak delme</h3><p>Birkaç saniye sürer, neredeyse hiç hissetmezsin. İğne paketinden senin önünde çıkar.</p></li>'));
-  // Çelik piercing has its own card; until it has a photo of its own it shows none.
-  assert.ok(block.includes('<li><i class="num">04</i><h3>Çelik piercing</h3><p>Cerrahi çelik takıyla bütçene uygun piercing. Kulak, burun, göbek; model seçimi sende.</p></li>'));
+  // Çelik piercing has its own card and its own photo.
+  assert.ok(block.includes('<li><figure class="svc-ph"><img src="/media/hizmet-celik.jpg" alt="Çınar Tattoo’da yapılan kaş piercing, çelik top uçlu" width="560" height="700" loading="lazy" decoding="async"></figure><i class="num">04</i><h3>Çelik piercing</h3><p>Cerrahi çelik takıyla bütçene uygun piercing. Kulak, burun, göbek; model seçimi sende.</p></li>'));
   const one = page({}, { services: [{ id: 9, name: "Onur'un <i>", description: '' }] });
   assert.ok(one.includes('<li><i class="num">01</i><h3>Onur’un &lt;i&gt;</h3></li>'));
   const none = page({}, { services: [] });

@@ -35,6 +35,7 @@ const ARTIST_PHOTO = { src: '/media/sanatci.jpg', width: 800, height: 1000, alt:
 // "kulak" goes first, so that an ear piercing gets the ear.
 const SERVICE_PHOTOS = [
   { key: 'kulak', words: ['kulak'], src: '/media/hizmet-kulak.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da delinen kulak: çiçek ve yıldız küpeler' },
+  { key: 'celik', words: ['çelik'], src: '/media/hizmet-celik.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan kaş piercing, çelik top uçlu' },
   { key: 'piercing', words: ['piercing'], src: '/media/hizmet-piercing.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan göbek piercing, sallantılı taşlı uç' },
   { key: 'gecici', words: ['geçici', 'çıkartma'], src: '/media/hizmet-gecici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan renkli güller, ön kol' },
   { key: 'kalici', words: ['dövme'], src: '/media/hizmet-kalici.jpg', width: 560, height: 700, alt: 'Çınar Tattoo’da yapılan kadın portresi ve yapraklar dövmesi' },
