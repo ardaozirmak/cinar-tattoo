@@ -2,7 +2,7 @@
 // the page still answers 200 with the default content (spec §8), and the failure is logged.
 import { assetVersion } from './_lib/assets.js';
 import { defaultContent, ensureSchema, getContent } from './_lib/db.js';
-import { htmlHeaders } from './_lib/http.js';
+import { htmlHeaders, siteRedirect } from './_lib/http.js';
 import { renderPage } from './_lib/render.js';
 
 const YEAR = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Istanbul', year: 'numeric' });
@@ -19,6 +19,8 @@ async function loadContent(db) {
 }
 
 export async function onRequestGet({ request, env }) {
+  const away = siteRedirect(request, env);
+  if (away) return away;
   const origin = new URL(request.url).origin;
   const content = await loadContent(env.DB);
   const year = Number(YEAR.format(new Date()));

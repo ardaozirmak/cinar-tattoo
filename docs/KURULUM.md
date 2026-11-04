@@ -126,7 +126,11 @@ Bu, panelde değiştirilmiş şifreyi siler ve açık bütün oturumları kapat�
 
 ## İsteğe bağlı: alan adı ve Web Analytics
 
-**Kendi alan adı (ör. `cinartattoo.com`):** Pages projesi → **Custom domains** → **Set up a custom domain** → alan adını yaz ve Cloudflare'in gösterdiği DNS adımlarını izle. Alan adı Cloudflare'de değilse, sağlayıcının panelinde verilen CNAME kaydını ekle. Sertifika kendiliğinden gelir; birkaç dakika ile birkaç saat sürebilir. Alan adı çalışınca Google Search Console'a ekle ve site haritasını gönder: `https://<alan-adın>/sitemap.xml`.
+**Kendi alan adı (ör. `cinartattoo.com`):** Pages projesi → **Custom domains** → **Set up a custom domain** → alan adını yaz ve Cloudflare'in gösterdiği DNS adımlarını izle. Alan adı Cloudflare'de değilse, sağlayıcının panelinde verilen CNAME kaydını ekle. Sertifika kendiliğinden gelir; birkaç dakika ile birkaç saat sürebilir. `www.` ile başlayan adresi de aynı yoldan ekle.
+
+Alan adı açılınca **Settings → Variables and Secrets** altına bir değişken daha ekle (Production, tür **Text**): `SITE_URL` = `https://cinartattoo.com` (kendi alan adın, sonda `/` olmadan da olur). Sonra 7. adımdaki gibi yeniden yayınla. Bundan sonra `.pages.dev` adresine ve `www.` ile gelen ziyaretçi ana adrese yönlenir; Google siteyi tek adreste görür. Panel `.pages.dev` adresinde de açılmaya devam eder ama Onur Bey'e `https://<alan-adın>/admin` adresini ver.
+
+Alan adı çalışınca Google Search Console'a ekle ve site haritasını gönder: `https://<alan-adın>/sitemap.xml`.
 
 **Cloudflare Web Analytics:** Pages projesi → **Metrics** → **Web Analytics** → **Enable**. Dikkat: Cloudflare bunun için sayfaya `static.cloudflareinsights.com`'dan bir betik ekler, sitenin güvenlik kuralı (CSP) ise dışarıdan betik yüklenmesine izin vermez. Açmak istersen önce `functions/_lib/http.js` içindeki `SITE_CSP`'de `script-src`'ye `https://static.cloudflareinsights.com`, `connect-src`'ye `https://cloudflareinsights.com` ekle ve bu kuralı denetleyen testi güncelle. Gerek olmayabilir: panelin açılış ekranındaki sayım kartı, siteden kaç kişinin WhatsApp'a, aramaya ve yol tarifine geçtiğini zaten gösteriyor.
 

@@ -115,3 +115,20 @@ export function htmlHeaders() {
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   });
 }
+
+// SITE_URL (a Pages variable, e.g. https://cinartattoo.com) names the one address the public page
+// lives at. A request for the page on any other host (the .pages.dev address, www.) is sent there
+// with a permanent redirect, so Google indexes one address only. Unset: no redirect.
+export function siteRedirect(request, env) {
+  const site = typeof env?.SITE_URL === 'string' ? env.SITE_URL.trim() : '';
+  if (!site) return null;
+  let target;
+  try {
+    target = new URL(site);
+  } catch {
+    return null;
+  }
+  const url = new URL(request.url);
+  if (url.origin === target.origin) return null;
+  return new Response(null, { status: 301, headers: { Location: `${target.origin}${url.pathname}${url.search}` } });
+}

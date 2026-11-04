@@ -226,3 +226,15 @@ test('htmlHeaders gives a fresh Headers every time, so a caller can add to its o
   assert.equal(htmlHeaders().get('X-Mine'), null);
   assert.equal(htmlHeaders().get('Content-Type'), 'text/html; charset=utf-8');
 });
+
+test('siteRedirect sends other hosts to SITE_URL and leaves the site itself alone', async () => {
+  const { siteRedirect } = await import('../functions/_lib/http.js');
+  const env = { SITE_URL: 'https://cinartattoo.com/' };
+  const away = siteRedirect(new Request('https://cinar-tattoo.pages.dev/?a=1'), env);
+  assert.equal(away.status, 301);
+  assert.equal(away.headers.get('Location'), 'https://cinartattoo.com/?a=1');
+  assert.equal(siteRedirect(new Request('https://www.cinartattoo.com/sitemap.xml'), env).headers.get('Location'), 'https://cinartattoo.com/sitemap.xml');
+  assert.equal(siteRedirect(new Request('https://cinartattoo.com/'), env), null);
+  assert.equal(siteRedirect(new Request('https://cinar-tattoo.pages.dev/'), {}), null);
+  assert.equal(siteRedirect(new Request('https://cinar-tattoo.pages.dev/'), { SITE_URL: 'bozuk' }), null);
+});
