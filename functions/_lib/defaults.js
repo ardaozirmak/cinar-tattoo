@@ -47,8 +47,9 @@ export const DEFAULT_SETTINGS = {
 export const DEFAULT_SERVICES = [
   { id: 1, name: 'Kalıcı dövme', description: 'Fikrini anlat, desenini sana özel çizelim. Bileğe küçük bir yazıdan tam kola kadar.' },
   { id: 2, name: 'Geçici dövme', description: 'Deseni önce yapıştırma dövmeyle birkaç gün taşı. İçine sinerse kalıcısını yapalım.' },
-  { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek. Hassas cilde titanyum, bütçene göre çelik takı.' },
-  { id: 4, name: 'Ağrısız kulak delme', description: 'Birkaç saniye sürer, neredeyse hiç hissetmezsin. İğne paketinden senin önünde çıkar.' },
+  { id: 3, name: 'Titanyum piercing', description: 'Kulak, burun, göbek. Hassas cilde ve ilk delime uygun, alerji yapmayan titanyum takı.' },
+  { id: 4, name: 'Çelik piercing', description: 'Cerrahi çelik takıyla bütçene uygun piercing. Kulak, burun, göbek; model seçimi sende.' },
+  { id: 5, name: 'Ağrısız kulak delme', description: 'Birkaç saniye sürer, neredeyse hiç hissetmezsin. İğne paketinden senin önünde çıkar.' },
 ];
 
 // The gallery a new site opens with, in position order: the photos the owner picked on 2026-11-03,

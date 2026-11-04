@@ -117,7 +117,7 @@ async function tableCounts(db) {
 const SEEDED_COUNTS = {
   meta: 2,
   settings: SETTINGS_ROWS,
-  services: 4,
+  services: 5,
   photos: 31,
   admin_auth: 1,
   login_attempts: 0,
@@ -145,7 +145,7 @@ test('schema v1: the tables, columns, defaults and keys of the plan', async (t) 
   await assert.rejects(db.prepare('INSERT INTO admin_auth (id) VALUES (2)').run(), /CHECK constraint failed/, 'there is one admin row');
 });
 
-test('ensureSchema seeds the site: settings, 4 services, the 31 seed photos, 13 reviews, the admin row, no prices', async (t) => {
+test('ensureSchema seeds the site: settings, 5 services, the 31 seed photos, 13 reviews, the admin row, no prices', async (t) => {
   const db = await seededDb(t);
   assert.deepEqual(await tableCounts(db), SEEDED_COUNTS);
   assert.deepEqual(await rows(db, 'SELECT key, value FROM meta ORDER BY key'), [
@@ -155,7 +155,7 @@ test('ensureSchema seeds the site: settings, 4 services, the 31 seed photos, 13 
   assert.deepEqual(await rows(db, 'SELECT id, hash, salt, iterations, session_version FROM admin_auth'), [
     { id: 1, hash: null, salt: null, iterations: null, session_version: 1 },
   ]);
-  assert.deepEqual(await rows(db, 'SELECT id FROM services ORDER BY id'), [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]);
+  assert.deepEqual(await rows(db, 'SELECT id FROM services ORDER BY id'), [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]);
   assert.deepEqual(await rows(db, 'SELECT id FROM reviews ORDER BY id'), Array.from({ length: 13 }, (_, index) => ({ id: index + 1 })));
 });
 
@@ -238,7 +238,7 @@ test('seeding is INSERT OR IGNORE: even if the seeded flag is lost, nothing the 
 // Reading the content
 // ---------------------------------------------------------------------------------------------
 
-test('getContent on a new database: the default texts, 4 services, the 31 seed photos in order, 13 reviews and no prices', async (t) => {
+test('getContent on a new database: the default texts, 5 services, the 31 seed photos in order, 13 reviews and no prices', async (t) => {
   const db = await seededDb(t);
   const content = await getContent(db);
   assert.deepEqual(content.settings, SEEDED_SETTINGS);

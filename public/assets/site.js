@@ -388,6 +388,13 @@ function heroIn() {
     .add('.facts .fact', { opacity: [0, 1], y: [20, 0], duration: 1000, delay: stagger(90) }, 750);
   animate('#heroLogo', { opacity: [0, 1], scale: [1.08, 1], duration: 2000, ease: 'outExpo' });
   animate('.hero-copy .lbl', { opacity: [0, 1], duration: 900, delay: 200, ease: 'outQuad' });
+  // the Instagram address under the name opens left to right, its glyph spins in
+  const ig = $('.mark-ig');
+  if (ig) {
+    animate(ig, { clipPath: ['inset(0 100% 0 0)', 'inset(0 0% 0 0)'], duration: 1300, delay: 550, ease: 'inOutQuart', onComplete: () => (ig.style.clipPath = 'none') });
+    const icon = $('.ig-ico', ig);
+    if (icon) animate(icon, { scale: [0, 1], rotate: [-140, 0], duration: 1000, delay: 550, ease: 'outBack' });
+  }
   // the services slide in from the left edge, the address from the right one
   const left = $('.hi-what');
   const right = $('.hi-where');
@@ -415,22 +422,32 @@ function playIntro() {
     write('sessionStorage', 'cinar-intro', '1');
     heroIn();
   };
+  const FADE = $('#introIg') ? 2750 : 2350; // the opening holds a little longer when it has the address to show
   const timeline = createTimeline({ defaults: { ease: 'outExpo' }, onComplete: done })
     .add('#introLine', { scaleX: [0, 1], duration: 900, ease: 'inOutQuart' }, 0)
     .add('#introName .ch', { y: ['105%', '0%'], duration: 950, delay: stagger(28) }, 450) // 26 letters, all home by ~2.1 s
     .add('#introYear', { opacity: [0, 1], duration: 500 }, 700)
     .add(counter, { v: [2005, to], duration: 1500, ease: 'inOutQuad', onUpdate: () => year && (year.textContent = String(Math.round(counter.v))) }, 700)
-    .add(['#introName', '#introYear', '#introSkip'], { opacity: [1, 0], duration: 450, ease: 'inQuad' }, 2350)
-    .add('#introLine', { scaleX: [1, 0], duration: 600, ease: 'inOutQuart', transformOrigin: 'right' }, 2350)
-    .add('.intro-half.t', { y: ['0%', '-101%'], duration: 1000, ease: 'inOutQuart', onBegin: heroIn }, 2700)
-    .add('.intro-half.b', { y: ['0%', '101%'], duration: 1000, ease: 'inOutQuart' }, 2700);
+    .add(['#introName', '#introYear', '#introSkip'], { opacity: [1, 0], duration: 450, ease: 'inQuad' }, FADE)
+    .add('#introLine', { scaleX: [1, 0], duration: 600, ease: 'inOutQuart', transformOrigin: 'right' }, FADE)
+    .add('.intro-half.t', { y: ['0%', '-101%'], duration: 1000, ease: 'inOutQuart', onBegin: heroIn }, FADE + 350)
+    .add('.intro-half.b', { y: ['0%', '101%'], duration: 1000, ease: 'inOutQuart' }, FADE + 350);
+  // under the services the Instagram address: its glyph spins in, the letters rise one by one
+  const ig = $('#introIg');
+  if (ig) {
+    timeline
+      .add(ig, { opacity: [0, 1], duration: 300, ease: 'linear' }, 1250)
+      .add($('.ig-ico', ig), { scale: [0, 1], rotate: [-140, 0], duration: 800, ease: 'outBack' }, 1250)
+      .add($$('.ch', ig), { y: ['105%', '0%'], duration: 700, delay: stagger(24) }, 1350)
+      .add(ig, { opacity: [1, 0], duration: 450, ease: 'inQuad' }, FADE);
+  }
   // the service names flash past under the line, one every 300 ms; the last one stays until the fade
   const names = [...document.querySelectorAll('#introSvc span')];
   names.forEach((name, index) => {
     const at = 900 + index * 300;
     timeline.add(name, { opacity: [0, 1], y: ['100%', '0%'], duration: 280, ease: 'outQuart' }, at);
     if (index < names.length - 1) timeline.add(name, { opacity: [1, 0], y: ['0%', '-100%'], duration: 200, ease: 'inQuad' }, at + 250);
-    else timeline.add(name, { opacity: [1, 0], duration: 450, ease: 'inQuad' }, 2350);
+    else timeline.add(name, { opacity: [1, 0], duration: 450, ease: 'inQuad' }, FADE);
   });
   $('#introSkip')?.addEventListener('click', () => {
     timeline.pause();

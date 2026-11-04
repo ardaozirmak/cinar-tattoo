@@ -76,12 +76,13 @@ test('every default passes the rule of its own field', () => {
   assert.deepEqual(result.values, DEFAULT_SETTINGS); // nothing about a default changes when it is saved as it is
 });
 
-test('DEFAULT_SERVICES: ids 1 to 4, in order', () => {
+test('DEFAULT_SERVICES: ids 1 to 5, in order', () => {
   assert.deepEqual(DEFAULT_SERVICES, [
     { id: 1, name: 'Kalıcı dövme', description: 'Fikrini anlat, desenini sana özel çizelim. Bileğe küçük bir yazıdan tam kola kadar.' },
     { id: 2, name: 'Geçici dövme', description: 'Deseni önce yapıştırma dövmeyle birkaç gün taşı. İçine sinerse kalıcısını yapalım.' },
-    { id: 3, name: 'Titanyum & çelik piercing', description: 'Kulak, burun, göbek. Hassas cilde titanyum, bütçene göre çelik takı.' },
-    { id: 4, name: 'Ağrısız kulak delme', description: 'Birkaç saniye sürer, neredeyse hiç hissetmezsin. İğne paketinden senin önünde çıkar.' },
+    { id: 3, name: 'Titanyum piercing', description: 'Kulak, burun, göbek. Hassas cilde ve ilk delime uygun, alerji yapmayan titanyum takı.' },
+    { id: 4, name: 'Çelik piercing', description: 'Cerrahi çelik takıyla bütçene uygun piercing. Kulak, burun, göbek; model seçimi sende.' },
+    { id: 5, name: 'Ağrısız kulak delme', description: 'Birkaç saniye sürer, neredeyse hiç hissetmezsin. İğne paketinden senin önünde çıkar.' },
   ]);
   const result = validateServices(DEFAULT_SERVICES.map(({ name, description }) => ({ name, description })));
   assert.equal(result.ok, true, result.message);

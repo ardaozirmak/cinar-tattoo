@@ -98,7 +98,7 @@ export function renderPage({ content, origin, assetVersion, year }) {
 <html lang="tr"${ctx.waDigits ? ` data-wa="${ctx.waDigits}"` : ''}>
 ${head(ctx, assetVersion)}
 <body id="top"${hasNotice(ctx) ? ' class="has-duyuru"' : ''}>
-${intro(year, content.services)}
+${intro(year, content.services, ctx.handle)}
 ${bar(ctx, built)}
 ${sheet(ctx, built)}
 <main>
@@ -228,20 +228,24 @@ function structuredData(ctx) {
 // ---------------------------------------------------------------------------------------------
 
 // The opening: "Çınar Tattoo" and under it "ESENLER · 2005", big, over the line; under the line the service
-// names flash past one by one.
+// names flash past one by one, and under them the Instagram address types itself in.
 const INTRO_PLACE = 'ESENLER · 2005';
 
-function intro(year, services = []) {
+// Instagram's glyph, drawn in the text colour (the palette stays as it is).
+const IG_ICON = '<svg class="ig-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg>';
+
+function intro(year, services = [], handle = null) {
   const letters = (word) => [...word].map((ch) => `<span class="ch">${ch === ' ' ? '&nbsp;' : escapeHtml(ch)}</span>`).join('');
   const name = `<span class="in-row in-brand">${letters(BRAND_NAME)}</span><span class="in-row in-place">${letters(INTRO_PLACE)}</span>`;
   const names = services.map((service) => String(service.name ?? '').trim()).filter(Boolean);
   const ticker = names.length
     ? `\n  <p class="intro-svc" id="introSvc">${names.map((name) => `<span>${text(name)}</span>`).join('')}</p>`
     : '';
+  const ig = handle === null ? '' : `\n  <p class="intro-ig" id="introIg">${IG_ICON}<span class="in-ig-t">${letters(handle)}</span></p>`;
   return `<div class="intro" id="intro" aria-hidden="true">
   <div class="intro-half t"></div><div class="intro-half b"></div>
   <div class="intro-name" id="introName">${name}</div>
-  <div class="intro-line" id="introLine"></div>${ticker}
+  <div class="intro-line" id="introLine"></div>${ticker}${ig}
   <p class="intro-year num" id="introYear" data-to="${escapeHtml(year)}">${FOUNDED}</p>
   <button class="intro-skip" id="introSkip" type="button">Atla</button>
 </div>`;
@@ -259,9 +263,14 @@ function bar(ctx, sections) {
   const notice = hasNotice(ctx)
       ? `\n  <div class="duyuru" role="note"><p>${text(String(settings.announcement_text).trim())}</p><button type="button" class="duyuru-kapat" aria-label="Duyuruyu kapat">✕</button></div>`
       : '';
+  // Under the name: the Instagram address, so it is the first thing seen after the opening.
+  const igMark = instaLink(ctx, 'mark-ig', `${IG_ICON}<span class="mark-ig-t">${escapeHtml(ctx.handle ?? 'Instagram')}</span>`);
+  const igMarkHtml = igMark === '' ? '' : `\n      ${igMark}`;
   return `<header class="bar" id="bar">
   <div class="bar-in">
-    <a class="mark" href="#top" aria-label="Çınar Tattoo, başa dön"><b>Çınar Tattoo</b><span>ESENLER · 2005</span></a>
+    <div class="brand">
+      <a class="mark" href="#top" aria-label="Çınar Tattoo, başa dön"><b>Çınar Tattoo</b><span>ESENLER · 2005</span></a>${igMarkHtml}
+    </div>
     <nav class="menu" aria-label="Ana menü">${menu}</nav>
     ${waLink(ctx, 'btn', `WhatsApp${arrow}`)}
     <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="sheet">Menü</button>
