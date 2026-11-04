@@ -315,7 +315,8 @@ test('GET stats adds up the clicks of today in Istanbul and the 29 days before i
 
   t.mock.timers.tick(24 * 60 * 60 * 1000); // a day later, 17 Nov in Istanbul: the 18th of October drops out
   await addClicks(env, '2026-11-17', 'directions', 5);
-  assert.deepEqual((await (await api(env, 'GET', 'stats', { cookie })).json()).totals, { whatsapp: 0, call: 5, directions: 5, form: 1, instagram: 7 });
+  const later = await loginCookie(env); // a session lasts 12 hours, so a day later is a new login
+  assert.deepEqual((await (await api(env, 'GET', 'stats', { cookie: later })).json()).totals, { whatsapp: 0, call: 5, directions: 5, form: 1, instagram: 7 });
 });
 
 // ---------------------------------------------------------------------------------------------

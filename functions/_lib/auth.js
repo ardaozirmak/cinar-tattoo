@@ -16,7 +16,9 @@ export const SESSION_COOKIE = 'cinar_admin';
 // do most of the protecting.
 export const PBKDF2_ITERATIONS = 10000;
 
-const SESSION_SECONDS = 30 * 24 * 60 * 60; // a session lasts 30 days
+// A session lasts at most 12 hours. The cookie itself has no Max-Age, so it also ends when the
+// browser closes; the panel asks for the password again on every fresh open (public/admin/js/main.js).
+const SESSION_SECONDS = 12 * 60 * 60;
 const MIN_SECRET_LENGTH = 32;
 const SALT_BYTES = 16;
 
@@ -93,7 +95,7 @@ const pepperOf = (secret) => hmac(secret, 'pepper');
 // The session token and its cookie
 // ---------------------------------------------------------------------------------------------
 
-/** A session token for `sessionVersion`, valid for 30 days from `now` (milliseconds). */
+/** A session token for `sessionVersion`, valid for 12 hours from `now` (milliseconds). */
 export async function createSessionToken(secret, sessionVersion, now) {
   const payload = `v1.${Math.floor(now / 1000) + SESSION_SECONDS}.${sessionVersion}`;
   return `${payload}.${await signatureOf(secret, payload)}`;
@@ -117,7 +119,7 @@ const signatureOf = async (secret, payload) => toBase64Url(await hmac(await hmac
 
 /** The Set-Cookie value that starts a session. */
 export function sessionCookie(token, { secure = true } = {}) {
-  return cookie(token, SESSION_SECONDS, secure);
+  return cookie(token, null, secure); // a browser-session cookie: no Max-Age
 }
 
 /** The Set-Cookie value that ends the session in this browser. */
@@ -128,7 +130,8 @@ export function clearSessionCookie({ secure = true } = {}) {
 // Sent only to the API (Path), never readable by scripts (HttpOnly), never on a request another
 // site starts (SameSite=Strict), and only over https (Secure) unless cookieSecure says otherwise.
 function cookie(value, maxAge, secure) {
-  return `${SESSION_COOKIE}=${value}; Path=/api/admin; Max-Age=${maxAge}; HttpOnly; SameSite=Strict${secure ? '; Secure' : ''}`;
+  const age = maxAge === null ? '' : `; Max-Age=${maxAge}`;
+  return `${SESSION_COOKIE}=${value}; Path=/api/admin${age}; HttpOnly; SameSite=Strict${secure ? '; Secure' : ''}`;
 }
 
 /**

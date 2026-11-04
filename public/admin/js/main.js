@@ -40,7 +40,28 @@ onUnauthorized(() => showLogin(appShown ? SESSION_ENDED : ''));
 // Start and login
 // ---------------------------------------------------------------------------------------------
 
+// The owner wants the password on every visit: only a refresh of the same page keeps the session.
+// Opening /admin anew (a new tab, the home-screen icon, a link, coming back from the site) ends
+// whatever session this browser still had, and the login view comes up.
+function isRefresh() {
+  const entry = performance.getEntriesByType?.('navigation')?.[0];
+  return entry?.type === 'reload';
+}
+
+async function endSessionAndAsk() {
+  try {
+    await api('logout', { method: 'POST' });
+  } catch {
+    // No connection: the login view still comes up, and the server ends the session by itself.
+  }
+  showLogin('');
+}
+
 async function start() {
+  if (!isRefresh()) {
+    await endSessionAndAsk();
+    return;
+  }
   try {
     await openApp();
   } catch (error) {
@@ -157,6 +178,11 @@ window.addEventListener('beforeunload', (event) => {
   if (!appShown || !texts.anyDirty()) return;
   event.preventDefault();
   event.returnValue = ''; // what older Chromium browsers (Samsung Internet among them) wait for
+});
+
+// Coming back with the browser's back button can show the page from memory without loading it.
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) endSessionAndAsk();
 });
 
 start();

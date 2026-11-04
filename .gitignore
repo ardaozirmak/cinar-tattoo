@@ -3,3 +3,7 @@
 .dev.vars
 node_modules/
 onizleme/
+
+# yerel calisma notlari (repoya girmez)
+docs/ILERLEME.md
+docs/superpowers/

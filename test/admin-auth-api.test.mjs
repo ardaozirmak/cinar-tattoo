@@ -97,7 +97,7 @@ test('login: a wrong password is 401 "Şifre yanlış."; the right one is 200 wi
   const cookie = setCookieOf(right);
   assert.equal(cookie.name, 'cinar_admin');
   assert.match(cookie.value, /^v1\.\d+\.1\.[A-Za-z0-9_-]{43}$/);
-  assert.deepEqual(cookie.attributes, { path: '/api/admin', 'max-age': '2592000', httponly: true, samesite: 'Strict', secure: true });
+  assert.deepEqual(cookie.attributes, { path: '/api/admin', httponly: true, samesite: 'Strict', secure: true });
 });
 
 test('login over plain http: no Secure with DEV_INSECURE_COOKIES=1 (the emulator), Secure without it (the live site)', async (t) => {
@@ -449,7 +449,7 @@ test('an unexpected error is logged and answered 500 with a message the owner ca
 // Sessions
 // ---------------------------------------------------------------------------------------------
 
-test('a changed, expired or foreign session token is 401; one that is 29 days old still works', async (t) => {
+test('a changed, expired or foreign session token is 401; one that is 11 hours old still works', async (t) => {
   const env = freshEnv(t);
   const token = (await loginCookie(env)).slice('cinar_admin='.length);
   const [, exp, version, mac] = token.split('.');
@@ -458,14 +458,14 @@ test('a changed, expired or foreign session token is 401; one that is 29 days ol
     'a changed signature': `v1.${exp}.${version}.${mac.slice(0, 20)}${mac[20] === 'A' ? 'B' : 'A'}${mac.slice(21)}`,
     'a longer life': `v1.${Number(exp) + 30 * 86400}.${version}.${mac}`,
     'another session version': `v1.${exp}.2.${mac}`,
-    'expired a second ago': await createSessionToken(env.APP_SECRET, 1, now - 30 * DAY - 1000),
+    'expired a second ago': await createSessionToken(env.APP_SECRET, 1, now - DAY / 2 - 1000),
     'signed with another APP_SECRET': await createSessionToken('z'.repeat(40), 1, now),
     'not a token': 'abc',
   };
   for (const [label, value] of Object.entries(bad)) {
     await assertError(await api(env, 'GET', 'state', { cookie: `cinar_admin=${value}` }), 401, SIGNED_OUT, label);
   }
-  const old = await createSessionToken(env.APP_SECRET, 1, now - 29 * DAY);
+  const old = await createSessionToken(env.APP_SECRET, 1, now - 11 * DAY / 24);
   assert.equal((await api(env, 'GET', 'state', { cookie: `cinar_admin=${old}` })).status, 200);
 });
 
@@ -482,7 +482,7 @@ test('password change: the old cookie becomes 401, the new cookie works, ADMIN_P
   const fresh = setCookieOf(response);
   assert.equal(fresh.name, 'cinar_admin');
   assert.match(fresh.value, /^v1\.\d+\.2\.[A-Za-z0-9_-]{43}$/, 'it carries the new session version');
-  assert.deepEqual(fresh.attributes, { path: '/api/admin', 'max-age': '2592000', httponly: true, samesite: 'Strict', secure: true });
+  assert.deepEqual(fresh.attributes, { path: '/api/admin', httponly: true, samesite: 'Strict', secure: true });
 
   await assertError(await api(env, 'GET', 'state', { cookie: oldCookie }), 401, SIGNED_OUT, 'the old cookie');
   assert.equal((await api(env, 'GET', 'state', { cookie: cookieHeaderOf(response) })).status, 200, 'the new cookie');

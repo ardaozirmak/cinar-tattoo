@@ -172,6 +172,7 @@ function head(ctx, assetVersion) {
 <title>${title}</title>
 <meta name="description" content="${description}">
 <link rel="canonical" href="${url}">
+<meta name="google-site-verification" content="bhIO55ry1z20ZDjaXzZaaiPPsfQYL4Fpa_nvUbUzs1I">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${escapeHtml(BRAND_NAME)}">
 <meta property="og:title" content="${title}">

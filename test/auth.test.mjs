@@ -19,7 +19,7 @@ import { ensureSchema, setPassword } from '../functions/_lib/db.js';
 
 const SECRET = 'k'.repeat(40);
 const SITE = 'https://cinar.test';
-// A whole second, so that "30 days later" is an exact number of milliseconds.
+// A whole second, so that "12 hours later" is an exact number of milliseconds.
 const NOW = Date.UTC(2026, 10, 3, 12, 0, 0);
 const DAY = 24 * 60 * 60 * 1000;
 const SALT = 'AAECAwQFBgcICQoLDA0ODw=='; // the bytes 0 to 15
@@ -113,16 +113,16 @@ test('verifyPassword lets nobody in when there is no password to compare with, o
 // Session tokens
 // ---------------------------------------------------------------------------------------------
 
-test('a session token is v1.<expiry: 30 days on, in seconds>.<session version>.<base64url HMAC keyed with HMAC(APP_SECRET, "session")>', async () => {
-  assert.equal(await createSessionToken(SECRET, 7, NOW), referenceToken(SECRET, NOW / 1000 + 2592000, 7));
-  assert.equal(await createSessionToken(SECRET, 1793750400, NOW + 999), referenceToken(SECRET, NOW / 1000 + 2592000, 1793750400), 'whole seconds');
+test('a session token is v1.<expiry: 12 hours on, in seconds>.<session version>.<base64url HMAC keyed with HMAC(APP_SECRET, "session")>', async () => {
+  assert.equal(await createSessionToken(SECRET, 7, NOW), referenceToken(SECRET, NOW / 1000 + 43200, 7));
+  assert.equal(await createSessionToken(SECRET, 1793750400, NOW + 999), referenceToken(SECRET, NOW / 1000 + 43200, 1793750400), 'whole seconds');
 });
 
-test('verifySessionToken: good for 30 days, only for the session version it was made for and only under its APP_SECRET', async () => {
+test('verifySessionToken: good for 12 hours, only for the session version it was made for and only under its APP_SECRET', async () => {
   const token = await createSessionToken(SECRET, 3, NOW);
   assert.equal(await verifySessionToken(SECRET, token, 3, NOW), true);
-  assert.equal(await verifySessionToken(SECRET, token, 3, NOW + 30 * DAY - 1), true, 'the last moment');
-  assert.equal(await verifySessionToken(SECRET, token, 3, NOW + 30 * DAY), false, 'expired');
+  assert.equal(await verifySessionToken(SECRET, token, 3, NOW + DAY / 2 - 1), true, 'the last moment');
+  assert.equal(await verifySessionToken(SECRET, token, 3, NOW + DAY / 2), false, 'expired');
   assert.equal(await verifySessionToken(SECRET, token, 4, NOW), false, 'the password was changed since');
   assert.equal(await verifySessionToken(SECRET, token, 2, NOW), false);
   assert.equal(await verifySessionToken('z'.repeat(40), token, 3, NOW), false, 'another APP_SECRET');
